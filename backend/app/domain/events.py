@@ -142,8 +142,11 @@ class MatchStats(BaseModel):
 class AnalysisResult(BaseModel):
     id: str
     created_at: str
-    source: str  # video filename or "demo"
-    mode: str  # "demo" | "full"
+    source: str  # video filename, "demo", or the YouTube video title
+    mode: str  # "demo" | "full" | "youtube"
+    # YouTube review provenance (null for uploads/demo).
+    source_url: Optional[str] = None
+    source_title: Optional[str] = None
     fps: float
     players: dict[int, str] = Field(default_factory=dict)
     rallies: list[Rally] = Field(default_factory=list)

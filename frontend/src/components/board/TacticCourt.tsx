@@ -132,7 +132,7 @@ export default function TacticCourt({
         </marker>
       </defs>
 
-      <CourtBase />
+      <CourtBase theme={tactic.theme} />
 
       {/* shot paths of this frame */}
       {frame.paths.map((p, i) => (

@@ -59,6 +59,11 @@ needed). A student opening the `/t/…` link sees the frame-by-frame animation:
 players glide between keyframes, shots play in sequence, with step/speed/seek
 controls. The coach's draft autosaves to browser localStorage.
 
+Grand Slam court themes (classic, Australian, French, Wimbledon, US Open) re-skin
+the board; the chosen theme travels with the share link and viewers can switch it
+locally for preview. Players can be added to either side independently (up to 4),
+so the same board works for singles and doubles drills.
+
 ### Pro workflow integrations (all frontend-only)
 
 Inspired by how pro teams actually prepare (match charting → video/pattern review

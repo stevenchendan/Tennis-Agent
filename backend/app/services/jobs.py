@@ -27,6 +27,8 @@ class JobStatus(str, Enum):
 
 
 STAGES = ["ingest", "detect", "map", "events", "tactics", "report"]
+# YouTube mode prepends a download stage before the regular pipeline.
+YOUTUBE_STAGES = ["download", *STAGES]
 
 
 class StageStatus(str, Enum):
@@ -50,10 +52,12 @@ class Stage:
 @dataclass
 class AnalysisJob:
     id: str
-    mode: str  # "demo" | "full"
+    mode: str  # "demo" | "full" | "youtube"
     video_id: Optional[str] = None
     status: JobStatus = JobStatus.QUEUED
     stages: list[Stage] = field(default_factory=lambda: [Stage(n) for n in STAGES])
+    # Which analysis engine ran/will run: "cv" | "llm_vision" (youtube mode).
+    engine: Optional[str] = None
     error: Optional[str] = None
     created_at: float = field(default_factory=time.time)
     finished_at: Optional[float] = None
@@ -67,6 +71,7 @@ class AnalysisJob:
             "id": self.id,
             "mode": self.mode,
             "video_id": self.video_id,
+            "engine": self.engine,
             "status": self.status.value,
             "stages": [s.as_dict() for s in self.stages],
             "error": self.error,
@@ -80,8 +85,15 @@ class JobStore:
         self._jobs: dict[str, AnalysisJob] = {}
         self._lock = threading.Lock()
 
-    def create(self, mode: str, video_id: Optional[str] = None) -> AnalysisJob:
-        job = AnalysisJob(id=uuid.uuid4().hex[:12], mode=mode, video_id=video_id)
+    def create(
+        self, mode: str, video_id: Optional[str] = None, stages: Optional[list[str]] = None
+    ) -> AnalysisJob:
+        job = AnalysisJob(
+            id=uuid.uuid4().hex[:12],
+            mode=mode,
+            video_id=video_id,
+            stages=[Stage(n) for n in (stages or STAGES)],
+        )
         with self._lock:
             self._jobs[job.id] = job
         return job

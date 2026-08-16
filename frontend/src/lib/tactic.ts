@@ -1,5 +1,5 @@
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from "lz-string";
-import { CX, LEN, NET, W } from "@/lib/court";
+import { COURT_THEMES, CX, LEN, W } from "@/lib/court";
 
 export interface Point {
   x: number;
@@ -27,6 +27,8 @@ export interface Frame {
 export interface Tactic {
   v: 1;
   title: string;
+  /** court skin key (see COURT_THEMES); absent = classic */
+  theme?: string;
   frames: Frame[];
 }
 
@@ -109,7 +111,7 @@ function toPoint(v: unknown): Point | null {
  */
 export function sanitizeTactic(raw: unknown): Tactic | null {
   if (typeof raw !== "object" || raw === null) return null;
-  const { title, frames } = raw as Record<string, unknown>;
+  const { title, theme, frames } = raw as Record<string, unknown>;
   if (!Array.isArray(frames) || frames.length === 0) return null;
 
   const outFrames: Frame[] = [];
@@ -150,7 +152,11 @@ export function sanitizeTactic(raw: unknown): Tactic | null {
     typeof title === "string" && title.trim() !== ""
       ? title.trim().slice(0, MAX_TITLE_LEN)
       : "";
-  return { v: 1, title: cleanTitle, frames: outFrames };
+  const cleanTheme =
+    typeof theme === "string" && COURT_THEMES[theme] ? theme : undefined;
+  return cleanTheme
+    ? { v: 1, title: cleanTitle, theme: cleanTheme, frames: outFrames }
+    : { v: 1, title: cleanTitle, frames: outFrames };
 }
 
 /** Compress a tactic into a URL-path-safe string (lz-string URI alphabet, `+` → `_`). */
@@ -182,14 +188,13 @@ export function tacticShareUrl(t: Tactic): string {
   return `${window.location.origin}/t/${encodeTactic(t)}`;
 }
 
-/** Default spawn point for a new player: partner on the side with fewer players. */
-export function spawnPlayerPos(players: PlayerPos[]): PlayerPos {
+/** Default spawn point for a new player on the requested side (doubles-friendly). */
+export function spawnPlayerPos(players: PlayerPos[], side: "near" | "far"): PlayerPos {
   const ids = new Set(players.map((p) => p.id));
   const id = [1, 2, 3, 4].find((i) => !ids.has(i)) ?? 5;
-  const nearCount = players.filter((p) => p.y < NET).length;
-  const farCount = players.length - nearCount;
-  const near = nearCount <= farCount;
-  const offset = 1.6 + 0.4 * (near ? nearCount : farCount);
+  const near = side === "near";
+  const sameSideCount = players.filter((p) => (near ? p.y < LEN / 2 : p.y >= LEN / 2)).length;
+  const offset = 1.6 + 0.5 * sameSideCount;
   return {
     id,
     x: round2(clamp(CX + (near ? offset : -offset), 0.4, W - 0.4)),

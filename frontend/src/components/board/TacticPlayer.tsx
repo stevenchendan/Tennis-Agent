@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import TacticCourt from "@/components/board/TacticCourt";
+import { COURT_THEMES } from "@/lib/court";
 import type { PlayerPos, Point, Tactic } from "@/lib/tactic";
 
 const FRAME_MS = 1500;
@@ -17,8 +18,15 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
   const [playing, setPlaying] = useState(true);
   const [speedIx, setSpeedIx] = useState(1);
   const [elapsed, setElapsed] = useState(0);
+  // local theme override (viewer-side only, does not change the shared link)
+  const [themeOverride, setThemeOverride] = useState<string | null>(null);
   const elapsedRef = useRef(0);
   const rafRef = useRef(0);
+
+  const courtTactic = useMemo(
+    () => ({ ...tactic, theme: themeOverride ?? tactic.theme }),
+    [tactic, themeOverride],
+  );
 
   useEffect(() => {
     if (!playing) return;
@@ -87,7 +95,7 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-2xl border border-neutral-900 bg-neutral-950 p-3">
-        <TacticCourt tactic={tactic} frameIndex={frameIndex} playersOverride={players} ballAt={ball} height={560} />
+        <TacticCourt tactic={courtTactic} frameIndex={frameIndex} playersOverride={players} ballAt={ball} height={560} />
       </div>
 
       {/* progress bar with frame ticks, click/drag to seek */}
@@ -153,6 +161,18 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
         >
           {SPEEDS[speedIx]}x
         </button>
+        <select
+          value={themeOverride ?? tactic.theme ?? "classic"}
+          onChange={(e) => setThemeOverride(e.target.value)}
+          title="球场主题（仅本地预览）"
+          className="rounded-lg border border-neutral-800 bg-neutral-900 px-2.5 py-2 text-sm text-neutral-300 outline-none"
+        >
+          {Object.values(COURT_THEMES).map((t) => (
+            <option key={t.key} value={t.key}>
+              {t.name}
+            </option>
+          ))}
+        </select>
         <span className="ml-1 text-sm text-neutral-500">
           第 {frameIndex + 1} / {n} 帧
         </span>

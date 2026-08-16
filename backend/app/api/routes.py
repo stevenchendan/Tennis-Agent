@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import re
 import uuid
+from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile
@@ -12,8 +13,8 @@ from pydantic import BaseModel
 
 from app.core.config import Settings, get_settings
 from app.domain.events import AnalysisResult
-from app.services import pipeline, storage
-from app.services.jobs import JobStatus, job_store
+from app.services import pipeline, storage, youtube
+from app.services.jobs import JobStatus, YOUTUBE_STAGES, job_store
 from app.tour import db as tour_db
 from app.tour import scouting as tour_scouting
 
@@ -49,6 +50,7 @@ def health(settings: Settings = Depends(get_settings)) -> dict:
         "version": settings.version,
         "llm_enabled": settings.llm_enabled,
         "full_mode_ready": bool(settings.ball_model_path),
+        "youtube_ready": youtube.is_available(),
     }
 
 
@@ -90,7 +92,8 @@ def list_videos(settings: Settings = Depends(get_settings)) -> list[dict]:
 
 class CreateAnalysis(BaseModel):
     video_id: Optional[str] = None
-    mode: str = "demo"  # "demo" | "full"
+    mode: str = "demo"  # "demo" | "full" | "youtube"
+    youtube_url: Optional[str] = None  # required for mode="youtube"
 
 
 def _get_result_or_404(analysis_id: str, settings: Settings) -> AnalysisResult:
@@ -100,13 +103,15 @@ def _get_result_or_404(analysis_id: str, settings: Settings) -> AnalysisResult:
     return result
 
 
-def _run_job(settings: Settings, job_id: str, video_path=None) -> None:
+def _run_job(settings: Settings, job_id: str, video_path=None, youtube_url: str | None = None) -> None:
     job = job_store.get(job_id)
     if job is None:
         return
     try:
         if job.mode == "demo":
             result = pipeline.run_demo_analysis(settings, job)
+        elif job.mode == "youtube":
+            result = pipeline.run_youtube_analysis(settings, job, youtube_url or "")
         else:
             result = pipeline.run_full_analysis(settings, job, video_path)
         job_store.attach_result(job_id, result)
@@ -135,17 +140,57 @@ def create_analysis(
         if not matches:
             raise HTTPException(404, "video not found")
         video_path = matches[0]
+    elif body.mode == "youtube":
+        if not youtube.is_available():
+            raise HTTPException(400, "youtube mode needs yt-dlp: pip install yt-dlp (see README)")
+        if not body.youtube_url or not youtube.parse_youtube_url(body.youtube_url):
+            raise HTTPException(
+                400, "youtube_url must be a YouTube link (watch / youtu.be / shorts)"
+            )
+        if not settings.ball_model_path and not settings.llm_enabled:
+            raise HTTPException(
+                400,
+                "youtube mode needs an analysis engine: set TENNIS_BALL_MODEL_PATH "
+                "(full detection pipeline) or TENNIS_OPENAI_API_KEY (AI vision review)",
+            )
     elif body.mode != "demo":
-        raise HTTPException(400, "mode must be 'demo' or 'full'")
+        raise HTTPException(400, "mode must be 'demo', 'full' or 'youtube'")
 
-    job = job_store.create(mode=body.mode, video_id=body.video_id)
-    background.add_task(_run_job, settings, job.id, video_path)
+    job = job_store.create(
+        mode=body.mode,
+        video_id=body.video_id,
+        stages=YOUTUBE_STAGES if body.mode == "youtube" else None,
+    )
+    background.add_task(_run_job, settings, job.id, video_path, body.youtube_url)
     return {"analysis_id": job.id, "status": job.status.value}
+
+
+def _created_at_ts(v) -> float:
+    """created_at arrives as a unix float (jobs) or ISO string (persisted)."""
+    if isinstance(v, (int, float)):
+        return float(v)
+    try:
+        return datetime.fromisoformat(v).timestamp()
+    except ValueError:
+        return 0.0
 
 
 @router.get("/analyses")
 def list_analyses(settings: Settings = Depends(get_settings)) -> list[dict]:
-    out = []
+    # Persisted results keep the history alive across restarts; in-memory
+    # jobs add live state (running/failed) and override their own entries.
+    out: dict[str, dict] = {}
+    for result in storage.list_analyses(settings):
+        out[result.id] = {
+            "id": result.id,
+            "mode": result.mode,
+            "status": JobStatus.DONE.value,
+            "created_at": result.created_at,
+            "points": result.stats.points,
+            "patterns": len(result.patterns),
+            "title": result.source,
+            "source_url": result.source_url,
+        }
     for job in job_store.list():
         summary = {
             "id": job.id,
@@ -159,10 +204,12 @@ def list_analyses(settings: Settings = Depends(get_settings)) -> list[dict]:
                     "points": job.result.stats.points,
                     "patterns": len(job.result.patterns),
                     "title": job.result.source,
+                    "source_url": job.result.source_url,
                 }
             )
-        out.append(summary)
-    return out
+        out[job.id] = summary
+    entries = sorted(out.values(), key=lambda e: -_created_at_ts(e["created_at"]))
+    return entries
 
 
 @router.get("/analyses/{analysis_id}")

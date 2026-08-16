@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import TacticCourt, { type BoardMode } from "@/components/board/TacticCourt";
 import TacticPlayer from "@/components/board/TacticPlayer";
 import TemplatePicker from "@/components/board/TemplatePicker";
+import { COURT_THEMES } from "@/lib/court";
 import {
   decodeTactic,
   defaultTactic,
@@ -118,9 +119,9 @@ export default function BoardEditor() {
     }
     updateFrame(i, (f) => ({ ...f, players: f.players.filter((p) => p.id !== playerId) }));
   }
-  function addPlayer() {
+  function addPlayer(side: "near" | "far") {
     if (frame.players.length >= MAX_PLAYERS) return;
-    updateFrame(idx, (f) => ({ ...f, players: [...f.players, spawnPlayerPos(f.players)] }));
+    updateFrame(idx, (f) => ({ ...f, players: [...f.players, spawnPlayerPos(f.players, side)] }));
   }
 
   function addFrame(copyAll: boolean) {
@@ -241,13 +242,45 @@ export default function BoardEditor() {
             ))}
           </div>
           <button
-            onClick={addPlayer}
+            onClick={() => addPlayer("near")}
             disabled={frame.players.length >= MAX_PLAYERS}
             className="rounded-xl border border-neutral-800 bg-neutral-900/60 px-3 py-2 text-xs text-neutral-300 transition hover:border-neutral-600 disabled:opacity-40"
           >
-            + 球员（{frame.players.length}/{MAX_PLAYERS}）
+            + 近端球员
+          </button>
+          <button
+            onClick={() => addPlayer("far")}
+            disabled={frame.players.length >= MAX_PLAYERS}
+            className="rounded-xl border border-neutral-800 bg-neutral-900/60 px-3 py-2 text-xs text-neutral-300 transition hover:border-neutral-600 disabled:opacity-40"
+          >
+            + 远端球员（{frame.players.length}/{MAX_PLAYERS}）
           </button>
           <span className="text-xs text-neutral-600">{activeMode.hint}</span>
+        </div>
+
+        {/* court theme picker (stored in the tactic, travels with the share link) */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-neutral-500">球场主题</span>
+          {Object.values(COURT_THEMES).map((t) => {
+            const active = (tactic.theme ?? "classic") === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setTactic((prev) => ({ ...prev, theme: t.key }))}
+                className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs transition ${
+                  active
+                    ? "border-emerald-500 bg-emerald-500/10 text-emerald-300"
+                    : "border-neutral-800 text-neutral-400 hover:border-neutral-600"
+                }`}
+              >
+                <span
+                  className="inline-block h-3 w-3 rounded-full border border-black/40"
+                  style={{ background: `linear-gradient(135deg, ${t.inner} 50%, ${t.outer} 50%)` }}
+                />
+                {t.name}
+              </button>
+            );
+          })}
         </div>
 
         {/* court */}

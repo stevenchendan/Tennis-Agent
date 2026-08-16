@@ -59,6 +59,25 @@ needed). A student opening the `/t/…` link sees the frame-by-frame animation:
 players glide between keyframes, shots play in sequence, with step/speed/seek
 controls. The coach's draft autosaves to browser localStorage.
 
+### Pro workflow integrations (all frontend-only)
+
+Inspired by how pro teams actually prepare (match charting → video/pattern review
+→ game plan → drill), the analysis dashboard connects mined data to the board:
+
+- **Rally → animated tactic**: in the point-by-point replay, one click converts a
+  tracked rally into an editable tactics-board animation (one frame per shot,
+  hitter at the hit position, opponent at their next contact, ball = hit →
+  landing). Tweak and share the link.
+- **Situation filters**: filter rallies by inferred break points / game points /
+  serving games, outcome, and rally length. Scores are reconstructed on the
+  client from per-point winners (heuristic — the UI labels the confidence).
+- **Game plan tab**: a printable one-pager derived deterministically from mined
+  patterns — opponent threats with counter-strategies, own weapons to reinforce,
+  links to evidence rallies and related board drills.
+- **Template library**: ready-made tactics in the editor (deuce-wide serve +
+  open-court forehand, ad-T serve + approach, serve+1 crosscourt, return down
+  the line, doubles poach, drop shot + topspin lob).
+
 ## Analyzing Real Videos (full mode)
 
 Requires a tennis-ball detection YOLO weights file (any ultralytics format):

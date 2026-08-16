@@ -14,11 +14,32 @@ from app.core.config import Settings, get_settings
 from app.domain.events import AnalysisResult
 from app.services import pipeline, storage
 from app.services.jobs import JobStatus, job_store
+from app.tour import db as tour_db
+from app.tour import scouting as tour_scouting
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
 
 _SAFE_NAME = re.compile(r"[^A-Za-z0-9_.-]")
+
+
+def _tour_db_path(settings: Settings):
+    from pathlib import Path
+
+    return settings.data_dir / "tour" / tour_db.DB_NAME
+
+
+def _tour_conn(settings: Settings):
+    import sqlite3
+
+    path = _tour_db_path(settings)
+    if not path.exists():
+        raise HTTPException(
+            503,
+            "tour database not built yet: run python scripts/tour_sync.py "
+            "(downloads ATP/WTA archive and builds SQLite)",
+        )
+    return tour_db.get_conn(path)
 
 
 @router.get("/health")
@@ -209,3 +230,113 @@ def chat(
     ]
     storage.save_chat_history(settings, analysis_id, history)
     return {"answer": answer, "llm": settings.llm_enabled}
+
+
+# ---------------------------------------------------------------------------
+# Tour（职业巡回赛资料库 / 球探报告）
+# ---------------------------------------------------------------------------
+
+@router.get("/tour/status")
+def tour_status(settings: Settings = Depends(get_settings)) -> dict:
+    path = _tour_db_path(settings)
+    if not path.exists():
+        return {"built": False}
+    conn = _tour_conn(settings)
+    meta = {r["key"]: r["value"] for r in conn.execute("SELECT * FROM meta")}
+    counts = conn.execute(
+        "SELECT (SELECT COUNT(*) FROM matches) AS matches, "
+        "(SELECT COUNT(*) FROM players) AS players, "
+        "(SELECT COUNT(*) FROM elo) AS elo"
+    ).fetchone()
+    return {"built": True, **dict(counts), **meta}
+
+
+@router.get("/tour/players")
+def tour_players(
+    q: str,
+    tour: str | None = None,
+    limit: int = 20,
+    settings: Settings = Depends(get_settings),
+) -> list[dict]:
+    conn = _tour_conn(settings)
+    hits = tour_scouting.search_players(conn, q, min(limit, 50))
+    if tour:
+        hits = [h for h in hits if h["tour"] == tour]
+    return hits
+
+
+@router.get("/tour/players/{player_id}")
+def tour_player(
+    player_id: int,
+    tour: str = "atp",
+    settings: Settings = Depends(get_settings),
+) -> dict:
+    conn = _tour_conn(settings)
+    core = tour_scouting.player_core(conn, player_id, tour)
+    if not core:
+        raise HTTPException(404, "player not found")
+    recent = metrics_recent(conn, player_id, tour)
+    core["recent_matches"] = recent
+    return core
+
+
+def metrics_recent(conn, player_id: int, tour: str, n: int = 10) -> list[dict]:
+    from app.tour import metrics as tour_metrics
+
+    ms = tour_metrics.player_matches(
+        conn, player_id, tour_metrics.MatchFilter(tour=tour)
+    )[:n]
+    return [
+        {
+            "date": m["date"], "tournament": m["tourney_name"], "surface": m["surface"],
+            "won": bool(m["won"]), "score": m["score"], "opponent": m["opp_name"],
+        }
+        for m in ms
+    ]
+
+
+@router.get("/tour/tournaments")
+def tour_tournaments(
+    tour: str | None = None, settings: Settings = Depends(get_settings)
+) -> list[dict]:
+    conn = _tour_conn(settings)
+    ts = tour_scouting.tournaments(conn)
+    if tour:
+        ts = [t for t in ts if t["tour"] == tour]
+    return ts[:200]
+
+
+class ScoutingRequest(BaseModel):
+    opponent_id: int
+    tour: str = "atp"                       # player_id 跨巡回赛不唯一
+    client_id: int | None = None            # 我方球员（生成 H2H）
+    client_tour: str | None = None          # 默认同巡回赛
+    surface: Optional[str] = None           # Clay / Hard / Grass
+    tournament_id: Optional[str] = None     # 指定赛事（自动带出场地）
+    months: int = 12                        # 统计窗口
+    include_secondary: bool = False         # 纳入挑战赛/ITF
+
+
+@router.post("/tour/scouting")
+def tour_scouting_report(
+    body: ScoutingRequest, settings: Settings = Depends(get_settings)
+) -> dict:
+    if body.surface and body.surface not in ("Clay", "Hard", "Grass", "Carpet"):
+        raise HTTPException(400, "surface must be Clay/Hard/Grass/Carpet")
+    if body.tour not in ("atp", "wta"):
+        raise HTTPException(400, "tour must be atp or wta")
+    _tour_conn(settings)  # 503 if not built
+    try:
+        report = tour_scouting.build_report(
+            _tour_db_path(settings),
+            opponent_id=body.opponent_id,
+            tour=body.tour,
+            client_id=body.client_id,
+            surface=body.surface,
+            tournament_id=body.tournament_id,
+            months=body.months,
+            include_secondary=body.include_secondary,
+        )
+    except KeyError as e:
+        raise HTTPException(404, str(e)) from e
+    return report

@@ -58,6 +58,13 @@ class Settings(BaseSettings):
     # --- Pattern mining ---------------------------------------------------
     min_pattern_support: int = 3
 
+    # --- YouTube review ---------------------------------------------------
+    # Reject videos longer than this before downloading (0 = no limit).
+    youtube_max_duration_min: int = 90
+    # Frames sampled evenly across the video for the LLM vision review
+    # (used when no YOLO weights are configured).
+    review_frame_count: int = 24
+
     # --- LLM ----------------------------------------------------------
     openai_api_key: str = ""
     openai_base_url: str | None = None

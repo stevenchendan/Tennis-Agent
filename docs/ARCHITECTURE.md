@@ -68,6 +68,39 @@ queued → ingest → detect → map → events → tactics → report → done
 - `/analyses/[id]`：轮询 job 状态（running 时 1.2s），done 后切换四个视图。
 - `MiniCourt`：纯 SVG 球场（10.97×23.75 viewBox），击球点→落点箭头按球员着色，
   发球/截击打标记；`RallyBrowser` 提供逐分点击回放 + 逐拍语义条目。
+- `/scouting`：职业球探报告。选手搜索（ATP/WTA 双库）→ 选场地/赛事/我方球员
+  （生成 H2H）→ 报告视图：快照+风格标签、战绩 KPI、发球/接发百分位条、
+  场地基因、交手/场馆史、战术卡、近期比赛表。
+
+## 巡回赛资料库（app/tour/）
+
+数据源：ATP/WTA 官网有 Cloudflare/Incapsula 防爬（403），无法直接抓取；
+采用官方记分系统导出的开放归档（Sackmann 格式，社区持续同步）——
+1968 至今全部 ATP/WTA 比赛（含逐项发球统计）、挑战赛/ITF（2015+）、
+球员资料（惯用手/生日/身高/国籍）、2000 年以来周级排名。归档基址可整体
+替换（`tour/ingest.py::ARCHIVE_BASE`）。
+
+- **ingest**：全量下载（断点续传，约 240MB），`scripts/tour_sync.py` 一键
+  下载 + 建库。
+- **db**：SQLite（约 500MB）。比分串入库时解析为结构化列（盘/局/抢七/
+  决胜盘/完赛标记，容错 ret/w/o/快4制）；Elo 从 2000 年起重放（整体 +
+  分场地，K 值按赛事级别、净胜盘加成）。**坑**：player_id 跨巡回赛不唯一
+  （ATP/WTA 各自编号），players/elo 以 (player_id, tour) 为主键，所有
+  查询必须带 tour。
+- **metrics**：高阶指标引擎。发球端（保发率/一二发得分率/ACE/双误/救破发点）、
+  接发端（破发率/接一二发得分率/兑现破发点）、统治率 DR、抢七与决胜盘、
+  对 Top10/50 战绩、近期状态（连胜/击败过的最高排名）、负荷（28 天场次/
+  三盘率/休整天数）。比率只用完整完赛场次（与官方口径一致）；
+  保发率 = 1−丢失破发点/发球局数（数据集通行估计）。
+  百分位人群 = 同巡回赛同窗口发球分 ≥800 的全体球员。
+- **scouting**：报告组装（快照/风格标签/分场地基因/百分位/H2H/场馆史/
+  规则战术库——每条战术由数字触发并附证据）。战术文案 ATP 用"他"、
+  WTA 自动替换"她"。
+- **API**：`GET /api/tour/status|players|tournaments`、`POST /api/tour/scouting`
+  （opponent_id + tour 必填，可选 client_id/surface/tournament_id/months/
+  include_secondary）。未建库返回 503 并提示运行 tour_sync。
+- 数据滞后如实标注：报告附 data_window（from/to/synced_at），
+  前端页脚展示统计口径。
 
 ## 测试策略
 

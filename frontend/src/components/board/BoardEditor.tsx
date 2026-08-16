@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import TacticCourt, { type BoardMode } from "@/components/board/TacticCourt";
 import TacticPlayer from "@/components/board/TacticPlayer";
+import TemplatePicker from "@/components/board/TemplatePicker";
 import {
   decodeTactic,
   defaultTactic,
@@ -21,6 +22,7 @@ import {
   type PlayerPos,
   type Tactic,
 } from "@/lib/tactic";
+import { templateByKey } from "@/lib/templates";
 
 const DRAFT_KEY = "tactics-board-draft-v1";
 
@@ -37,6 +39,7 @@ export default function BoardEditor() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [templateOpen, setTemplateOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   const urlInputRef = useRef<HTMLInputElement | null>(null);
@@ -48,9 +51,21 @@ export default function BoardEditor() {
     toastTimer.current = setTimeout(() => setToast(null), 2400);
   }
 
-  // restore draft once on mount
+  // On mount: a `?import=` tactic (converted rally / template drill) wins over
+  // the locally saved draft.
   useEffect(() => {
     try {
+      const imp = new URLSearchParams(window.location.search).get("import");
+      if (imp) {
+        const t = decodeTactic(imp);
+        if (t) {
+          setTactic(t);
+          setFrameIndex(0);
+          flash("已载入战术，可自由修改后分享");
+          return;
+        }
+        flash("导入的战术数据无效");
+      }
       const raw = localStorage.getItem(DRAFT_KEY);
       if (raw) {
         const t = decodeTactic(raw);
@@ -165,6 +180,12 @@ export default function BoardEditor() {
             placeholder="给战术起个名字，例如：发球上网套路"
             className="min-w-40 flex-1 bg-transparent text-lg font-semibold text-neutral-100 outline-none placeholder:text-neutral-700"
           />
+          <button
+            onClick={() => setTemplateOpen(true)}
+            className="rounded-lg border border-neutral-800 px-3 py-1.5 text-xs text-neutral-400 transition hover:border-neutral-600 hover:text-neutral-200"
+          >
+            模板
+          </button>
           <button
             onClick={() => {
               setTactic(demoTactic());
@@ -311,6 +332,22 @@ export default function BoardEditor() {
           战术会自动保存在本机浏览器；「分享」生成的链接包含全部数据，无需登录、永久有效。
         </p>
       </main>
+
+      {/* template picker modal */}
+      {templateOpen && (
+        <TemplatePicker
+          onClose={() => setTemplateOpen(false)}
+          onPick={(key) => {
+            const tpl = templateByKey(key);
+            if (tpl) {
+              setTactic(tpl.build());
+              setFrameIndex(0);
+              flash(`已载入模板：${tpl.name}`);
+            }
+            setTemplateOpen(false);
+          }}
+        />
+      )}
 
       {/* preview modal */}
       {previewOpen && (

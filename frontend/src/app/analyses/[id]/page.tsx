@@ -7,12 +7,14 @@ import StageProgress from "@/components/StageProgress";
 import PatternCards from "@/components/PatternCards";
 import RallyBrowser from "@/components/RallyBrowser";
 import CoachChat from "@/components/CoachChat";
+import GamePlan from "@/components/GamePlan";
 
-type Tab = "report" | "patterns" | "rallies" | "chat";
+type Tab = "report" | "patterns" | "plan" | "rallies" | "chat";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "report", label: "战术报告" },
   { key: "patterns", label: "模式卡片" },
+  { key: "plan", label: "作战计划" },
   { key: "rallies", label: "逐分回放" },
   { key: "chat", label: "教练问答" },
 ];
@@ -23,6 +25,7 @@ export default function AnalysisPage() {
   const [job, setJob] = useState<AnalysisJob | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("report");
+  const [rallyId, setRallyId] = useState(0);
 
   const refresh = useCallback(async () => {
     try {
@@ -76,7 +79,7 @@ export default function AnalysisPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
-      <header className="mb-6 flex flex-wrap items-baseline justify-between gap-3">
+      <header className="no-print mb-6 flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-neutral-50">战术分析</h1>
           <p className="text-sm text-neutral-500">
@@ -99,7 +102,7 @@ export default function AnalysisPage() {
         <Stat label="截击" value={`${(s.volleys["1"] ?? 0) + (s.volleys["2"] ?? 0)}`} sub={`P1 ${s.volleys["1"] ?? 0} / P2 ${s.volleys["2"] ?? 0}`} />
       </div>
 
-      <nav className="mb-6 flex gap-1 border-b border-neutral-800">
+      <nav className="no-print mb-6 flex gap-1 border-b border-neutral-800">
         {TABS.map((t) => (
           <button
             key={t.key}
@@ -121,7 +124,16 @@ export default function AnalysisPage() {
         </article>
       )}
       {tab === "patterns" && <PatternCards patterns={r.patterns} />}
-      {tab === "rallies" && <RallyBrowser rallies={r.rallies} />}
+      {tab === "plan" && (
+        <GamePlan
+          result={r}
+          onShowRally={(rid) => {
+            setRallyId(rid);
+            setTab("rallies");
+          }}
+        />
+      )}
+      {tab === "rallies" && <RallyBrowser rallies={r.rallies} activeId={rallyId} onSelect={setRallyId} />}
       {tab === "chat" && <CoachChat analysisId={r.id} />}
     </main>
   );

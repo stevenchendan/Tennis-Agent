@@ -99,6 +99,15 @@ export default function Home() {
           打开网球战术板：画好战术，生成链接分享给学生（无需登录）
         </Link>
 
+        <Link
+          href="/scouting"
+          className={`rounded-xl border border-neutral-700 px-6 py-3 text-sm text-neutral-300 transition hover:border-emerald-600 hover:text-emerald-300 ${
+            busy ? "pointer-events-none opacity-50" : ""
+          }`}
+        >
+          职业球探报告：选对手 / 选场地赛事，出高阶数据赛前报告（ATP·WTA·ITF）
+        </Link>
+
         {backendUp === false && (
           <p className="text-sm text-amber-400">
             后端未启动：请先运行 <code className="rounded bg-neutral-800 px-1.5 py-0.5">uvicorn app.main:app</code>

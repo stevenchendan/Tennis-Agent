@@ -1,0 +1,27 @@
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.pytest_tmp/
+.ruff_cache/
+*.egg-info/
+
+# data (videos & analysis results)
+backend/data/
+backend/models/*.pt
+backend/models/*.pth
+
+# node / next
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# env & IDE
+.env
+.env.local
+.vscode/
+.idea/
+.DS_Store

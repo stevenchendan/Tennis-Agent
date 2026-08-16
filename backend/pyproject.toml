@@ -1,0 +1,17 @@
+[project]
+name = "tennis-agent-backend"
+version = "0.1.0"
+description = "Tennis video tactical analysis: YOLO tracking + pattern mining + LangChain coaching"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B"]
+ignore = ["E501"]

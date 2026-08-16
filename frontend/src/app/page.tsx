@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
@@ -88,6 +89,15 @@ export default function Home() {
             }}
           />
         </label>
+
+        <Link
+          href="/board"
+          className={`rounded-xl border border-neutral-700 px-6 py-3 text-sm text-neutral-300 transition hover:border-emerald-600 hover:text-emerald-300 ${
+            busy ? "pointer-events-none opacity-50" : ""
+          }`}
+        >
+          打开网球战术板：画好战术，生成链接分享给学生（无需登录）
+        </Link>
 
         {backendUp === false && (
           <p className="text-sm text-amber-400">

@@ -1,0 +1,168 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import TacticCourt from "@/components/board/TacticCourt";
+import type { PlayerPos, Point, Tactic } from "@/lib/tactic";
+
+const FRAME_MS = 1500;
+const SPEEDS = [0.5, 1, 2] as const;
+
+const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
+  const n = tactic.frames.length;
+  const total = n * FRAME_MS;
+
+  const [playing, setPlaying] = useState(true);
+  const [speedIx, setSpeedIx] = useState(1);
+  const [elapsed, setElapsed] = useState(0);
+  const elapsedRef = useRef(0);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    if (!playing) return;
+    let last = performance.now();
+    const tick = (now: number) => {
+      const dt = now - last;
+      last = now;
+      elapsedRef.current = Math.min(elapsedRef.current + dt * SPEEDS[speedIx], total);
+      setElapsed(elapsedRef.current);
+      if (elapsedRef.current >= total) {
+        setPlaying(false);
+        return;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [playing, speedIx, total]);
+
+  function seek(t: number) {
+    const v = Math.min(Math.max(t, 0), total);
+    elapsedRef.current = v;
+    setElapsed(v);
+  }
+  function togglePlay() {
+    if (!playing && elapsedRef.current >= total) seek(0);
+    setPlaying((p) => !p);
+  }
+  function stepToFrame(k: number) {
+    setPlaying(false);
+    seek(k * FRAME_MS);
+  }
+
+  const frameIndex = Math.min(Math.floor(elapsed / FRAME_MS), n - 1);
+  const localT = clamp01((elapsed - frameIndex * FRAME_MS) / FRAME_MS);
+  const cur = tactic.frames[frameIndex];
+  const next = tactic.frames[frameIndex + 1];
+
+  // players ease toward their next-frame positions across the frame
+  const players: PlayerPos[] = next
+    ? cur.players.map((p) => {
+        const np = next.players.find((q) => q.id === p.id);
+        if (!np) return p;
+        const e = easeInOutCubic(localT);
+        return { id: p.id, x: p.x + (np.x - p.x) * e, y: p.y + (np.y - p.y) * e };
+      })
+    : cur.players;
+
+  // shots of the frame play sequentially; ball hidden once all have flown
+  const ball: Point | null = (() => {
+    const paths = cur.paths;
+    if (paths.length === 0) return null;
+    const pos = localT * paths.length;
+    if (pos >= paths.length) return null;
+    const i = Math.floor(pos);
+    const t = pos - i;
+    const p = paths[i];
+    return {
+      x: p.from.x + (p.to.x - p.from.x) * t,
+      y: p.from.y + (p.to.y - p.from.y) * t,
+    };
+  })();
+
+  const ended = !playing && elapsed >= total;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="rounded-2xl border border-neutral-900 bg-neutral-950 p-3">
+        <TacticCourt tactic={tactic} frameIndex={frameIndex} playersOverride={players} ballAt={ball} height={560} />
+      </div>
+
+      {/* progress bar with frame ticks, click/drag to seek */}
+      <div
+        role="slider"
+        aria-label="播放进度"
+        aria-valuemin={0}
+        aria-valuemax={n}
+        aria-valuenow={frameIndex + 1}
+        tabIndex={0}
+        className="group relative h-6 cursor-pointer"
+        onPointerDown={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          const seekTo = (clientX: number) =>
+            seek(((clientX - r.left) / r.width) * total);
+          seekTo(e.clientX);
+          const move = (ev: PointerEvent) => seekTo(ev.clientX);
+          const up = () => {
+            window.removeEventListener("pointermove", move);
+            window.removeEventListener("pointerup", up);
+          };
+          window.addEventListener("pointermove", move);
+          window.addEventListener("pointerup", up);
+        }}
+      >
+        <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-neutral-800" />
+        <div
+          className="absolute top-1/2 left-0 h-2 -translate-y-1/2 rounded-full bg-emerald-500"
+          style={{ width: `${(elapsed / total) * 100}%` }}
+        />
+        {Array.from({ length: n - 1 }, (_, k) => (
+          <span
+            key={k}
+            className="absolute top-1/2 h-3 w-px -translate-y-1/2 bg-neutral-600"
+            style={{ left: `${((k + 1) / n) * 100}%` }}
+          />
+        ))}
+      </div>
+
+      {/* controls */}
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <button
+          onClick={() => stepToFrame(Math.max(frameIndex - 1, 0))}
+          className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-300 transition hover:border-neutral-600"
+        >
+          ◀ 上一帧
+        </button>
+        <button
+          onClick={togglePlay}
+          className="rounded-lg bg-emerald-500 px-6 py-2 text-sm font-semibold text-neutral-950 shadow-lg shadow-emerald-900/50 transition hover:bg-emerald-400"
+        >
+          {playing ? "⏸ 暂停" : ended ? "↺ 重播" : "▶ 播放"}
+        </button>
+        <button
+          onClick={() => stepToFrame(Math.min(frameIndex + 1, n - 1))}
+          className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-300 transition hover:border-neutral-600"
+        >
+          下一帧 ▶
+        </button>
+        <button
+          onClick={() => setSpeedIx((i) => (i + 1) % SPEEDS.length)}
+          className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-300 transition hover:border-neutral-600"
+        >
+          {SPEEDS[speedIx]}x
+        </button>
+        <span className="ml-1 text-sm text-neutral-500">
+          第 {frameIndex + 1} / {n} 帧
+        </span>
+      </div>
+
+      {/* current frame note */}
+      <div className="rounded-xl border border-neutral-900 bg-neutral-950 px-4 py-3 text-sm leading-relaxed text-neutral-300">
+        <span className="mr-2 font-semibold text-emerald-400">第 {frameIndex + 1} 帧</span>
+        {cur.note?.trim() ? cur.note : <span className="text-neutral-600">（本帧没有备注）</span>}
+      </div>
+    </div>
+  );
+}

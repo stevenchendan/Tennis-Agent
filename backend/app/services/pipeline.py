@@ -149,7 +149,7 @@ def _run_detection_stages(
 
 
 def _run_vision_review(
-    settings: Settings, job: AnalysisJob, video_path: Path, url: str, info: "VideoInfo"
+    settings: Settings, job: AnalysisJob, video_path: Path, url: str, info: VideoInfo
 ) -> AnalysisResult:
     """LLM-only review: no per-shot data, the report is the product."""
     job.engine = "llm_vision"

@@ -16,6 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.core.config import get_settings  # noqa: E402
+from app.tour import charting as tour_charting  # noqa: E402
 from app.tour import db as tour_db  # noqa: E402
 from app.tour import ingest  # noqa: E402
 
@@ -40,6 +41,15 @@ def main() -> int:
 
     stats = tour_db.build(db_path, raw_dir)
     print(f"build: {stats}")
+
+    mcp_files_present = (raw_dir / "mcp__charting-m-matches.csv").exists()
+    if mcp_files_present:
+        conn = tour_db.connect(db_path)
+        try:
+            cstats = tour_charting.build_charting(conn, raw_dir)
+            print(f"charting: {cstats}  mapping: {tour_charting.map_stats(conn)}")
+        finally:
+            conn.close()
     return 0
 
 

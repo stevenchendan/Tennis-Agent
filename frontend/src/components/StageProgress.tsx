@@ -11,6 +11,7 @@ const STATUS_STYLE: Record<string, string> = {
 };
 
 const LABELS: Record<string, string> = {
+  download: "下载",
   ingest: "读取",
   detect: "检测",
   map: "球场映射",

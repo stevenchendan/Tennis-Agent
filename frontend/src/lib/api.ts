@@ -69,6 +69,8 @@ export interface AnalysisResult {
   created_at: string;
   source: string;
   mode: string;
+  source_url?: string | null;
+  source_title?: string | null;
   fps: number;
   players: Record<string, string>;
   rallies: Rally[];
@@ -90,10 +92,22 @@ export interface AnalysisJob {
   id: string;
   mode: string;
   video_id: string | null;
+  engine?: string | null; // "cv" | "llm_vision" (youtube mode)
   status: "queued" | "running" | "done" | "failed";
   stages: Stage[];
   error: string | null;
   result: AnalysisResult | null;
+}
+
+export interface AnalysisSummary {
+  id: string;
+  mode: string;
+  status: string;
+  created_at: number | string; // unix seconds (live jobs) or ISO string (persisted)
+  title?: string;
+  points?: number;
+  patterns?: number;
+  source_url?: string | null;
 }
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
@@ -163,6 +177,61 @@ export interface ScoutingTactic {
   detail: string;
 }
 
+// 微观层（Match Charting Project 图表化数据）
+export interface ChartingProfile {
+  sample_matches: number;
+  insufficient?: boolean;
+  note?: string | null;
+  error?: string;
+  serve_direction?: Record<string, Record<string, {
+    wide_pct: number | null; body_pct: number | null; t_pct: number | null; serves: number;
+  }>>;
+  first_strike?: Record<string, number | null>;
+  rally?: Record<string, {
+    pts: number; win_pct: number | null;
+    winners: number; forced_err: number; unforced: number;
+  }>;
+  net?: { net_freq_pct: number | null; net_win_pct: number | null; passed_pct: number | null };
+  key_points_serve?: Record<string, number | null> & { bp_pts?: number };
+  return_depth?: Record<string, number | null>;
+  wings?: Record<string, number | null>;
+  shot_direction?: Record<string, Record<string, number | null>>;
+}
+
+export interface DrawPlayer {
+  player_id: number;
+  name: string;
+  rank: number | null;
+  elo: number | null;
+}
+
+export interface DrawMatch {
+  winner_id: number; winner: string;
+  loser_id: number; loser: string;
+  score: string; date: string;
+  round?: string;
+  won?: boolean;
+}
+
+export interface TournamentDraw {
+  info: { tourney_id: string; name: string; surface: string | null; level: string; tour: string };
+  rounds: Record<string, DrawMatch[]>;
+  other_rounds: string[];
+  completed: boolean;
+  alive: DrawPlayer[];
+  is_ko: boolean;
+}
+
+export interface MyDrawPath {
+  draw: TournamentDraw;
+  status: "alive" | "eliminated" | "completed" | "not_in_draw";
+  my_matches?: DrawMatch[];
+  last_round?: string;
+  next_round?: string | null;
+  next_opponent_candidates?: DrawPlayer[];
+  candidates_note?: string;
+}
+
 export interface ScoutingReport {
   opponent: {
     player_id: number;
@@ -214,17 +283,25 @@ export interface ScoutingReport {
     list: { date: string; round: string; won: boolean; opp_name: string; score: string }[];
   } | null;
   tactics: ScoutingTactic[];
+  charting: ChartingProfile | null;
   data_window: { from: string | null; to: string | null; synced_at: string };
 }
 
 export const api = {
-  health: () => req<{ status: string; llm_enabled: boolean; full_mode_ready: boolean }>("/api/health"),
+  health: () =>
+    req<{
+      status: string;
+      llm_enabled: boolean;
+      full_mode_ready: boolean;
+      youtube_ready: boolean;
+    }>("/api/health"),
   createDemoAnalysis: () =>
     req<{ analysis_id: string }>("/api/analyses", {
       method: "POST",
       body: JSON.stringify({ mode: "demo" }),
     }),
   getAnalysis: (id: string) => req<AnalysisJob>(`/api/analyses/${id}`),
+  listAnalyses: () => req<AnalysisSummary[]>("/api/analyses"),
   chat: (id: string, message: string) =>
     req<{ answer: string; llm: boolean }>(`/api/analyses/${id}/chat`, {
       method: "POST",
@@ -242,9 +319,19 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ mode: "full", video_id }),
     }),
+  createYoutubeAnalysis: (youtube_url: string) =>
+    req<{ analysis_id: string }>("/api/analyses", {
+      method: "POST",
+      body: JSON.stringify({ mode: "youtube", youtube_url }),
+    }),
   tourStatus: () => req<Record<string, unknown>>("/api/tour/status"),
   tourPlayers: (q: string) => req<TourPlayerHit[]>(`/api/tour/players?q=${encodeURIComponent(q)}`),
   tourTournaments: () => req<TourTournament[]>("/api/tour/tournaments"),
+  tourDraw: (tournamentId: string, tour: string, playerId?: number) =>
+    req<MyDrawPath | { draw: TournamentDraw }>(
+      `/api/tour/draw?tournament_id=${encodeURIComponent(tournamentId)}&tour=${tour}` +
+      (playerId ? `&player_id=${playerId}` : ""),
+    ),
   tourScouting: (body: {
     opponent_id: number;
     tour: Tour;

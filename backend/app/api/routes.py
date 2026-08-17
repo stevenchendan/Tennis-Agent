@@ -387,3 +387,22 @@ def tour_scouting_report(
     except KeyError as e:
         raise HTTPException(404, str(e)) from e
     return report
+
+
+@router.get("/tour/draw")
+def tour_draw(
+    tournament_id: str,
+    player_id: int | None = None,
+    tour: str = "atp",
+    settings: Settings = Depends(get_settings),
+) -> dict:
+    """签表状态 + 我方球员路径与下一轮潜在对手。"""
+    if tour not in ("atp", "wta"):
+        raise HTTPException(400, "tour must be atp or wta")
+    conn = _tour_conn(settings)
+    try:
+        if player_id:
+            return tour_scouting.my_draw_path(conn, tournament_id, tour, player_id)
+        return {"draw": tour_scouting.tournament_draw(conn, tournament_id, tour)}
+    except KeyError as e:
+        raise HTTPException(404, str(e)) from e

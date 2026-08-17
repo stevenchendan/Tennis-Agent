@@ -10,6 +10,7 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
+from app.tour import charting as tour_charting
 from app.tour import db as tour_db
 from app.tour import metrics
 
@@ -509,6 +510,17 @@ def build_report(
     tactics = build_tactics(opponent, prof_s, perc, form.get("last10", {}), fat,
                             surface, h2h, venue, tour=tour)
 
+    # 微观层（图表化数据）：样本不足时自动缺失/降级，不阻塞宏观报告
+    chart = None
+    try:
+        chart = tour_charting.player_profile(conn, opponent_id, tour,
+                                             surface=surface, months=36)
+    except Exception as e:  # noqa: BLE001
+        chart = {"insufficient": True, "error": str(e), "sample_matches": 0}
+    if chart and not chart.get("insufficient"):
+        tactics.extend(charting_tactics(chart))
+        tactics = tactics[:10]
+
     report = {
         "opponent": opponent,
         "context": {"surface": surface, "tournament": venue["tournament"] if venue else None,
@@ -525,6 +537,7 @@ def build_report(
         "h2h": h2h,
         "venue": venue,
         "tactics": tactics,
+        "charting": chart,
         "data_window": {
             "from": date_from, "to": data_to,
             "synced_at": conn.execute(
@@ -533,3 +546,185 @@ def build_report(
         },
     }
     return report
+
+
+def charting_tactics(chart: dict) -> list[dict]:
+    """由图表化微观层数据触发的战术（样本 ≥5 场才触发）。"""
+    out: list[dict] = []
+    if chart.get("sample_matches", 0) < 5:
+        return out
+    n = chart["sample_matches"]
+
+    def sd(serve: str, side: str, key: str):
+        return _get(chart, "serve_direction", serve, side, key)
+
+    # 二发落点倾向 → 接发布局
+    for side, label in (("deuce", "平分区"), ("ad", "占先区")):
+        w = sd("second", side, "wide_pct")
+        t = sd("second", side, "t_pct")
+        if w is not None and w >= 60:
+            out.append({
+                "title": f"接二发 {label}：他 {w}% 发外角",
+                "evidence": f"图表化 {n} 场二发落点分布（外角 {w}% / 追身 {sd('second', side, 'body_pct')}% / T {t}%）",
+                "detail": "接发站位向外侧多让一步、正手侧身准备打外角来球的反斜线，"
+                          "迫使他改变落点时二发质量通常先下降。",
+            })
+            break
+        if t is not None and t >= 60:
+            out.append({
+                "title": f"接二发 {label}：他 {t}% 发 T（追你的正手/中路）",
+                "evidence": f"图表化 {n} 场二发落点（T {t}% / 外角 {w}%）",
+                "detail": "站位略靠近中线，接 T 发球后优先打斜线深区压制其上网/第三拍。",
+            })
+            break
+
+    rally = chart.get("rally") or {}
+    short = rally.get("0_3") or {}
+    long = rally.get("10p") or {}
+    if short.get("win_pct") is not None and long.get("win_pct") is not None:
+        if short["win_pct"] >= 55 and long["win_pct"] <= 45:
+            out.append({
+                "title": "他是'前三拍'型选手——把比赛拖长",
+                "evidence": f"0-3 拍胜率 {short['win_pct']}% vs 10+ 拍胜率 {long['win_pct']}%（图表化 {n} 场）",
+                "detail": "接发以回深为主不求制胜，发球后第三拍保持过网高度与深度，"
+                          "主动把分打到 5 拍以后——他的长回合胜率明显掉档。",
+            })
+        elif long["win_pct"] >= 55 and short["win_pct"] <= 50:
+            out.append({
+                "title": "他是相持型选手——前三拍就要下杀手",
+                "evidence": f"0-3 拍胜率 {short['win_pct']}% vs 10+ 拍胜率 {long['win_pct']}%（图表化 {n} 场）",
+                "detail": "发球+第一拍抢攻组合要敢用：他的稳定性建立在长回合里，"
+                          "前三拍建立优势后坚决上网或变线终结。",
+            })
+
+    wings = chart.get("wings") or {}
+    if wings.get("ue_share_fh_pct") is not None and wings["ue_share_fh_pct"] >= 65:
+        out.append({
+            "title": "他的 UE 大头在正手（诱攻正手）",
+            "evidence": f"非受迫性失误 {wings['ue_share_fh_pct']}% 来自正手（图表化 {n} 场）",
+            "detail": "把球权'送'给他的正手（深区+上旋），诱他在移动中发力；"
+                      "他的正手 UE 率显著高于反手。",
+        })
+    net = chart.get("net") or {}
+    if net.get("net_freq_pct") is not None and net["net_freq_pct"] >= 25 \
+            and net.get("net_win_pct", 0) >= 65:
+        out.append({
+            "title": "网前型打法：穿越球与挑高球要提前练",
+            "evidence": f"网前频率 {net['net_freq_pct']}%、网前得分率 {net['net_win_pct']}%（图表化 {n} 场）",
+            "detail": "多用低而深的穿越（两条线都要有）+ 关键分挑高球；"
+                      "他的网前效率很高，防守性挑高球至少能打断他的上网节奏。",
+        })
+    return out
+
+
+# ---------------------------------------------------------------------------
+# 签表导航："下一轮对手"工作流
+# ---------------------------------------------------------------------------
+
+# 淘汰赛轮次从早到晚（数据集中 round 的取值）
+_ROUND_ORDER = ["R128", "R64", "R32", "R16", "QF", "SF", "F"]
+_ROUND_NEXT = dict(zip(_ROUND_ORDER, _ROUND_ORDER[1:]))
+
+
+def tournament_draw(conn: sqlite3.Connection, tourney_id: str, tour: str) -> dict:
+    """一届赛事的签表状态：各轮已完成比赛 + 仍存活球员。"""
+    rows = conn.execute(
+        """
+        SELECT tourney_date, "round", winner_id, winner_name, loser_id, loser_name,
+               score, surface, tourney_level, tourney_name, completed, wo
+        FROM matches WHERE tourney_id = ? AND tour = ? ORDER BY tourney_date, match_id
+        """,
+        (tourney_id, tour),
+    ).fetchall()
+    if not rows:
+        raise KeyError(f"tournament {tourney_id} not found in {tour}")
+
+    info = {
+        "tourney_id": tourney_id,
+        "name": rows[0]["tourney_name"],
+        "surface": rows[0]["surface"],
+        "level": rows[0]["tourney_level"],
+        "tour": tour,
+    }
+    rounds: dict[str, list] = {}
+    for r in rows:
+        rounds.setdefault(r["round"], []).append({
+            "winner_id": r["winner_id"], "winner": r["winner_name"],
+            "loser_id": r["loser_id"], "loser": r["loser_name"],
+            "score": r["score"], "date": r["tourney_date"],
+        })
+    ko_rounds = [rd for rd in _ROUND_ORDER if rd in rounds]
+    has_final = "F" in rounds
+    losses: dict[int, int] = {}
+    wins: dict[int, int] = {}
+    name_by_id: dict[int, str] = {}
+    for rd, ms in rounds.items():
+        for m in ms:
+            if m["winner_id"]:
+                wins[m["winner_id"]] = wins.get(m["winner_id"], 0) + 1
+                name_by_id[m["winner_id"]] = m["winner"]
+            if m["loser_id"]:
+                losses[m["loser_id"]] = losses.get(m["loser_id"], 0) + 1
+                name_by_id[m["loser_id"]] = m["loser"]
+    if has_final:
+        # 已完赛：冠军即最后存活者
+        alive = [m["winner_id"] for m in rounds["F"] if m["winner_id"]]
+    else:
+        alive = [pid for pid in wins if losses.get(pid, 0) == 0]
+    # 带上当前排名/Elo 便于排序展示
+    alive_info = []
+    for pid in alive:
+        p = conn.execute(
+            "SELECT r.rank FROM rankings r WHERE r.player_id=? AND r.tour=? "
+            "AND r.ranking_date=(SELECT MAX(ranking_date) FROM rankings WHERE tour=?)",
+            (pid, tour, tour),
+        ).fetchone()
+        e = conn.execute(
+            "SELECT elo_overall FROM elo WHERE player_id=? AND tour=?", (pid, tour)
+        ).fetchone()
+        alive_info.append({
+            "player_id": pid, "name": name_by_id.get(pid, str(pid)),
+            "rank": p["rank"] if p else None,
+            "elo": round(e["elo_overall"]) if e and e["elo_overall"] else None,
+        })
+    alive_info.sort(key=lambda x: (x["rank"] is None, x["rank"] or 9999))
+    return {
+        "info": info,
+        "rounds": {rd: rounds[rd] for rd in _ROUND_ORDER if rd in rounds},
+        "other_rounds": sorted(set(rounds) - set(_ROUND_ORDER)),
+        "completed": has_final,
+        "alive": alive_info,
+        "is_ko": bool(ko_rounds),
+    }
+
+
+def my_draw_path(conn: sqlite3.Connection, tourney_id: str, tour: str,
+                 player_id: int) -> dict:
+    """我方球员在该赛事的路径 + 下一轮潜在对手。"""
+    draw = tournament_draw(conn, tourney_id, tour)
+    my_rounds = {}
+    for rd, ms in draw["rounds"].items():
+        for m in ms:
+            if m["winner_id"] == player_id or m["loser_id"] == player_id:
+                my_rounds[rd] = m | {"won": m["winner_id"] == player_id, "round": rd}
+    if not my_rounds:
+        return {"draw": draw, "status": "not_in_draw"}
+    played = [rd for rd in _ROUND_ORDER if rd in my_rounds]
+    my_matches = [my_rounds[rd] for rd in played]
+    last = played[-1] if played else None
+    if draw["completed"]:
+        return {"draw": draw, "status": "completed", "my_matches": my_matches,
+                "last_round": last, "next_round": None,
+                "next_opponent_candidates": []}
+    eliminated = bool(my_rounds.get(last, {}).get("won") is False)
+    candidates = [p for p in draw["alive"] if p["player_id"] != player_id]
+    return {
+        "draw": draw,
+        "status": "eliminated" if eliminated else "alive",
+        "my_matches": my_matches,
+        "last_round": last,
+        "next_round": _ROUND_NEXT.get(last),
+        # 无签表位置数据时无法精确到同半区，给出全部存活候选并按排名排序
+        "next_opponent_candidates": candidates,
+        "candidates_note": "签表半区信息不在记分数据中，候选为当前轮全部存活球员",
+    }

@@ -66,7 +66,11 @@ export default function AnalysisPage() {
       <Center>
         <p className="mb-1 text-lg font-medium text-neutral-200">正在分析比赛…</p>
         <p className="mb-6 text-sm text-neutral-500">
-          {job.mode === "demo" ? "演示模式（合成比赛）" : job.video_id ?? ""}
+          {job.mode === "demo"
+            ? "演示模式（合成比赛）"
+            : job.mode === "youtube"
+              ? "正在下载并分析 YouTube 视频（长视频可能需要几分钟）…"
+              : job.video_id ?? ""}
         </p>
         <StageProgress stages={job.stages} />
       </Center>
@@ -76,6 +80,7 @@ export default function AnalysisPage() {
   const r = job.result;
   if (!r) return <Center>等待结果…</Center>;
   const s = r.stats;
+  const vision = r.report_generated_by === "llm_vision";
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
@@ -83,8 +88,25 @@ export default function AnalysisPage() {
         <div>
           <h1 className="text-2xl font-bold text-neutral-50">战术分析</h1>
           <p className="text-sm text-neutral-500">
-            {r.source} · {s.points} 分 · {r.rallies.length} 个回合 ·{" "}
-            {r.report_generated_by === "llm" ? "LLM 报告" : "规则报告"}
+            {r.source_url ? (
+              <a
+                href={r.source_url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-emerald-400/90 underline decoration-emerald-900 hover:text-emerald-300"
+              >
+                {r.source}
+              </a>
+            ) : (
+              r.source
+            )}
+            {" · "}
+            {vision
+              ? "AI 视觉复盘"
+              : r.report_generated_by === "llm"
+                ? "LLM 报告"
+                : "规则报告"}
+            {!vision && ` · ${s.points} 分 · ${r.rallies.length} 个回合`}
           </p>
         </div>
         {r.notes.length > 0 && (
@@ -93,14 +115,16 @@ export default function AnalysisPage() {
       </header>
 
       {/* stats strip */}
-      <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <Stat label="总比分" value={`${s.points_won["1"] ?? 0} : ${s.points_won["2"] ?? 0}`} sub="P1 : P2" />
-        <Stat label="平均回合" value={`${s.avg_rally_length}`} sub="拍" />
-        <Stat label="最长回合" value={`${s.longest_rally}`} sub="拍" />
-        <Stat label="P1 斜线" value={`${s.direction_counts["1"]?.cross ?? 0}`} sub={`直线 ${s.direction_counts["1"]?.line ?? 0}`} />
-        <Stat label="P2 斜线" value={`${s.direction_counts["2"]?.cross ?? 0}`} sub={`直线 ${s.direction_counts["2"]?.line ?? 0}`} />
-        <Stat label="截击" value={`${(s.volleys["1"] ?? 0) + (s.volleys["2"] ?? 0)}`} sub={`P1 ${s.volleys["1"] ?? 0} / P2 ${s.volleys["2"] ?? 0}`} />
-      </div>
+      {!vision && (
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <Stat label="总比分" value={`${s.points_won["1"] ?? 0} : ${s.points_won["2"] ?? 0}`} sub="P1 : P2" />
+          <Stat label="平均回合" value={`${s.avg_rally_length}`} sub="拍" />
+          <Stat label="最长回合" value={`${s.longest_rally}`} sub="拍" />
+          <Stat label="P1 斜线" value={`${s.direction_counts["1"]?.cross ?? 0}`} sub={`直线 ${s.direction_counts["1"]?.line ?? 0}`} />
+          <Stat label="P2 斜线" value={`${s.direction_counts["2"]?.cross ?? 0}`} sub={`直线 ${s.direction_counts["2"]?.line ?? 0}`} />
+          <Stat label="截击" value={`${(s.volleys["1"] ?? 0) + (s.volleys["2"] ?? 0)}`} sub={`P1 ${s.volleys["1"] ?? 0} / P2 ${s.volleys["2"] ?? 0}`} />
+        </div>
+      )}
 
       <nav className="no-print mb-6 flex gap-1 border-b border-neutral-800">
         {TABS.map((t) => (
@@ -123,17 +147,26 @@ export default function AnalysisPage() {
           <Markdown text={r.report ?? "（无报告）"} />
         </article>
       )}
-      {tab === "patterns" && <PatternCards patterns={r.patterns} />}
-      {tab === "plan" && (
-        <GamePlan
-          result={r}
-          onShowRally={(rid) => {
-            setRallyId(rid);
-            setTab("rallies");
-          }}
-        />
-      )}
-      {tab === "rallies" && <RallyBrowser rallies={r.rallies} activeId={rallyId} onSelect={setRallyId} />}
+      {tab === "patterns" &&
+        (vision ? <VisionNote /> : <PatternCards patterns={r.patterns} />)}
+      {tab === "plan" &&
+        (vision ? (
+          <VisionNote />
+        ) : (
+          <GamePlan
+            result={r}
+            onShowRally={(rid) => {
+              setRallyId(rid);
+              setTab("rallies");
+            }}
+          />
+        ))}
+      {tab === "rallies" &&
+        (vision ? (
+          <VisionNote />
+        ) : (
+          <RallyBrowser rallies={r.rallies} activeId={rallyId} onSelect={setRallyId} />
+        ))}
       {tab === "chat" && <CoachChat analysisId={r.id} />}
     </main>
   );
@@ -144,6 +177,17 @@ function Center({ children }: { children: React.ReactNode }) {
     <main className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
       {children}
     </main>
+  );
+}
+
+/** Shown on data tabs when the analysis came from the AI vision review. */
+function VisionNote() {
+  return (
+    <p className="py-12 text-center text-sm leading-relaxed text-neutral-600">
+      AI 视觉复盘不包含逐拍数据。
+      <br />
+      设置 TENNIS_BALL_MODEL_PATH（YOLO 权重）后重新分析，可获得逐分回放、模式卡片与作战计划。
+    </p>
   );
 }
 

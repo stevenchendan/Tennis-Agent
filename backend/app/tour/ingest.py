@@ -27,6 +27,20 @@ SECONDARY_FROM_YEAR = 2015
 TOURS = ("atp", "wta")
 _TIMEOUT = 60
 
+# 击球图表化项目（Match Charting Project）：逐场微观统计（发球落点/接发深度/
+# 回合结构/网前/关键分/正反手）。schema 见 data_dictionary.txt。
+MCP_BASE = "https://raw.githubusercontent.com/JeffSackmann/tennis_MatchChartingProject/master"
+MCP_STATS = ("ServeDirection", "ServeBasics", "ReturnDepth", "ReturnOutcomes", "Rally",
+             "NetPoints", "KeyPointsServe", "KeyPointsReturn", "ShotDirection", "Overview")
+
+
+def mcp_files() -> list[str]:
+    out = ["mcp__charting-data_dictionary.txt",
+           "mcp__charting-m-matches.csv", "mcp__charting-w-matches.csv"]
+    for t in ("m", "w"):
+        out.extend(f"mcp__charting-{t}-stats-{s}.csv" for s in MCP_STATS)
+    return out
+
 
 def _urls_for_year(tour: str, year: int) -> list[tuple[str, str]]:
     """返回 [(相对路径, 本地文件名)]。"""
@@ -85,27 +99,30 @@ def sync(raw_dir: Path, force: bool = False) -> dict:
         for p in raw_dir.glob("*.csv"):
             p.unlink()
 
-    jobs: list[tuple[str, str]] = []  # (远端相对路径, 本地名)
+    jobs: list[tuple[str, str]] = []  # (远端 URL 或 None, 本地名)
     for tour in TOURS:
         for y in range(1968, year + 1):
             jobs.extend(_urls_for_year(tour, y))
         jobs.extend(_static_files(tour))
-    jobs.append(("atp/matches_data_dictionary.txt", "atp__matches_data_dictionary.txt"))
+    mcp_jobs: list[tuple[str, str]] = []
+    for local in mcp_files():
+        remote = local.replace("mcp__charting-", "charting-")
+        mcp_jobs.append((f"{MCP_BASE}/{remote}", local))
 
     downloaded, skipped, failed, total_bytes = 0, 0, 0, 0
-    for rel, local in jobs:
-        url = f"{ARCHIVE_BASE}/{rel}"
+    all_jobs = [(f"{ARCHIVE_BASE}/{rel}", local) for rel, local in jobs] + mcp_jobs
+    for url, local in all_jobs:
         dest = raw_dir / local
         try:
             got, size = _download(url, dest)
         except Exception as e:  # noqa: BLE001
-            log.warning("download failed: %s (%s)", rel, e)
+            log.warning("download failed: %s (%s)", local, e)
             failed += 1
             continue
         total_bytes += size
         if got:
             downloaded += 1
-            log.info("fetched %s (%.1f KB)", rel, size / 1024)
+            log.info("fetched %s (%.1f KB)", local, size / 1024)
         else:
             skipped += 1
     return {
@@ -113,5 +130,5 @@ def sync(raw_dir: Path, force: bool = False) -> dict:
         "skipped": skipped,
         "failed": failed,
         "total_mb": round(total_bytes / 1e6, 1),
-        "files": len(jobs),
+        "files": len(all_jobs),
     }

@@ -64,6 +64,11 @@ the board; the chosen theme travels with the share link and viewers can switch i
 locally for preview. Players can be added to either side independently (up to 4),
 so the same board works for singles and doubles drills.
 
+Playback also has a **3D view** (three.js / React Three Fiber, lazy-loaded):
+editing stays 2D top-down for precision, while students watch the tactic on an
+orbitable 3D court with a real net, capsule players and a ball flying a
+distance-scaled arc. One toggle switches between 3D and the classic SVG view.
+
 ### Pro workflow integrations (all frontend-only)
 
 Inspired by how pro teams actually prepare (match charting → video/pattern review

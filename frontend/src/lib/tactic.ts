@@ -29,7 +29,20 @@ export interface Tactic {
   title: string;
   /** court skin key (see COURT_THEMES); absent = classic */
   theme?: string;
+  /** Optional strategy identity and coaching metadata for guided board demos. */
+  strategy?: StrategyMeta;
   frames: Frame[];
+}
+
+export type StrategyCategory = "serve" | "return" | "baseline" | "transition" | "defense" | "doubles";
+
+export interface StrategyMeta {
+  id: string;
+  category: StrategyCategory;
+  goal: string;
+  trigger: string;
+  fallback: string;
+  coachCue: string;
 }
 
 export const MAX_FRAMES = 30;
@@ -111,7 +124,7 @@ function toPoint(v: unknown): Point | null {
  */
 export function sanitizeTactic(raw: unknown): Tactic | null {
   if (typeof raw !== "object" || raw === null) return null;
-  const { title, theme, frames } = raw as Record<string, unknown>;
+  const { title, theme, strategy, frames } = raw as Record<string, unknown>;
   if (!Array.isArray(frames) || frames.length === 0) return null;
 
   const outFrames: Frame[] = [];
@@ -154,9 +167,29 @@ export function sanitizeTactic(raw: unknown): Tactic | null {
       : "";
   const cleanTheme =
     typeof theme === "string" && COURT_THEMES[theme] ? theme : undefined;
+  const cleanStrategy = sanitizeStrategy(strategy);
+  const base = cleanStrategy ? { v: 1 as const, title: cleanTitle, strategy: cleanStrategy, frames: outFrames } : { v: 1 as const, title: cleanTitle, frames: outFrames };
   return cleanTheme
-    ? { v: 1, title: cleanTitle, theme: cleanTheme, frames: outFrames }
-    : { v: 1, title: cleanTitle, frames: outFrames };
+    ? { ...base, theme: cleanTheme }
+    : base;
+}
+
+function sanitizeStrategy(raw: unknown): StrategyMeta | undefined {
+  if (typeof raw !== "object" || raw === null) return undefined;
+  const value = raw as Record<string, unknown>;
+  const categories: StrategyCategory[] = ["serve", "return", "baseline", "transition", "defense", "doubles"];
+  if (typeof value.id !== "string" || !/^[a-z0-9-]+$/.test(value.id)) return undefined;
+  if (typeof value.category !== "string" || !categories.includes(value.category as StrategyCategory)) return undefined;
+  const text = [value.goal, value.trigger, value.fallback, value.coachCue];
+  if (text.some((item) => typeof item !== "string" || item.trim() === "")) return undefined;
+  return {
+    id: value.id,
+    category: value.category as StrategyCategory,
+    goal: (value.goal as string).trim().slice(0, 240),
+    trigger: (value.trigger as string).trim().slice(0, 240),
+    fallback: (value.fallback as string).trim().slice(0, 240),
+    coachCue: (value.coachCue as string).trim().slice(0, 240),
+  };
 }
 
 /** Compress a tactic into a URL-path-safe string (lz-string URI alphabet, `+` → `_`). */

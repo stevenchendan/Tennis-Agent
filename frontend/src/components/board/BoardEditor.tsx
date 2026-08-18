@@ -24,6 +24,7 @@ import {
   type Tactic,
 } from "@/lib/tactic";
 import { templateByKey } from "@/lib/templates";
+import { findStrategies } from "@/lib/strategies";
 
 const DRAFT_KEY = "tactics-board-draft-v1";
 
@@ -387,9 +388,10 @@ export default function BoardEditor() {
         <TemplatePicker
           onClose={() => setTemplateOpen(false)}
           onPick={(key) => {
-            const tpl = templateByKey(key);
-            if (tpl) {
-              setTactic(tpl.build());
+            const strategy = findStrategies().find((item) => item.id === key);
+            const tpl = templateByKey(key) ?? (strategy ? { ...strategy, name: strategy.title } : undefined);
+            if (strategy || tpl) {
+              setTactic((strategy ?? tpl)!.build());
               setFrameIndex(0);
               flash(`已载入模板：${tpl.name}`);
             }

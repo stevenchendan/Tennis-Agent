@@ -393,7 +393,7 @@ export default function BoardEditor() {
             if (strategy || tpl) {
               setTactic((strategy ?? tpl)!.build());
               setFrameIndex(0);
-              flash(`已载入模板：${tpl.name}`);
+              flash(`Loaded strategy: ${(strategy?.title ?? tpl?.name) ?? "strategy"}`);
             }
             setTemplateOpen(false);
           }}

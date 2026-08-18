@@ -112,6 +112,15 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
 
   return (
     <div className="flex flex-col gap-4">
+      {tactic.title.toLowerCase().includes("server +1") && (
+        <div className="rounded-xl border border-amber-700/50 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          <p className="font-semibold text-amber-300">Server +1: what to watch</p>
+          <p className="mt-1 text-xs leading-relaxed text-amber-100/70">
+            Follow the three decisions: pull the returner wide, recover to a balanced court position, then
+            attack the first ball into the open court. Pause or step frame-by-frame to rehearse each decision.
+          </p>
+        </div>
+      )}
       <div className="rounded-2xl border border-neutral-900 bg-neutral-950 p-3">
         {view3d ? (
           <TacticCourt3D

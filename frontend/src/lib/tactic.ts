@@ -43,6 +43,7 @@ export interface StrategyMeta {
   trigger: string;
   fallback: string;
   coachCue: string;
+  fallbackId?: string;
 }
 
 export const MAX_FRAMES = 30;
@@ -189,6 +190,7 @@ function sanitizeStrategy(raw: unknown): StrategyMeta | undefined {
     trigger: (value.trigger as string).trim().slice(0, 240),
     fallback: (value.fallback as string).trim().slice(0, 240),
     coachCue: (value.coachCue as string).trim().slice(0, 240),
+    ...(typeof value.fallbackId === "string" && /^[a-z0-9-]+$/.test(value.fallbackId) ? { fallbackId: value.fallbackId } : {}),
   };
 }
 

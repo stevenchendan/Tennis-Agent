@@ -22,6 +22,32 @@ const f = (
 
 export const TEMPLATES: TacticTemplate[] = [
   {
+    key: "serve-plus-one-demo",
+    name: "Server +1: wide serve, cross-court forehand",
+    desc: "A practical three-step pattern: serve wide, recover inside the court, then attack the open cross-court space with the first forehand.",
+    build: () => ({
+      v: 1,
+      title: "Server +1: wide serve, cross-court forehand",
+      frames: [
+        f(
+          [[1, 6.7, 1.2], [2, 3.3, 20.4]],
+          [[6.7, 1.7], [1.8, 17.2]],
+          "1 · Serve wide to pull the returner off the court. Recover toward the singles centre mark.",
+        ),
+        f(
+          [[1, 6.1, 2.6], [2, 1.6, 19.0]],
+          [[1.6, 19.0], [8.7, 8.0]],
+          "2 · Expect the stretched return and stay balanced inside the baseline for the +1 ball.",
+        ),
+        f(
+          [[1, 8.0, 7.0], [2, 2.8, 19.8]],
+          [[8.0, 7.0], [2.5, 21.2]],
+          "3 · Drive the first forehand cross-court into the open space, then recover for the next ball.",
+        ),
+      ],
+    }),
+  },
+  {
     key: "deuce-wide-forehand",
     name: "平分区外角发球 + 正手空档进攻",
     desc: "把接发者拉出场外，第三拍打向身后空档。现代网球最经典的“设计分”。",

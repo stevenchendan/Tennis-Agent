@@ -224,6 +224,22 @@ export default function BoardEditor() {
       </header>
 
       <main className="mx-auto max-w-3xl space-y-4 px-4 py-6">
+        <button
+          onClick={() => {
+            const tpl = templateByKey("serve-plus-one-demo");
+            if (tpl) {
+              setTactic(tpl.build());
+              setFrameIndex(0);
+              flash("Loaded Server +1 demo");
+            }
+          }}
+          className="w-full rounded-2xl border border-amber-700/70 bg-amber-500/10 p-4 text-left transition hover:border-amber-500 hover:bg-amber-500/20"
+        >
+          <span className="block text-sm font-semibold text-amber-300">Try the Server +1 strategy</span>
+          <span className="mt-1 block text-xs text-amber-100/60">
+            Serve wide, recover inside the court, then attack the first ball into open space.
+          </span>
+        </button>
         {/* toolbar */}
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-xl border border-neutral-800 bg-neutral-900/60 p-1">

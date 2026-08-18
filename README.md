@@ -32,7 +32,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000 and click **"看一场演示比赛"** (watch a demo match).
+Open http://localhost:3000 and click **"Watch a demo match"**.
 The demo mode uses a built-in synthetic match (with two "planted" tactical patterns)
 and **requires no model weights, GPU, or API key** — it walks the full
 detection→events→patterns→report→Q&A pipeline and UI.
@@ -51,7 +51,7 @@ end), and the API (upload/analysis/Q&A full flow).
 
 ## Tennis Tactics Board (no backend required)
 
-From the home page click **"打开网球战术板"** (or visit `/board` directly): drag
+From the home page click **"Open the tennis tactics board"** (or visit `/board` directly): drag
 players into position, drag to draw shot trajectories, arrange the tactic frame by
 frame with per-frame notes, then click **Share** to generate a self-contained link
 (tactic data is compressed into the URL with lz-string — no database, no accounts

@@ -121,6 +121,13 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
           </p>
         </div>
       )}
+      {tactic.strategy && (
+        <div className="grid gap-2 rounded-xl border border-neutral-800 bg-neutral-900/60 p-3 text-xs text-neutral-300 sm:grid-cols-3">
+          <div><span className="font-semibold text-emerald-300">Goal</span><p className="mt-1 text-neutral-400">{tactic.strategy.goal}</p></div>
+          <div><span className="font-semibold text-amber-300">Trigger</span><p className="mt-1 text-neutral-400">{tactic.strategy.trigger}</p></div>
+          <div><span className="font-semibold text-sky-300">Fallback</span><p className="mt-1 text-neutral-400">{tactic.strategy.fallback}</p></div>
+        </div>
+      )}
       <div className="rounded-2xl border border-neutral-900 bg-neutral-950 p-3">
         {view3d ? (
           <TacticCourt3D

@@ -51,6 +51,24 @@ def health(settings: Settings = Depends(get_settings)) -> dict:
         "llm_enabled": settings.llm_enabled,
         "full_mode_ready": bool(settings.ball_model_path),
         "youtube_ready": youtube.is_available(),
+        "utr_configured": settings.utr_configured,
+    }
+
+
+@router.get("/utr/status")
+def utr_status(settings: Settings = Depends(get_settings)) -> dict:
+    """Return safe UTR integration state without exposing credentials or ratings."""
+    return {
+        "provider": "UTR Sports Engage API",
+        "configured": settings.utr_configured,
+        "authorized": False,
+        "rating_available": False,
+        "message": (
+            "UTR developer credentials are not configured"
+            if not settings.utr_configured
+            else "OAuth player authorization is required"
+        ),
+        "docs_url": "https://www.utrsports.net/pages/engage-api",
     }
 
 

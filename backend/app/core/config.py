@@ -71,12 +71,22 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-4o-mini"
     llm_temperature: float = 0.3
 
+    # --- UTR Engage API -------------------------------------------------
+    # Credentials are supplied only after an approved UTR developer application.
+    utr_client_id: str = ""
+    utr_client_secret: str = ""
+    utr_redirect_uri: str = ""
+
     # CORS for the Next.js dev server (and common alt ports).
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
 
     @property
     def llm_enabled(self) -> bool:
         return bool(self.openai_api_key)
+
+    @property
+    def utr_configured(self) -> bool:
+        return bool(self.utr_client_id and self.utr_client_secret and self.utr_redirect_uri)
 
     @property
     def cors_origin_list(self) -> list[str]:

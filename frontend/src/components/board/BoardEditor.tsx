@@ -170,10 +170,10 @@ export default function BoardEditor() {
   const activeMode = MODES.find((m) => m.key === mode)!;
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-neutral-900 bg-neutral-950/90 backdrop-blur">
+    <div className="min-h-screen bg-transparent">
+      <header className="sticky top-0 z-20 border-b border-white/10 bg-[#101110]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-2 px-4 py-3">
-          <Link href="/" className="text-sm text-neutral-500 transition hover:text-emerald-400">
+          <Link href="/" className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-500 transition hover:text-[#ff5a1f]">
             ← 首页
           </Link>
           <input
@@ -217,7 +217,7 @@ export default function BoardEditor() {
           </button>
           <button
             onClick={share}
-            className="rounded-lg bg-emerald-500 px-4 py-1.5 text-xs font-semibold text-neutral-950 shadow-lg shadow-emerald-900/50 transition hover:bg-emerald-400"
+            className="rounded-lg bg-[#ff5a1f] px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-white shadow-lg shadow-orange-950/40 transition hover:bg-[#ff7040]"
           >
             分享 →
           </button>
@@ -234,9 +234,9 @@ export default function BoardEditor() {
               flash("Loaded Server +1 demo");
             }
           }}
-          className="w-full rounded-2xl border border-amber-700/70 bg-amber-500/10 p-4 text-left transition hover:border-amber-500 hover:bg-amber-500/20"
+          className="w-full rounded-2xl border border-[#ff5a1f]/50 bg-[#ff5a1f]/10 p-4 text-left transition hover:border-[#ff5a1f] hover:bg-[#ff5a1f]/15"
         >
-          <span className="block text-sm font-semibold text-amber-300">Try the Server +1 strategy</span>
+          <span className="block text-sm font-semibold uppercase tracking-wide text-[#ff9b7a]">Try the Server +1 strategy</span>
           <span className="mt-1 block text-xs text-amber-100/60">
             Serve wide, recover inside the court, then attack the first ball into open space.
           </span>

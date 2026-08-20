@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0f0d;
-  --foreground: #e7efe9;
+  /* Nike-inspired court house: ink black, chalk white, signal orange. */
+  --background: #101110;
+  --foreground: #f5f5f0;
+  --surface: #191b19;
+  --surface-raised: #222522;
+  --signal: #ff5a1f;
+  --signal-soft: rgba(255, 90, 31, 0.14);
 }
 
 @theme inline {
@@ -23,8 +28,27 @@ body {
     sans-serif;
 }
 
+/* Athletic editorial texture: dense ink canvas with a restrained court-line grid. */
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  opacity: 0.18;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+
+button, input, textarea { font-family: inherit; }
+button { letter-spacing: -0.01em; }
+
+.brand-signal { color: var(--signal); }
+.surface-card { background: var(--surface); border-color: rgba(255,255,255,.10); }
+
 ::selection {
-  background: rgba(52, 211, 153, 0.35);
+  background: rgba(255, 90, 31, 0.35);
 }
 
 /* Game plan printing: strip dark theme and interactive controls */

@@ -6,6 +6,7 @@ import TacticCourt from "@/components/board/TacticCourt";
 import type { Ball3D } from "@/components/board/TacticCourt3D";
 import { COURT_THEMES } from "@/lib/court";
 import type { PlayerPos, Point, Tactic } from "@/lib/tactic";
+import { findStrategies } from "@/lib/strategies";
 
 // three.js chunk is only fetched when the 3D view is actually used
 const TacticCourt3D = dynamic(() => import("@/components/board/TacticCourt3D"), {
@@ -24,7 +25,10 @@ const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
-  const n = tactic.frames.length;
+  const [branch, setBranch] = useState<"primary" | "fallback">("primary");
+  const fallback = tactic.strategy?.fallbackId ? findStrategies().find((item) => item.id === tactic.strategy?.fallbackId)?.build() : null;
+  const activeTactic = branch === "fallback" && fallback ? fallback : tactic;
+  const n = activeTactic.frames.length;
   const total = n * FRAME_MS;
 
   const [playing, setPlaying] = useState(true);
@@ -38,8 +42,8 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
   const rafRef = useRef(0);
 
   const courtTactic = useMemo(
-    () => ({ ...tactic, theme: themeOverride ?? tactic.theme }),
-    [tactic, themeOverride],
+    () => ({ ...activeTactic, theme: themeOverride ?? activeTactic.theme }),
+    [activeTactic, themeOverride],
   );
 
   useEffect(() => {
@@ -76,8 +80,8 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
 
   const frameIndex = Math.min(Math.floor(elapsed / FRAME_MS), n - 1);
   const localT = clamp01((elapsed - frameIndex * FRAME_MS) / FRAME_MS);
-  const cur = tactic.frames[frameIndex];
-  const next = tactic.frames[frameIndex + 1];
+  const cur = activeTactic.frames[frameIndex];
+  const next = activeTactic.frames[frameIndex + 1];
 
   // players ease toward their next-frame positions across the frame
   const players: PlayerPos[] = next
@@ -126,6 +130,13 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
           <div><span className="font-semibold text-emerald-300">Goal</span><p className="mt-1 text-neutral-400">{tactic.strategy.goal}</p></div>
           <div><span className="font-semibold text-amber-300">Trigger</span><p className="mt-1 text-neutral-400">{tactic.strategy.trigger}</p></div>
           <div><span className="font-semibold text-sky-300">Fallback</span><p className="mt-1 text-neutral-400">{tactic.strategy.fallback}</p></div>
+        </div>
+      )}
+      {tactic.strategy?.fallbackId && fallback && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs">
+          <span className="mr-1 text-neutral-500">Plan:</span>
+          <button onClick={() => { setBranch("primary"); seek(0); }} className={`rounded-lg px-2.5 py-1.5 ${branch === "primary" ? "bg-emerald-500 text-neutral-950" : "bg-neutral-900 text-neutral-400 hover:text-neutral-200"}`}>Primary sequence</button>
+          <button onClick={() => { setBranch("fallback"); seek(0); }} className={`rounded-lg px-2.5 py-1.5 ${branch === "fallback" ? "bg-amber-400 text-neutral-950" : "bg-neutral-900 text-neutral-400 hover:text-neutral-200"}`}>If neutralized</button>
         </div>
       )}
       <div className="rounded-2xl border border-neutral-900 bg-neutral-950 p-3">

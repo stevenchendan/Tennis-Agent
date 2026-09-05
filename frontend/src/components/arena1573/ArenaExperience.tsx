@@ -112,7 +112,7 @@ export default function ArenaExperience(){
   }
   const [data,setData]=useState<ContextData|null>(null),[loadError,setLoadError]=useState(false),[ready,setReady]=useState(false),[seats,setSeats]=useState(0);
   const [shot,setShot]=useState<Shot>({view:'hero',serial:0}),[light,setLight]=useState<Light>('day');
-  const [rotate,setRotate]=useState(false),[context,setContext]=useState(true),[crowd,setCrowd]=useState(false),[markers,setMarkers]=useState(true),[rally,setRally]=useState(false);
+  const [rotate,setRotate]=useState(false),[context,setContext]=useState(true),[crowd,setCrowd]=useState(false),[markers,setMarkers]=useState(false),[rally,setRally]=useState(false);
   const [selected,setSelected]=useState<string|null>(null),[info,setInfo]=useState(false),[panel,setPanel]=useState(false),[toast,setToast]=useState('');
   const container=useRef<HTMLElement>(null),canvas=useRef<HTMLCanvasElement|null>(null);
   useEffect(()=>{
@@ -158,7 +158,7 @@ export default function ArenaExperience(){
       <div className={styles.controlLabel}><span>{tr("光线氛围")}</span><small>{tr("LIGHT & TIME")}</small></div>
       <div className={styles.lights}>{(['day','golden','night'] as Light[]).map((l,i)=><button key={l} aria-pressed={light===l} className={light===l?styles.activeLight:''} onClick={()=>setLight(l)}><span>{['☀','◒','☾'][i]}</span>{[tr("日间"),tr("日落"),tr("夜场")][i]}</button>)}</div>
       <div className={styles.divider}/>
-      {[{label:tr("周边建筑"),sub:tr("Precinct context"),value:context,set:setContext},{label:tr("场景热点"),sub:tr("Points of interest"),value:markers,set:setMarkers},{label:tr("看台观众"),sub:tr("A little match-day life"),value:crowd,set:setCrowd}].map(c=><label key={c.label} className={styles.toggleRow}><span>{c.label}<small>{c.sub}</small></span><input type="checkbox" checked={c.value} onChange={e=>c.set(e.target.checked)}/><i/></label>)}
+      {[{label:tr("周边建筑"),sub:tr("Precinct context"),value:context,set:setContext},{label:tr("显示标签"),sub:tr("球场与看台标签 · H"),value:markers,set:setMarkers},{label:tr("看台观众"),sub:tr("A little match-day life"),value:crowd,set:setCrowd}].map(c=><label key={c.label} className={styles.toggleRow}><span>{c.label}<small>{c.sub}</small></span><input type="checkbox" checked={c.value} onChange={e=>c.set(e.target.checked)}/><i/></label>)}
       <div className={styles.divider}/>
       <button className={`${styles.orbitButton} ${rotate?styles.engaged:''}`} aria-pressed={rotate} onClick={()=>setRotate(v=>!v)}><span>{rotate?'Ⅱ':'▷'}</span>{rotate?tr("暂停环绕"):tr("自动环绕")}<small>{tr("SPACE")}</small></button>
       <button className={styles.rallyButton} aria-pressed={rally} onClick={()=>setRally(v=>!v)}>{rally?'●':'○'} {rally?tr("暂停网球轨迹"):tr("播放网球轨迹")} <span>↗</span></button>

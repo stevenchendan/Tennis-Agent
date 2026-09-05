@@ -36,6 +36,7 @@ const english: Record<string, string> = {
   '下载衍生地理数据 · ODbL / CC BY 4.0 ↓': 'Download derived geodata · ODbL / CC BY 4.0 ↓',
   '快捷键：1–5 切换视角 · R 重置 · H 热点 · 空格环绕': 'Shortcuts: 1–5 views · R reset · H hotspots · Space orbit',
   '探索': 'Explore ', '页面语言': 'Page language',
+  '显示标签': 'Show labels', '球场与看台标签 · H': 'Court & seating labels · H',
 };
 
 const chinese: Record<string, string> = {

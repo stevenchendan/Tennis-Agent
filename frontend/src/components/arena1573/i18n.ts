@@ -37,6 +37,18 @@ const english: Record<string, string> = {
   '快捷键：1–5 切换视角 · R 重置 · H 热点 · 空格环绕': 'Shortcuts: 1–5 views · R reset · H hotspots · Space orbit',
   '探索': 'Explore ', '页面语言': 'Page language',
   '显示标签': 'Show labels', '球场与看台标签 · H': 'Court & seating labels · H',
+  '视觉主题': 'Visual theme', '原色': 'Classic', '水墨': 'Ink wash',
+  '一方球场，一纸山水。': 'A court, composed in ink.',
+  '远山为艺术化背景，并非当地地貌。': 'The distant mountains are an artistic backdrop, not local geography.',
+  '夏日日照': 'Summer sun', '日期': 'Date', '年份': 'Year', '当地时间': 'Local time', '日照时间': 'Sunlight time',
+  '日出': 'Sunrise', '太阳高度': 'Elevation', '方位': 'Bearing', '太阳已在地平线以下': 'Sun below the horizon · no direct sunlight',
+  '看台遮阴对比': 'Compare stand shade', '遮阴采样点 / 每侧9点': 'Shaded samples / 9 per side',
+  '北侧看台': 'North stand', '东侧看台': 'East stand', '南侧看台': 'South stand', '西侧看台': 'West stand',
+  '点击看台查看视角。比较不同时段，再选择座位。': 'Tap a stand for its view. Compare times before choosing a seat.',
+  '仅为近似建筑模型的遮阴参考，不含云层、紫外线或临时设施；不是座位遮阴保证。': 'Approximate structural shade only. Excludes clouds, UV and temporary structures; not a seat-shade guarantee.',
+  '太阳位置算法 · NOAA ↗': 'Solar-position method · NOAA ↗',
+  'AO 2027：资格赛 1月11–16日；正赛 1月17–31日。': 'AO 2027: qualifying 11–16 Jan; main draw 17–31 Jan.',
+  '暂定赛程 ↗': 'Provisional schedule ↗',
 };
 
 const chinese: Record<string, string> = {

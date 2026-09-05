@@ -194,6 +194,19 @@ export default function Home() {
           职业球探报告：选对手 / 选场地赛事，出高阶数据赛前报告（ATP·WTA·ITF）
         </Link>
 
+        <Link
+          href="/melbourne-park"
+          className={`group flex w-full max-w-xl items-center justify-between rounded-xl border border-sky-500/35 bg-sky-500/5 px-5 py-4 text-left transition hover:border-sky-400 hover:bg-sky-500/10 ${
+            busy ? "pointer-events-none opacity-50" : ""
+          }`}
+        >
+          <span>
+            <span className="block text-sm font-semibold text-sky-200">Melbourne Park 3D</span>
+            <span className="mt-1 block text-xs text-neutral-500">Explore the Australian Open precinct and 28 selectable courts</span>
+          </span>
+          <span className="text-lg text-sky-300 transition group-hover:translate-x-1">→</span>
+        </Link>
+
         {backendUp === false && (
           <p className="text-sm text-amber-400">
             后端未启动：请先运行 <code className="rounded bg-neutral-800 px-1.5 py-0.5">uvicorn app.main:app</code>

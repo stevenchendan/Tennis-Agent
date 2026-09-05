@@ -69,6 +69,29 @@ editing stays 2D top-down for precision, while students watch the tactic on an
 orbitable 3D court with a real net, capsule players and a ball flying a
 distance-scaled arc. One toggle switches between 3D and the classic SVG view.
 
+The separate `/melbourne-park` experience is a self-hosted, open-data digital-twin
+foundation for the Australian Open precinct. It renders 863 surveyed building
+tiers at their real coordinates and measured heights, 32 mapped tennis surfaces,
+and local paths/roads/rail geometry. A game-style ground mode lets users enter the
+precinct with WASD/arrow-key movement, drag-to-look, sprint and aerial/ground
+transitions. Venue roofs use our own PBR material layer, while 1,234 mapped trees
+and the street-light layer are GPU-instanced for street-level performance. The
+experience includes day/night lighting, camera presets and navigation back to the tactics board.
+There are no Google map or commercial 3D-tile dependencies.
+
+The bundled geographic package is generated from City of Melbourne Open Data
+(2020 Building Footprints, CC BY 4.0) and OpenStreetMap (ODbL). Refresh it with:
+
+```bash
+cd frontend
+node scripts/sync-melbourne-park-open-data.mjs
+```
+
+The optional AO-zone overlay is explicitly labeled as a planning draft because
+temporary tournament facilities change each year. Production event alignment
+should be updated from the current official AO map or venue CAD/GIS rather than
+silently treated as surveyed geometry.
+
 ### Pro workflow integrations (all frontend-only)
 
 Inspired by how pro teams actually prepare (match charting → video/pattern review

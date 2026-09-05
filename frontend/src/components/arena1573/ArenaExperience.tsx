@@ -10,6 +10,7 @@ import styles from './arena.module.css';
 import { getTranslator, Language } from './i18n';
 import { InkLandscape, InkWash } from './InkWash';
 import SunControls from './SunControls';
+import TennisRally from './TennisRally';
 import { SEATING_LIFT } from './dimensions';
 import { summerSun, ShadeResult, SolarDate, Stand, standSamples, STANDS } from './solar';
 
@@ -100,12 +101,6 @@ function Rig({shot,rotate,onInteract,canvasRef}:{shot:Shot;rotate:boolean;onInte
   return <OrbitControls ref={controls} makeDefault enableDamping dampingFactor={.075} minDistance={1.5} maxDistance={330} maxPolarAngle={Math.PI*.488} autoRotate={rotate} autoRotateSpeed={.45} zoomSpeed={.7} target={[4,1,-1]} onStart={()=>{transitioning.current=false;onInteract();}}/>;
 }
 
-function Rally({active}:{active:boolean}) {
-  const ball=useRef<T.Mesh>(null);const elapsed=useRef(0);
-  useFrame((_,delta)=>{if(!active||!ball.current)return;elapsed.current+=delta;const t=(elapsed.current%2.6)/2.6;ball.current.position.set(Math.sin(t*Math.PI*2)*3.1,.28+Math.sin(t*Math.PI)*3.1,14-28*t);});
-  return <mesh ref={ball} visible={active} castShadow><sphereGeometry args={[.12,16,12]}/><meshStandardMaterial color="#d6ec49" emissive="#a4b22a" emissiveIntensity={.2}/></mesh>;
-}
-
 function Scene({data,shot,light,rotate,context,crowd,markers,rally,onSelect,onReady,onInteract,canvasRef,language,theme,sun,onShade}:{data:ContextData;shot:Shot;light:Light;rotate:boolean;context:boolean;crowd:boolean;markers:boolean;rally:boolean;onSelect:(id:string)=>void;onReady:(seats:number)=>void;onInteract:()=>void;canvasRef:React.RefObject<HTMLCanvasElement|null>;language:Language;theme:Theme;sun:Sun;onShade:(result:ShadeResult|null)=>void}){
   const tr=getTranslator(language);
   const night=light==='night'||!!sun&&!sun.aboveHorizon,golden=light==='golden'||!!sun&&sun.aboveHorizon&&sun.elevation<15;
@@ -120,7 +115,7 @@ function Scene({data,shot,light,rotate,context,crowd,markers,rally,onSelect,onRe
     {night&&<><pointLight position={[-18,18,0]} intensity={1600} distance={85} decay={2} color="#e7f2ff"/><pointLight position={[18,18,0]} intensity={1600} distance={85} decay={2} color="#fff0d6"/><pointLight position={[0,17,-22]} intensity={1100} distance={65} decay={2}/><pointLight position={[0,17,22]} intensity={1100} distance={65} decay={2}/></>}
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-3.2,0]} receiveShadow><planeGeometry args={[3000,3000]}/><meshStandardMaterial color={bg} roughness={1}/></mesh>
     <World data={data} light={light} context={context} crowd={crowd} onReady={onReady} sun={sun} onShade={onShade}/>
-    <Rally active={rally}/>
+    <TennisRally active={rally}/>
     {markers&&points.filter(p=>context||p.id!=='precinct').map((p,i)=><Html key={p.id} position={p.position} center zIndexRange={[10,0]}><button className={styles.pin} title={tr(p.title)} aria-label={`${tr('探索')}${tr(p.title)}`} onClick={()=>onSelect(p.id)}><span>{String(i+1).padStart(2,'0')}</span><b>{tr(p.title)}</b></button></Html>)}
     <Rig shot={shot} rotate={rotate} onInteract={onInteract} canvasRef={canvasRef}/>
   </>;
@@ -152,6 +147,7 @@ export default function ArenaExperience(){
   function changeSolarDate(date:SolarDate){setShade(null);setSolarDate(date);}
   function viewStand(stand:Stand){setShot(s=>({view:'seat',serial:s.serial+1,stand}));setRotate(false);setSelected(null);}
   const [rotate,setRotate]=useState(false),[context,setContext]=useState(true),[crowd,setCrowd]=useState(false),[markers,setMarkers]=useState(false),[rally,setRally]=useState(false);
+  useEffect(()=>{if(rotate)setRally(true);},[rotate]);
   const [selected,setSelected]=useState<string|null>(null),[info,setInfo]=useState(false),[panel,setPanel]=useState(false),[toast,setToast]=useState('');
   const container=useRef<HTMLElement>(null),canvas=useRef<HTMLCanvasElement|null>(null);
   useEffect(()=>{
@@ -203,7 +199,7 @@ export default function ArenaExperience(){
       {[{label:tr("周边建筑"),sub:tr("Precinct context"),value:context,set:setContext},{label:tr("显示标签"),sub:tr("球场与看台标签 · H"),value:markers,set:setMarkers},{label:tr("看台观众"),sub:tr("A little match-day life"),value:crowd,set:setCrowd}].map(c=><label key={c.label} className={styles.toggleRow}><span>{c.label}<small>{c.sub}</small></span><input type="checkbox" checked={c.value} disabled={light==='solar'&&c.set===setContext} onChange={e=>c.set(e.target.checked)}/><i/></label>)}
       <div className={styles.divider}/>
       <button className={`${styles.orbitButton} ${rotate?styles.engaged:''}`} aria-pressed={rotate} onClick={()=>setRotate(v=>!v)}><span>{rotate?'Ⅱ':'▷'}</span>{rotate?tr("暂停环绕"):tr("自动环绕")}<small>{tr("SPACE")}</small></button>
-      <button className={styles.rallyButton} aria-pressed={rally} onClick={()=>setRally(v=>!v)}>{rally?'●':'○'} {rally?tr("暂停网球轨迹"):tr("播放网球轨迹")} <span>↗</span></button>
+      <button className={styles.rallyButton} aria-pressed={rally} onClick={()=>setRally(v=>!v)}>{rally?'●':'○'} {rally?tr("暂停球员回合"):tr("播放球员回合")} <span>↗</span></button>
     </aside>
     <div className={styles.north} title={tr("北向相对球场长轴约偏转 8°")}><span>N</span><svg width="34" height="42" viewBox="0 0 34 42" aria-hidden="true"><path d="M17 3 L29 34 L17 27 L5 34 Z" fill="none" stroke="currentColor" strokeWidth="1.2"/><path d="M17 3 L17 27 L5 34 Z" fill="currentColor"/></svg><small>{tr("地理北向参考 · 8°")}</small></div>
     <section className={styles.caption}><div className={styles.captionNumber}>01<span> / {tr('FIELD NOTES')}</span></div><h2>{tr("一座开放的网球剧场。")}</h2><p>{tr("蓝色硬地、层叠看台与铜色屋顶，")}<br/>{tr("在墨尔本公园的一隅相遇。")}</p><div className={styles.metrics}><div><b>{seats?seats.toLocaleString():'—'}</b><span>{tr("模型座椅")}</span></div><div><b>23.77<span> m</span></b><span>{tr("标准场地长度")}</span></div></div></section>

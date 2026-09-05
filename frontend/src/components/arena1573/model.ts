@@ -14,6 +14,9 @@ class Builder {
   group = new T.Group();
   batches = new Map<string, T.BufferGeometry[]>();
   add(geometry: T.BufferGeometry, color: string) {
+    // Extruded shapes are non-indexed; boxes and cylinders are indexed.
+    // Normalize before batching so an entire material group is not dropped.
+    if (!geometry.index) geometry.setIndex(Array.from({length:geometry.getAttribute('position').count},(_,i)=>i));
     const list = this.batches.get(color) || [];
     list.push(geometry); this.batches.set(color, list);
   }

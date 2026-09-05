@@ -18,7 +18,7 @@ const english: Record<string, string> = {
   '离球场，更近一点。': 'A little closer to the court.', '场景设置': 'Scene settings', '此刻的球场': 'Make it your view',
   '光线氛围': 'Lighting', '日间': 'Day', '日落': 'Sunset', '夜场': 'Night',
   '周边建筑': 'Surroundings', '场景热点': 'Scene hotspots', '看台观众': 'Spectators',
-  '暂停环绕': 'Pause orbit', '自动环绕': 'Auto orbit', '暂停网球轨迹': 'Pause ball animation', '播放网球轨迹': 'Play ball animation',
+  '暂停环绕': 'Pause orbit', '自动环绕': 'Auto orbit', '暂停球员回合': 'Pause rally', '播放球员回合': 'Play rally',
   '北向相对球场长轴约偏转 8°': 'North is approximately 8° from the court’s long axis', '地理北向参考 · 8°': 'Geographic north · 8°',
   '一座开放的网球剧场。': 'An open-air tennis theatre.', '蓝色硬地、层叠看台与铜色屋顶，': 'Blue courts, tiered seats and copper roofs,', '在墨尔本公园的一隅相遇。': 'together in a corner of Melbourne Park.',
   '模型座椅': 'Modelled seats', '标准场地长度': 'Regulation court length', '相机视角': 'Camera views', '快捷键': 'Shortcut',

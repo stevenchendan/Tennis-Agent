@@ -22,4 +22,6 @@ The stand comparison casts rays toward the sun from nine seated head-height samp
 
 Run `node scripts/check-1573-solar.mjs` from `frontend` to check solar directions, coordinate rotation, January/February daylight boundaries, leap years and input validation. Method: https://gml.noaa.gov/grad/solcalc/solareqns.PDF.
 
+`TennisRally.tsx` adds two articulated, stylized players with lateral recovery, racket swings and a synchronized bouncing ball. The grey shirt/white cap and yellow shirt take visual cues from the supplied Tennis TV reference (https://www.youtube.com/watch?v=5gj4iLvsQOo). This is hand-authored choreography, not motion capture or an exact match replay. Auto orbit starts the rally; Play/Pause rally controls it independently. `node scripts/check-1573-rally.mjs` checks trajectory continuity, net clearance, bounce height and racket contact alignment.
+
 Run `npm run dev -- --port 3100`, then open `http://localhost:3100/1573-arena`. Shortcuts: 1–5 camera presets, R reset, H hotspots, Space orbit, Escape close panels.

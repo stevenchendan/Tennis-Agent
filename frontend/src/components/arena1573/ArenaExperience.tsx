@@ -31,7 +31,7 @@ const cameras: Record<View,{position:[number,number,number];target:[number,numbe
   plan:{position:[0,105,.01],target:[0,0,0]},
   seat:{position:[-16.2,5.4+SEATING_LIFT,9],target:[0,1,0]},
   court:{position:[-2,1.75,16.6],target:[0,1,-6]},
-  precinct:{position:[-118,147,165],target:[32,0,-27]},
+  precinct:{position:[-170,230,255],target:[12,0,-28]},
 };
 const points = [
   {id:'court',title:'蓝色中心球场',en:'THE PLAYING SURFACE',position:[0,.3,0] as [number,number,number],view:'court' as View,description:'23.77 × 10.97 米标准双打场地。单打边线、发球区、中心标记，以及中部下垂的球网，均以米为单位建模。'},

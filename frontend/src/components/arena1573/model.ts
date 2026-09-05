@@ -184,7 +184,12 @@ export function buildArena() {
 
 export function buildContext(data: ContextData) {
   const b=new Builder();
-  b.box(37,-1.65,0,280,3,310,'#b9bbaa');
+  b.box(0,-1.65,0,650,3,620,'#a6af94');
+  // Riverbank follows the existing Yarra Trail, offset toward the water.
+  const bank=[[-210,-260],[-175,-170],[-151,-82],...(data.features.find(f=>f.id==='way/991624386')?.points??[])];
+  const riverShape=new T.Shape([...bank.map(p=>new T.Vector2(p[0]-16,-p[1])),new T.Vector2(-325,-260),new T.Vector2(-325,265)]);
+  const riverGeometry=new T.ShapeGeometry(riverShape);riverGeometry.rotateX(-Math.PI/2);riverGeometry.translate(0,-.06,0);
+  const river=new T.Mesh(riverGeometry,new T.MeshStandardMaterial({color:'#547d80',roughness:.48,metalness:.12}));river.receiveShadow=true;b.group.add(river);
   b.box(2,-.11,1,62,.1,83,'#c7c5b6');
   // Paving joints around the arena make the pedestrian scale legible.
   for(let x=-30;x<=30;x+=3) b.box(x,-.045,0,.018,.02,80,'#a8ab9d');
@@ -194,12 +199,25 @@ export function buildContext(data: ContextData) {
       for(let i=1;i<f.points.length;i++){
         const a=f.points[i-1], c=f.points[i], dx=c[0]-a[0],dz=c[1]-a[1];
         if(Math.abs((a[0]+c[0])/2)<24&&Math.abs((a[1]+c[1])/2)<33)continue;
-        b.box((a[0]+c[0])/2,-.018,(a[1]+c[1])/2,Math.max(2,f.width),.035,Math.hypot(dx,dz),'#d7d4c5',Math.atan2(dx,dz));
+        const bridge=f.name==='Tanderrum Bridge',road=f.name==='Batman Avenue';
+        // Paths cross the road network. Keep their top surfaces above both
+        // asphalt and lane markings to avoid coplanar depth-buffer flicker.
+        const y=bridge?6.6:road?-.018:.08,width=bridge?6:road?8:Math.max(2,f.width);
+        b.box((a[0]+c[0])/2,y,(a[1]+c[1])/2,width,bridge?.5:.035,Math.hypot(dx,dz),road?'#687070':'#d7d4c5',Math.atan2(dx,dz));
+        if(bridge){
+          const len=Math.hypot(dx,dz),nx=dz/len*2.9,nz=-dx/len*2.9;
+          for(const side of [-1,1]){
+            b.rod([a[0]+nx*side,7.9,a[1]+nz*side],[c[0]+nx*side,7.9,c[1]+nz*side],.065,'#8c938c');
+            for(let d=0;d<len;d+=3){const t=d/len,x=a[0]+dx*t+nx*side,z=a[1]+dz*t+nz*side;b.rod([x,6.85,z],[x,7.9,z],.035);}
+          }
+          for(let d=8;d<len;d+=24){const t=d/len;b.box(a[0]+dx*t,3.15,a[1]+dz*t,1.1,6.3,1.1,'#aeb2a9');}
+        }
+        if(road){const len=Math.hypot(dx,dz);for(let d=2;d<len-2;d+=8)b.box(a[0]+dx*d/len,.015,a[1]+dz*d/len,.12,.015,3,'#dedbc6',Math.atan2(dx,dz));}
       }
     }
     if(f.kind==='court'&&f.id!=='way/126844352'){
       const ps=f.points.slice(0,4),x=ps.reduce((s,p)=>s+p[0],0)/4,z=ps.reduce((s,p)=>s+p[1],0)/4;
-      if(Math.abs(x)>155||Math.abs(z)>148)continue;
+      if(Math.abs(x)>155||Math.abs(z)>195)continue;
       // Indoor courts are occluded by the actual surrounding building tiers.
       court(b,x,z,0,false);
       for(const s of [-1,1]){
@@ -209,6 +227,18 @@ export function buildContext(data: ContextData) {
     }
   }
   data.buildings.forEach(building=>{
+    // This footprint is the elevated bridge, rebuilt as an open deck above.
+    if(building.id==='810459-2-0')return;
+    if(building.name==='Margaret Court Arena')return;
+    if(building.name==='Rod Laver Arena'){
+      const shell=roundedPath(55,64,30);shell.holes.push(new T.Path(roundedPath(49,58,26).getPoints(32).reverse()));
+      const wall=new T.ExtrudeGeometry(shell,{depth:22,bevelEnabled:false,curveSegments:24});wall.rotateX(-Math.PI/2);wall.translate(154,0,72);b.add(wall,'#8b9799');
+      const roofShape=roundedPath(56,65,31);roofShape.holes.push(new T.Path(roundedPath(22,35,11).getPoints(32).reverse()));
+      const roof=new T.ShapeGeometry(roofShape,36);roof.rotateX(-Math.PI/2);const pos=roof.getAttribute('position');
+      for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);pos.setXYZ(i,x+154,23+5*(1-Math.min(1,Math.max(Math.abs(x)/56,Math.abs(z)/65))),z+72);}roof.computeVertexNormals();b.add(roof,'#e4e5dc');
+      for(let z=-42;z<=42;z+=14)b.rod([103,24,72+z],[205,24,72+z],.10,'#bfc5c3');
+      return;
+    }
     const shape=new T.Shape(building.ring.map(p=>new T.Vector2(p[0],-p[1])));
     const g=new T.ExtrudeGeometry(shape,{depth:building.height,bevelEnabled:false});g.rotateX(-Math.PI/2);g.translate(0,building.base,0);
     const cx=building.ring.reduce((s,p)=>s+p[0],0)/building.ring.length;
@@ -231,26 +261,42 @@ export function buildContext(data: ContextData) {
         if(inside(a)!==inside(c)){const t=(boundary-a[1])/(c[1]-a[1]);result.push([a[0]+(c[0]-a[0])*t,boundary]);}
       }return result;
     };
-    for(let z=-52;z<116;z+=5.5){
-      for(let half=0;half<2;half++){
-        const low=z+half*2.75, high=low+2.75;
-        const polygon=clip(clip(mca.ring.slice(0,-1),low,true),high,false);
-        if(polygon.length<3)continue;
-        const shape=new T.Shape(polygon.map(p=>new T.Vector2(p[0],-p[1])));
-        const g=new T.ShapeGeometry(shape);g.rotateX(-Math.PI/2);
-        const pos=g.getAttribute('position');
-        for(let i=0;i<pos.count;i++){
-          const fraction=T.MathUtils.clamp((pos.getZ(i)-low)/2.75,0,1);
-          pos.setY(i,15.12+(half===0?fraction:1-fraction)*1.65);
-        }g.computeVertexNormals();
-        const roof=new T.Mesh(g,new T.MeshStandardMaterial({color:half===0?'#a56c4b':'#ba8964',roughness:.76,side:T.DoubleSide}));roof.castShadow=true;roof.receiveShadow=true;b.group.add(roof);
-        polygon.forEach((p,i)=>{const c=polygon[(i+1)%polygon.length];if(Math.abs(p[1]-high)<.01&&Math.abs(c[1]-high)<.01)b.rod([p[0],15.2+(half===0?1.65:0),p[1]],[c[0],15.2+(half===0?1.65:0),c[1]],.07,'#d8bb9b');});
-      }
+    // Separate roof bays and lower perimeter skirts, clipped to the footprint.
+    const clipX=(poly:number[][],value:number,above:boolean)=>clip(poly.map(p=>[p[1],p[0]]),value,above).map(p=>[p[1],p[0]]);
+    const roofHeight=(x:number,z:number)=>{
+      const bay=Math.floor((z+48)/11),phase=((z+48)%11+11)%11;
+      const fold=1-Math.abs(phase-5.5)/5.5;
+      const skirt=Math.min(1,Math.max(0,(x-25)/10),Math.max(0,(118-x)/16));
+      return 10.5+skirt*(4.1+fold*2.8)+(bay>=5?-.7:0);
+    };
+    for(let z=-48;z<117;z+=5.5)for(const [xl,xh] of [[6,25],[25,35],[35,62],[62,65],[65,92],[92,102],[102,118],[118,140]]){
+      const polygon=clipX(clipX(clip(clip(mca.ring.slice(0,-1),z,true),z+5.5,false),xl,true),xh,false);
+      if(polygon.length<3)continue;
+      const g=new T.ShapeGeometry(new T.Shape(polygon.map(p=>new T.Vector2(p[0],-p[1]))));g.rotateX(-Math.PI/2);
+      const pos=g.getAttribute('position');for(let i=0;i<pos.count;i++)pos.setY(i,roofHeight(pos.getX(i),pos.getZ(i)));g.computeVertexNormals();
+      const roof=new T.Mesh(g,new T.MeshStandardMaterial({color:xl===62?'#94765e':(Math.round((z+48)/5.5)%2===0?'#aa7050':'#c58c65'),roughness:.8,side:T.DoubleSide}));roof.castShadow=true;roof.receiveShadow=true;b.group.add(roof);
+      polygon.forEach((p,i)=>{const q=polygon[(i+1)%polygon.length];b.rod([p[0],roofHeight(...p as [number,number])+.04,p[1]],[q[0],roofHeight(...q as [number,number])+.04,q[1]],.045,'#d3ad89');});
     }
-    // Glazed foyer strip and repeated copper facade fins.
-    b.box(25.41,5.3,0,.12,7.6,37,'#4e6669');
-    for(let z=-18;z<19;z+=2.4)b.box(25.1,5.3,z,.42,8,.15,'#c59c78');
+    // Full-height glazed perimeter with visible mullions, doors and opaque fins.
+    const fasciaParts:T.BufferGeometry[]=[];
+    mca.ring.forEach((p,i)=>{
+      if(!i)return;const a=mca.ring[i-1],dx=p[0]-a[0],dz=p[1]-a[1],len=Math.hypot(dx,dz),angle=Math.atan2(dx,dz);
+      for(let d=0;d<len;d+=1.5){
+        const t=d/len,u=Math.min(1,(d+1.5)/len),x=a[0]+dx*t,z=a[1]+dz*t,xx=a[0]+dx*u,zz=a[1]+dz*u;
+        const h=roofHeight(x,z),hh=roofHeight(xx,zz);
+        const fascia=new T.BufferGeometry();fascia.setAttribute('position',new T.Float32BufferAttribute([x,10.2,z,xx,10.2,zz,xx,hh,zz,x,10.2,z,xx,hh,zz,x,h,z],3));fascia.computeVertexNormals();
+        fasciaParts.push(fascia);
+      }
+      b.box((p[0]+a[0])/2,5.1,(p[1]+a[1])/2,.24,10.2,len,'#425b62',angle);
+      for(let d=0;d<len;d+=2.5){const t=d/len,x=a[0]+dx*t,z=a[1]+dz*t;b.rod([x,0,z],[x,10.4,z],.065,'#bdc3bc');}
+      for(const y of [1.1,4.8,8.4,10.3])b.rod([a[0],y,a[1]],[p[0],y,p[1]],.075,'#aeb7b3');
+    });
+    const fasciaGeometry=mergeGeometries(fasciaParts);fasciaParts.forEach(g=>g.dispose());
+    if(fasciaGeometry){const face=new T.Mesh(fasciaGeometry,new T.MeshStandardMaterial({color:'#aa7657',roughness:.8,side:T.DoubleSide}));face.castShadow=true;face.receiveShadow=true;b.group.add(face);}
+    for(const z of [-26,-23,20,23])b.box(25.3,5.3,z,.55,10.6,1.25,'#c8c8b9');
+    const sign=label('MARGARET COURT ARENA',15,.8,'#d5dcda','#263c43');sign.rotation.y=-Math.PI/2;sign.position.set(25.1,3.6,-4);b.group.add(sign);
   }
+
   // Service pavilions, entry furniture and planting are interpretive details.
   for(let z=-18;z<=18;z+=12){
     b.box(-28,1.7,z,4,3.4,7,'#66756f');b.box(-28,3.5,z,4.5,.18,7.5,'#dedacb');
@@ -264,12 +310,14 @@ export function buildContext(data: ContextData) {
     const sign=label('1573  →',2.8,.65,'#e5f0c9');sign.position.set(x,3.35,z+.26);b.group.add(sign);
   }
   const trees: number[][]=[];
-  for(let i=0;i<27;i++)trees.push([-37-Math.sin(i*.75)*5, -140+i*11]);
+  for(let i=0;i<27;i++)trees.push([-48-Math.sin(i*.75)*5, -145+i*11]);
+  bank.forEach(([x,z],i)=>{trees.push([x+3,z]);if(i%2===0)trees.push([x+10,z+5]);});
   for(let i=0;i<16;i++)trees.push([-81+i*13,-146+Math.sin(i)*4]);
   for(let i=0;i<14;i++)trees.push([-65+i*15,135+Math.sin(i)*6]);
-  const leaves=new T.InstancedMesh(new T.IcosahedronGeometry(1,1),new T.MeshStandardMaterial({color:'#687b4d',roughness:1,flatShading:true}),trees.length*4);
+  const plantedTrees=trees.filter(([x,z])=>!data.features.some(f=>f.kind==='court'&&x>Math.min(...f.points.map(p=>p[0]))-4&&x<Math.max(...f.points.map(p=>p[0]))+4&&z>Math.min(...f.points.map(p=>p[1]))-4&&z<Math.max(...f.points.map(p=>p[1]))+4));
+  const leaves=new T.InstancedMesh(new T.IcosahedronGeometry(1,1),new T.MeshStandardMaterial({color:'#687b4d',roughness:1,flatShading:true}),plantedTrees.length*4);
   const o=new T.Object3D();
-  trees.forEach(([x,z],i)=>{
+  plantedTrees.forEach(([x,z],i)=>{
     const height=5+(Math.sin(i*7)+1)*1.6;b.rod([x,0,z],[x,height,z],.28,'#83745b');
     b.box(x,.15,z,4,.3,4,'#999f7f');
     for(let j=0;j<4;j++){

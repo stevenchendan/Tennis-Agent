@@ -8,7 +8,9 @@ import ts from 'typescript';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const source=fs.readFileSync(path.join(root,'src/components/arena1573/solar.ts'),'utf8');
 const module={exports:{}};
-vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{module,exports:module.exports});
+const dimensions={exports:{}};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(root,'src/components/arena1573/dimensions.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{module:dimensions,exports:dimensions.exports});
+vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{module,exports:module.exports,require:(id)=>{assert.equal(id,'./dimensions');return dimensions.exports;}});
 const {summerSun,summerDaylight,sunDirection,clockTime,standSamples,STANDS}=module.exports;
 const close=(a,b,tolerance=1e-9)=>assert.ok(Math.abs(a-b)<tolerance,`${a} != ${b}`);
 
@@ -48,6 +50,7 @@ assert.ok(summerDaylight(2027,2,28).sunset<summerDaylight(2027,1,15).sunset);
 assert.throws(()=>summerSun({year:2027,month:1,day:32,minutes:600}));
 assert.throws(()=>summerSun({year:2027,month:1,day:1,minutes:NaN}));
 for(const stand of STANDS)assert.equal(standSamples(stand).length,9);
+assert.ok(standSamples('east')[0][1]>4,'Seated shade samples must sit above the raised retaining-wall base');
 console.log('Solar checks passed: AEDT day boundaries, January/February dates and leap years, sunrise/sunset crossings, sun bearings and arena alignment.');
 for(const minutes of [360,540,810,1080,1260]){
   const sun=summerSun({year:2027,month:1,day:15,minutes});

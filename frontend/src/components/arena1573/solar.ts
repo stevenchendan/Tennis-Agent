@@ -1,3 +1,4 @@
+import { SEATING_LIFT } from './dimensions';
 /** NOAA's general solar-position equations (geometric solar centre).
  * https://gml.noaa.gov/grad/solcalc/solareqns.PDF
  * Approximate clear-sky geometry, not weather, UV or a surveyed shade guarantee.
@@ -60,7 +61,7 @@ export function clockTime(minutes:number){
 // Counts describe these samples only, not real seat numbers or whole-stand area.
 export function standSamples(stand:Stand):[number,number,number][]{
   return [2,6,10].flatMap(row=>[-1,0,1].map(offset=>{
-    const y=.87+row*.43+.82;
+    const y=SEATING_LIFT+.87+row*.43+.82;
     if(stand==='east'||stand==='west')return [(stand==='east'?1:-1)*(11.2+row*.79),y,offset*9] as [number,number,number];
     return [offset*5,y,(stand==='south'?1:-1)*(19.9+row*.79)] as [number,number,number];
   }));

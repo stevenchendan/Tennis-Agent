@@ -6,6 +6,8 @@ The header offers Classic and Ink wash themes with a saved local preference. Ink
 
 `model.ts` builds metre-scale Three.js geometry: regulation court markings, a sagging net, twelve rounded seating tiers, 2,822 instanced seats, handrails, shade hoods, six lighting masts, benches and an umpire chair. Architecture, landscaping and crowds are interpretive, not surveyed. The neighbouring arenas use separate OpenStreetMap polygons; the combined city footprint is deliberately excluded to prevent overlapping roof volumes.
 
+The four user-supplied interior photographs inform the raised seating base: an estimated 1.65 m lift, continuous pale retaining wall with a dark upper fascia, lighter blue seating and intermediate aisle treads. `dimensions.ts` shares the lift between geometry, seated cameras and sunlight samples. Court level and neighbouring building heights are unchanged; the photo-derived height is not a surveyed measurement.
+
 `ArenaExperience.tsx` provides five camera presets, orbit/zoom/pan, day/sunset/night lighting, context and crowd toggles, clickable points of interest, a demonstration ball animation, PNG capture and fullscreen. The page works without external textures, fonts, map keys, a backend or Blender. WebGL 2 is required.
 
 Regenerate the compact local context from the existing dataset with `node scripts/extract-1573-context.mjs` from `frontend`. The source data attribution is preserved in `public/data/1573-context.json`, and the UI links both the sources and the downloadable derivative. City building data: CC BY 4.0. OpenStreetMap data: ODbL 1.0. Google Maps is a visual reference only; no map imagery is redistributed.

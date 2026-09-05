@@ -1,3 +1,4 @@
+import { SEATING_LIFT } from './dimensions';
 import * as T from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
@@ -8,7 +9,7 @@ export interface ContextData {
 
 // All dimensions are metres. Court geometry is regulation sized; architecture
 // is a visual reconstruction, not a surveyed or as-built model.
-const palette = { concrete: '#b4b4ac', edge: '#d4d1c5', steel: '#727d7b', dark: '#183b46', blue: '#147daa', outer: '#3593b5', seat: '#779da6', white: '#f2f0dc', copper: '#a87050' };
+const palette = { concrete: '#b4b4ac', edge: '#d4d1c5', steel: '#727d7b', dark: '#183b46', blue: '#147daa', outer: '#3593b5', seat: '#72b9e4', white: '#f2f0dc', copper: '#a87050' };
 class Builder {
   group = new T.Group();
   batches = new Map<string, T.BufferGeometry[]>();
@@ -84,11 +85,13 @@ function court(b: Builder, x=0,z=0,rotation=0, detailed=true) {
 export function buildArena() {
   const b = new Builder();
   court(b);
+  const stand = new Builder();
+  ring(b,0,10.9,.1,SEATING_LIFT,palette.concrete);
   const seats: {x:number;y:number;z:number;angle:number}[]=[];
   for(let row=0;row<12;row++) {
     const offset = row*.79;
-    ring(b,offset,offset+.79,.1,.5+row*.43,palette.concrete);
-    ring(b,offset,offset+.055,.61+row*.43,.025,palette.edge);
+    ring(stand,offset,offset+.79,.1,.5+row*.43,palette.concrete);
+    ring(stand,offset,offset+.055,.61+row*.43,.025,palette.edge);
     const path=roundedPath(11.2+offset,19.9+offset,3.2+offset);
     const length=path.getLength(), count=Math.floor(length/.52);
     for(let i=0;i<count;i++){
@@ -98,30 +101,40 @@ export function buildArena() {
       seats.push({x:p.x,y:.87+row*.43,z:-p.y,angle:Math.atan2(tangent.y,tangent.x)});
     }
   }
-  ring(b,9.48,10.9,.1,5.24,palette.concrete);
-  ring(b,10.7,10.94,5.34,.75,palette.edge);
-  // A continuous front advertising wall, with open corners at the entries.
+  ring(stand,9.48,10.9,.1,5.24,palette.concrete);
+  ring(stand,10.7,10.94,5.34,.75,palette.edge);
+  // Tall court-facing retaining wall visible in the supplied four photographs.
+  // Continuous rounded corners replace the previous low, disconnected boards.
+  ring(b,-.32,.02,.1,2.22,palette.edge);
+  ring(b,-.34,.025,1.77,.65,palette.dark);
   [-1,1].forEach(s=>{
-    b.box(s*10.55,.62,0,.16,1.04,29,palette.dark);
-    b.box(0,.62,s*19.1,14.9,1.04,.16,palette.dark);
-    const name=label('1573 ARENA',7.4,.75); name.position.set(0,.72,s*18.995); if(s>0)name.rotation.y=Math.PI;b.group.add(name);
-    for(let z=-10;z<=10;z+=10){ const ad=label(z===0?'MELBOURNE':'AO   /   1573',6,.68);ad.position.set(s*10.45,.72,z);ad.rotation.y=-s*Math.PI/2;b.group.add(ad); }
+    b.box(s*10.43,2.095,0,.08,.65,29,palette.dark);
+    b.box(0,2.095,s*19.13,15.4,.65,.08,palette.dark);
+    const name=label('1573 ARENA',7.4,.52);name.position.set(0,2.08,s*19.075);if(s>0)name.rotation.y=Math.PI;b.group.add(name);
+    for(let z=-10;z<=10;z+=10){const ad=label(z===0?'MELBOURNE':'AO   /   1573',6,.5);ad.position.set(s*10.375,2.08,z);ad.rotation.y=-s*Math.PI/2;b.group.add(ad);}
   });
   // Radial stair handrails and guardrails around the outer concourse.
   for(let section=0;section<12;section++) {
     const t=(section+.015)/12;
     const lo=roundedPath(11.05,19.75,3.05).getPointAt(t), hi=roundedPath(20.65,29.35,12.65).getPointAt(t);
-    b.rod([lo.x,1.6,-lo.y],[hi.x,6.5,-hi.y],.043);
-    for(let j=0;j<=4;j++){const k=j/4;b.rod([T.MathUtils.lerp(lo.x,hi.x,k),.65+k*4.9,-T.MathUtils.lerp(lo.y,hi.y,k)],[T.MathUtils.lerp(lo.x,hi.x,k),1.6+k*4.9,-T.MathUtils.lerp(lo.y,hi.y,k)],.035);}
+    // Half-height treads make the aisles climb in smaller steps than seat tiers.
+    for(let row=0;row<11;row++){
+      const offset=row*.79+.59;
+      const path=roundedPath(11.05+offset,19.75+offset,3.05+offset);
+      const p=path.getPointAt(t),tangent=path.getTangentAt(t);
+      stand.box(p.x,.7075+row*.43,-p.y,.85,.215,.395,palette.edge,Math.atan2(tangent.y,tangent.x));
+    }
+    stand.rod([lo.x,1.6,-lo.y],[hi.x,6.5,-hi.y],.043);
+    for(let j=0;j<=4;j++){const k=j/4;stand.rod([T.MathUtils.lerp(lo.x,hi.x,k),.65+k*4.9,-T.MathUtils.lerp(lo.y,hi.y,k)],[T.MathUtils.lerp(lo.x,hi.x,k),1.6+k*4.9,-T.MathUtils.lerp(lo.y,hi.y,k)],.035);}
   }
   const rail=roundedPath(21.55,30.25,13.55).getPoints(60);
-  rail.forEach((p,i)=>{if(i) b.rod([rail[i-1].x,6.8,-rail[i-1].y],[p.x,6.8,-p.y],.04);if(i%3===0)b.rod([p.x,6,-p.y],[p.x,6.8,-p.y],.035);});
+  rail.forEach((p,i)=>{if(i) stand.rod([rail[i-1].x,6.8,-rail[i-1].y],[p.x,6.8,-p.y],.04);if(i%3===0)stand.rod([p.x,6,-p.y],[p.x,6.8,-p.y],.035);});
   // Lightweight shade hoods at the back of the stands.
   for(const s of [-1,1])for(const z of [-19,-9,3,15]){
-    b.box(s*20,6.8,z,3.3,.16,5.3,'#ece9dd');
-    for(const end of [-2.3,2.3]) b.rod([s*21.15,5.35,z+end],[s*21.15,6.75,z+end],.065);
+    stand.box(s*20,6.8,z,3.3,.16,5.3,'#ece9dd');
+    for(const end of [-2.3,2.3]) stand.rod([s*21.15,5.35,z+end],[s*21.15,6.75,z+end],.065);
   }
-  for(const s of [-1,1])for(const x of [-6,3])b.box(x,6.8,s*29.4,6.5,.18,3,'#ece9dd');
+  for(const s of [-1,1])for(const x of [-6,3])stand.box(x,6.8,s*29.4,6.5,.18,3,'#ece9dd');
   // Six floodlight masts with cross bracing and individually modelled luminaires.
   const lamps = new T.Group();
   for(const x of [-22.7,22.7])for(const z of [-23,0,23]) {
@@ -147,9 +160,9 @@ export function buildArena() {
     const umbrella=new T.ConeGeometry(1.9,.58,8);umbrella.translate(9.2,3.25,z);b.add(umbrella,'#ecdfc2');
     b.box(9.2,.45,z+2, .65,.7,.65,palette.dark);
   }
-  const scoreboard = label('1573     •     MELBOURNE PARK',10.5,1.4,'#c8f586','#122d37');scoreboard.position.set(0,7.7,-29.7);b.group.add(scoreboard);
-  b.box(0,7.7,-29.86,10.8,1.65,.3,palette.dark);
-  b.rod([-4,5.3,-29.8],[-4,8.5,-29.8],.09);b.rod([4,5.3,-29.8],[4,8.5,-29.8],.09);
+  const scoreboard = label('1573     •     MELBOURNE PARK',10.5,1.4,'#c8f586','#122d37');scoreboard.position.set(0,7.7,-29.7);stand.group.add(scoreboard);
+  stand.box(0,7.7,-29.86,10.8,1.65,.3,palette.dark);
+  stand.rod([-4,5.3,-29.8],[-4,8.5,-29.8],.09);stand.rod([4,5.3,-29.8],[4,8.5,-29.8],.09);
 
   // One shared geometry and one draw call for thousands of individual seats.
   const base=new T.BoxGeometry(.43,.115,.43);base.translate(0,0,0);
@@ -158,13 +171,14 @@ export function buildArena() {
   const seatMesh=new T.InstancedMesh(seatGeometry,new T.MeshStandardMaterial({color:palette.seat,roughness:.66}),seats.length);
   const dummy=new T.Object3D();
   seats.forEach((s,i)=>{dummy.position.set(s.x,s.y,s.z);dummy.rotation.set(0,s.angle,0);dummy.updateMatrix();seatMesh.setMatrixAt(i,dummy.matrix);seatMesh.setColorAt(i,new T.Color(i%17===0?'#c5c7b6':i%7===0?'#a8bfc0':palette.seat));});
-  seatMesh.castShadow=true;seatMesh.receiveShadow=true;b.group.add(seatMesh);
+  seatMesh.castShadow=true;seatMesh.receiveShadow=true;stand.group.add(seatMesh);
   const crowd=new T.Group();
   const bodies=new T.InstancedMesh(new T.CapsuleGeometry(.15,.3,3,5),new T.MeshStandardMaterial({roughness:.9}),Math.floor(seats.length/7));
   const heads=new T.InstancedMesh(new T.SphereGeometry(.125,6,5),new T.MeshStandardMaterial({color:'#c79c78'}),bodies.count);
   const shirts=['#e4dcc4','#40586e','#ece9e1','#4d7385','#cc6c4c','#677052'];
   for(let i=0;i<bodies.count;i++) { const s=seats[i*7];dummy.position.set(s.x,s.y+.36,s.z);dummy.rotation.set(0,s.angle,0);dummy.updateMatrix();bodies.setMatrixAt(i,dummy.matrix);bodies.setColorAt(i,new T.Color(shirts[i%shirts.length]));dummy.position.y+=.39;dummy.updateMatrix();heads.setMatrixAt(i,dummy.matrix);}
-  crowd.add(bodies,heads);crowd.visible=false;b.group.add(crowd);
+  crowd.add(bodies,heads);crowd.visible=false;stand.group.add(crowd);
+  stand.finish();stand.group.position.y=SEATING_LIFT;b.group.add(stand.group);
   return {group:b.finish(),lamps,crowd,seats:seats.length};
 }
 

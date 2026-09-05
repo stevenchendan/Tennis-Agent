@@ -10,6 +10,7 @@ import styles from './arena.module.css';
 import { getTranslator, Language } from './i18n';
 import { InkLandscape, InkWash } from './InkWash';
 import SunControls from './SunControls';
+import { SEATING_LIFT } from './dimensions';
 import { summerSun, ShadeResult, SolarDate, Stand, standSamples, STANDS } from './solar';
 
 type View = 'hero' | 'plan' | 'seat' | 'court' | 'precinct';
@@ -17,7 +18,7 @@ type Light = 'day' | 'golden' | 'night' | 'solar';
 type Theme = 'classic' | 'ink';
 type Shot = {view:View;serial:number;stand?:Stand};
 type Sun = ReturnType<typeof summerSun> | null;
-const standCameras:Record<Stand,[number,number,number]>={north:[4,5.4,-25.5],east:[16.2,5.4,9],south:[-4,5.4,25.5],west:[-16.2,5.4,9]};
+const standCameras:Record<Stand,[number,number,number]>={north:[4,5.4+SEATING_LIFT,-25.5],east:[16.2,5.4+SEATING_LIFT,9],south:[-4,5.4+SEATING_LIFT,25.5],west:[-16.2,5.4+SEATING_LIFT,9]};
 const views: {id:View;label:string;en:string;icon:string}[] = [
   {id:'hero',label:'场馆全景',en:'ORBIT',icon:'◈'},
   {id:'plan',label:'垂直俯瞰',en:'PLAN',icon:'⊞'},
@@ -28,13 +29,13 @@ const views: {id:View;label:string;en:string;icon:string}[] = [
 const cameras: Record<View,{position:[number,number,number];target:[number,number,number]}> = {
   hero:{position:[-57,58,73],target:[4,1,-1]},
   plan:{position:[0,105,.01],target:[0,0,0]},
-  seat:{position:[-16.2,5.4,9],target:[0,1,0]},
+  seat:{position:[-16.2,5.4+SEATING_LIFT,9],target:[0,1,0]},
   court:{position:[-2,1.75,16.6],target:[0,1,-6]},
   precinct:{position:[-118,147,165],target:[32,0,-27]},
 };
 const points = [
   {id:'court',title:'蓝色中心球场',en:'THE PLAYING SURFACE',position:[0,.3,0] as [number,number,number],view:'court' as View,description:'23.77 × 10.97 米标准双打场地。单打边线、发球区、中心标记，以及中部下垂的球网，均以米为单位建模。'},
-  {id:'seat',title:'环抱式看台',en:'A SEAT IN THE ARENA',position:[-16,5,9] as [number,number,number],view:'seat' as View,description:'十二排逐级抬升的独立座椅，沿圆角矩形环绕球场。靠背、径向通道、扶手和后排遮阳棚均为实体几何；排数与细节为视觉近似。'},
+  {id:'seat',title:'环抱式看台',en:'A SEAT IN THE ARENA',position:[-16,5+SEATING_LIFT,9] as [number,number,number],view:'seat' as View,description:'十二排逐级抬升的独立座椅，沿圆角矩形环绕球场。靠背、径向通道、扶手和后排遮阳棚均为实体几何；排数与细节为视觉近似。'},
   {id:'precinct',title:'Margaret Court Arena',en:'THE COPPER NEIGHBOUR',position:[59,19,20] as [number,number,number],view:'precinct' as View,description:'东侧紧邻的铜色屋顶是这片区域的视觉地标。周边建筑底图来自墨尔本开放数据，屋顶折线为参考卫星图的示意细化。'},
 ];
 

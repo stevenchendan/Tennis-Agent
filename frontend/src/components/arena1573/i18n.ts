@@ -1,0 +1,55 @@
+export type Language = 'en' | 'zh';
+
+// Chinese is the original copy; proper names and architectural signage stay intact.
+const english: Record<string, string> = {
+  '场馆全景': 'Overview', '垂直俯瞰': 'Top view', '看台视角': 'From a seat', '走进球场': 'Courtside', '周边区域': 'Precinct',
+  '蓝色中心球场': 'The blue court', '环抱式看台': 'The seating bowl',
+  '23.77 × 10.97 米标准双打场地。单打边线、发球区、中心标记，以及中部下垂的球网，均以米为单位建模。': 'A regulation 23.77 × 10.97 m doubles court. Singles sidelines, service boxes, centre marks and the sagging net are all modelled in metres.',
+  '十二排逐级抬升的独立座椅，沿圆角矩形环绕球场。靠背、径向通道、扶手和后排遮阳棚均为实体几何；排数与细节为视觉近似。': 'Twelve rising rows of individual seats wrap around the court. Seat backs, radial aisles, handrails and rear shade hoods are solid geometry; row counts and details are visual approximations.',
+  '东侧紧邻的铜色屋顶是这片区域的视觉地标。周边建筑底图来自墨尔本开放数据，屋顶折线为参考卫星图的示意细化。': 'The neighbouring copper roof to the east is a local landmark. Building footprints use Melbourne open data and OpenStreetMap; roof folds are an interpretation of satellite imagery.',
+  '3D 场景暂时无法启动': 'The 3D scene could not start',
+  '请开启浏览器硬件加速，或使用支持 WebGL 2 的浏览器。': 'Enable browser hardware acceleration or use a browser that supports WebGL 2.',
+  '重新加载': 'Reload',
+  '当前浏览器不支持 WebGL 2。请开启硬件加速后重试。': 'This browser does not support WebGL 2. Enable hardware acceleration and try again.',
+  '当前浏览器不支持全屏，请使用浏览器的全屏功能。': 'Fullscreen is unavailable here. Try your browser’s fullscreen command.',
+  '已保存当前 3D 画面': 'Saved the current 3D view', '画面暂时无法保存，请重试。': 'The image could not be saved. Please try again.',
+  '1573 Arena 可交互三维场景': 'Interactive 3D scene of 1573 Arena', '返回 Tennis-Agent 首页': 'Back to Tennis-Agent home',
+  '关于模型': 'About the model', '关于模型 ↗': 'About ↗', '切换全屏': 'Toggle fullscreen', '全屏': 'Fullscreen',
+  '离球场，更近一点。': 'A little closer to the court.', '场景设置': 'Scene settings', '此刻的球场': 'Make it your view',
+  '光线氛围': 'Lighting', '日间': 'Day', '日落': 'Sunset', '夜场': 'Night',
+  '周边建筑': 'Surroundings', '场景热点': 'Scene hotspots', '看台观众': 'Spectators',
+  '暂停环绕': 'Pause orbit', '自动环绕': 'Auto orbit', '暂停网球轨迹': 'Pause ball animation', '播放网球轨迹': 'Play ball animation',
+  '北向相对球场长轴约偏转 8°': 'North is approximately 8° from the court’s long axis', '地理北向参考 · 8°': 'Geographic north · 8°',
+  '一座开放的网球剧场。': 'An open-air tennis theatre.', '蓝色硬地、层叠看台与铜色屋顶，': 'Blue courts, tiered seats and copper roofs,', '在墨尔本公园的一隅相遇。': 'together in a corner of Melbourne Park.',
+  '模型座椅': 'Modelled seats', '标准场地长度': 'Regulation court length', '相机视角': 'Camera views', '快捷键': 'Shortcut',
+  '重置视角 · R': 'Reset view · R', '重置视角': 'Reset view', '保存画面': 'Save image',
+  '场景已就绪': 'Scene ready', '正在构建场景': 'Building scene', '拖动旋转': 'Drag to orbit', '滚轮缩放': 'Scroll to zoom', '右键平移': 'Right-drag to pan', '双指操作': 'Two-finger gestures',
+  '正在构建你的场边视角': 'Building your courtside view', '球场 · 看台 · 墨尔本公园': 'Court · Grandstands · Melbourne Park',
+  '场景数据加载失败': 'Scene data could not load', '请检查连接后重试。': 'Check your connection and try again.',
+  '关闭热点详情': 'Close point of interest', '返回场馆全景 ↗': 'Back to overview ↗', '关闭模型说明': 'Close model information',
+  '真实位置，手工重建。': 'A real place. Rebuilt by hand.',
+  '1573 Arena 的标准球场与周边地理位置采用米制建模；圆角看台、座椅、遮阳棚、灯架和屋顶细节依据卫星图与公开场馆资料做视觉近似。不是测绘模型，也不代表最新的现场设施。': 'The regulation court and surrounding geography are modelled in metres. Rounded stands, seats, shade hoods, light masts and roof details are visual approximations based on satellite imagery and public venue references. This is not a surveyed model or a record of the latest on-site facilities.',
+  '日落与夜场为艺术灯光预设，网球轨迹为演示动画。树木、观众和街道家具是示意布置。': 'Sunset and night are artistic lighting presets; the ball follows a demonstration animation. Trees, spectators and street furniture are illustrative.',
+  '卫星图参考 · Google Maps ↗': 'Satellite reference · Google Maps ↗', '场馆位置参考 · Tennis Australia ↗': 'Venue reference · Tennis Australia ↗',
+  '建筑轮廓 · City of Melbourne · CC BY 4.0 ↗': 'Building footprints · City of Melbourne · CC BY 4.0 ↗',
+  '球场与道路 · © OpenStreetMap contributors · ODbL ↗': 'Courts & roads · © OpenStreetMap contributors · ODbL ↗',
+  '下载衍生地理数据 · ODbL / CC BY 4.0 ↓': 'Download derived geodata · ODbL / CC BY 4.0 ↓',
+  '快捷键：1–5 切换视角 · R 重置 · H 热点 · 空格环绕': 'Shortcuts: 1–5 views · R reset · H hotspots · Space orbit',
+  '探索': 'Explore ', '页面语言': 'Page language',
+};
+
+const chinese: Record<string, string> = {
+  'A TENNIS-AGENT EXPLORATION': 'TENNIS-AGENT 场馆探索', 'INTERACTIVE 3D': '交互式 3D',
+  'AUSTRALIA': '澳大利亚', 'MELBOURNE PARK': '墨尔本公园', 'YOUR PERSPECTIVE': '你的专属视角',
+  'LIGHT & TIME': '光线与时间', 'Precinct context': '场馆周边环境', 'Points of interest': '探索场馆细节',
+  'A little match-day life': '感受比赛日氛围', 'SPACE': '空格', 'FIELD NOTES': '场馆笔记', 'EXPLORE': '探索',
+  'VISUAL STUDY': '视觉研究', 'THE PLAYING SURFACE': '标准比赛场地', 'A SEAT IN THE ARENA': '坐进场边看台',
+  'THE COPPER NEIGHBOUR': '铜色屋顶的邻居', 'THE MAKING OF THIS PLACE': '场景的构建方式',
+};
+
+const translators = {
+  en: (text: string) => english[text] ?? text,
+  zh: (text: string) => chinese[text] ?? text,
+};
+
+export const getTranslator = (language: Language) => translators[language];

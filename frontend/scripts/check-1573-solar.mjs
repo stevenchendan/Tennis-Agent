@@ -7,11 +7,11 @@ import ts from 'typescript';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const source=fs.readFileSync(path.join(root,'src/components/arena1573/solar.ts'),'utf8');
-const module={exports:{}};
+const solarModule={exports:{}};
 const dimensions={exports:{}};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(root,'src/components/arena1573/dimensions.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{module:dimensions,exports:dimensions.exports});
-vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{module,exports:module.exports,require:(id)=>{assert.equal(id,'./dimensions');return dimensions.exports;}});
-const {summerSun,summerDaylight,sunDirection,clockTime,standSamples,STANDS}=module.exports;
+vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{module:solarModule,exports:solarModule.exports,require:(id)=>{assert.equal(id,'./dimensions');return dimensions.exports;}});
+const {summerSun,summerDaylight,sunDirection,clockTime,standSamples,STANDS}=solarModule.exports;
 const close=(a,b,tolerance=1e-9)=>assert.ok(Math.abs(a-b)<tolerance,`${a} != ${b}`);
 
 // Coordinate conventions are critical: east/north directions must be rotated

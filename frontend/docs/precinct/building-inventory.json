@@ -1,0 +1,1504 @@
+{
+  "reviewed": "2026-09-06",
+  "records": 107,
+  "buildings": [
+    {
+      "id": "800719-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Gable",
+      "bounds": [
+        266.14,
+        -318.27,
+        276.28,
+        -307.54
+      ],
+      "treatment": "Gable roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "801014-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Gable",
+      "bounds": [
+        -199.89,
+        219.46,
+        -193.81,
+        225.06
+      ],
+      "treatment": "Gable roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "802295-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        229.65,
+        -321.21,
+        235.43,
+        -304.82
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "802295-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Gable",
+      "bounds": [
+        229.78,
+        -313.79,
+        235.43,
+        -304.82
+      ],
+      "treatment": "Gable roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "803373-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Hip",
+      "bounds": [
+        741.74,
+        33.4,
+        744.98,
+        39.47
+      ],
+      "treatment": "Hip roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "803374-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        880.65,
+        -65.9,
+        886.67,
+        -60.18
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "803375-1-0",
+      "name": null,
+      "sourceType": "Ramp",
+      "sourceRoof": "Flat",
+      "bounds": [
+        333.33,
+        -220.6,
+        349.24,
+        -154.33
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "803376-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        676.84,
+        -287.3,
+        683.47,
+        -275.03
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "803895-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        218.56,
+        -329.09,
+        230,
+        -300.53
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "803895-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        218.62,
+        -325.14,
+        230,
+        -300.53
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "803895-3-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        225.07,
+        -323.03,
+        229.9,
+        -306.94
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "804119-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        58.64,
+        -295.39,
+        85.25,
+        -272.77
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "804119-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        67.63,
+        -291.17,
+        85.25,
+        -272.77
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "804918-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        323.89,
+        -331.89,
+        332.03,
+        -304.06
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "804918-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        323.89,
+        -331.89,
+        332.03,
+        -305.95
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "805343-1-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -8.39,
+        250.06,
+        147.18,
+        281.96
+      ],
+      "treatment": "Open deck and supports",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "805343-2-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -8.39,
+        250.06,
+        147.18,
+        283.35
+      ],
+      "treatment": "Duplicate bridge tier omitted",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806065-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        171.98,
+        -329.41,
+        191.05,
+        -302.64
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806200-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        771.92,
+        310.52,
+        797.65,
+        329.97
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806665-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        551.31,
+        286.54,
+        760.85,
+        495.76
+      ],
+      "treatment": "AAMI peripheral open field and segmented roof",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806665-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        572.77,
+        286.54,
+        742.06,
+        495.76
+      ],
+      "treatment": "Replaced by shared AAMI shell",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806894-1-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        709.04,
+        195.7,
+        775.98,
+        202
+      ],
+      "treatment": "Open deck and supports",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806898-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        117.43,
+        184.45,
+        129.12,
+        193.29
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806899-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Gable",
+      "bounds": [
+        -46.67,
+        -48.62,
+        -40.1,
+        -38.61
+      ],
+      "treatment": "Gable roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806900-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        142.66,
+        -98.81,
+        153.1,
+        -90.84
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806902-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        124.37,
+        -113.01,
+        133.41,
+        -104.21
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806903-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -45.93,
+        -97.3,
+        -39.83,
+        -88.6
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806904-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -73.98,
+        -158.28,
+        -69.84,
+        -153.58
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806905-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -46.83,
+        -247.29,
+        157.61,
+        -141.84
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806906-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        132.12,
+        140.33,
+        175.19,
+        160.11
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806907-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        515.21,
+        88.11,
+        530.69,
+        104.75
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806908-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        425.23,
+        69.97,
+        432.37,
+        73.12
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806909-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        412.23,
+        23.69,
+        416.47,
+        30.72
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806910-1-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        203.55,
+        -155.27,
+        340.93,
+        100.8
+      ],
+      "treatment": "Open deck and supports",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "806911-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        408.25,
+        71.93,
+        430.27,
+        102.76
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "807058-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        48.44,
+        -335.04,
+        88.41,
+        -302.89
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "807058-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        50.32,
+        -334.93,
+        88.41,
+        -305.27
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "807622-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Pyramid",
+      "bounds": [
+        -110.21,
+        257.15,
+        -96.24,
+        271.08
+      ],
+      "treatment": "Pyramid roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "807623-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -125.05,
+        242.45,
+        -107.8,
+        259.63
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "807623-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Pyramid",
+      "bounds": [
+        -131.27,
+        236.28,
+        -118.5,
+        249.03
+      ],
+      "treatment": "Pyramid roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "807979-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -57.67,
+        -96.75,
+        -47.47,
+        -89.33
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "808032-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Gable",
+      "bounds": [
+        276.26,
+        -317.6,
+        282.28,
+        -307.62
+      ],
+      "treatment": "Gable roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "808864-1-0",
+      "name": "Tennis administration building",
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        218.95,
+        -107.85,
+        284.83,
+        -42.41
+      ],
+      "treatment": "Reference-led named building",
+      "confidence": "Visual form cross-checked; dimensions approximate"
+    },
+    {
+      "id": "809333-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        332.01,
+        -331.98,
+        339,
+        -304.11
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809333-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        332.01,
+        -331.98,
+        338.92,
+        -306.83
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809333-3-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        332.01,
+        -330.32,
+        338.92,
+        -308.34
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809449-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Hip",
+      "bounds": [
+        330.87,
+        -275.82,
+        346.87,
+        -263.53
+      ],
+      "treatment": "Hip roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809684-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        898.76,
+        231.74,
+        900.58,
+        238.64
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809686-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        899.08,
+        217.65,
+        900.76,
+        224.71
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809687-1-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        546.66,
+        -16.95,
+        585.03,
+        144.01
+      ],
+      "treatment": "Open deck and supports",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809688-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        158.89,
+        -146.93,
+        163.08,
+        -144.07
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809689-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        150.64,
+        -150.68,
+        154.97,
+        -147.75
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809690-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        142.21,
+        -154.39,
+        146.81,
+        -151.09
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809691-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        163.99,
+        -158.52,
+        168.37,
+        -155.6
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809692-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        155.82,
+        -162.22,
+        160.16,
+        -159.32
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809693-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        127.49,
+        -160.95,
+        132.14,
+        -157.7
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809694-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        147.38,
+        -165.99,
+        151.87,
+        -162.86
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809695-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        119.26,
+        -164.63,
+        123.84,
+        -161.4
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809696-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        111.17,
+        -168.26,
+        115.63,
+        -165.19
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809697-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        132.87,
+        -172.52,
+        137.21,
+        -169.58
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809698-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        124.58,
+        -176.13,
+        129.14,
+        -173.07
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "809699-1-0",
+      "name": null,
+      "sourceType": "Tram Stop",
+      "sourceRoof": "Flat",
+      "bounds": [
+        116.32,
+        -179.8,
+        120.85,
+        -176.71
+      ],
+      "treatment": "Low platform",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "810291-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Gable",
+      "bounds": [
+        282.27,
+        -317.77,
+        288.45,
+        -307.66
+      ],
+      "treatment": "Gable roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "810422-1-0",
+      "name": "National Tennis Centre",
+      "sourceType": "Structure",
+      "sourceRoof": "Hip",
+      "bounds": [
+        562.99,
+        132.39,
+        717.9,
+        197.49
+      ],
+      "treatment": "Reference-led named building",
+      "confidence": "Visual form cross-checked; dimensions approximate"
+    },
+    {
+      "id": "810457-1-0",
+      "name": null,
+      "sourceType": "Toilet",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -87.96,
+        37.63,
+        -83.56,
+        42.15
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "810459-1-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -276.14,
+        -170.63,
+        -202.36,
+        -92.34
+      ],
+      "treatment": "Open deck and supports",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "810459-2-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -237.8,
+        -136.29,
+        -22.81,
+        -65.51
+      ],
+      "treatment": "Replaced by mapped Tanderrum deck",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "810639-1-0",
+      "name": null,
+      "sourceType": "Jetties",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -2.69,
+        165.5,
+        18.7,
+        186.56
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "810639-2-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -8.53,
+        154.99,
+        3.1,
+        171.32
+      ],
+      "treatment": "Open deck and supports",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "810705-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        890.59,
+        -61.46,
+        937.69,
+        62.93
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "810705-3-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        890.59,
+        -33.08,
+        926.8,
+        62.93
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "810705-5-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        890.59,
+        -26.1,
+        921.8,
+        47.81
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "810705-6-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Gable",
+      "bounds": [
+        890.59,
+        4.64,
+        916.65,
+        20.75
+      ],
+      "treatment": "Gable roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "812406-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Hip",
+      "bounds": [
+        361.8,
+        -317.1,
+        375.43,
+        -309.29
+      ],
+      "treatment": "Hip roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "812707-1-0",
+      "name": "Rod Laver eastern pavilion",
+      "sourceType": "Structure",
+      "sourceRoof": "Hip",
+      "bounds": [
+        216,
+        37.7,
+        245.95,
+        110.86
+      ],
+      "treatment": "Reference-led named building",
+      "confidence": "Visual form cross-checked; dimensions approximate"
+    },
+    {
+      "id": "812979-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        124.53,
+        -314.34,
+        162.42,
+        -299.89
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "812979-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        124.53,
+        -314.34,
+        162.42,
+        -299.89
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "813024-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Gable",
+      "bounds": [
+        235.4,
+        -313.91,
+        246.21,
+        -304.87
+      ],
+      "treatment": "Gable roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "813191-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        342.18,
+        -309.41,
+        373.92,
+        -301.41
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "813191-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        344.33,
+        -309.39,
+        372.01,
+        -301.44
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "813287-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Hip",
+      "bounds": [
+        191.01,
+        -313.09,
+        207.93,
+        -304.48
+      ],
+      "treatment": "Hip roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "813657-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        222.42,
+        277.11,
+        360.81,
+        430.47
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "813657-4-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Gable",
+      "bounds": [
+        247.47,
+        279.89,
+        345.48,
+        377.93
+      ],
+      "treatment": "Gable roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "814857-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        245.97,
+        -342.21,
+        266.2,
+        -300.76
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "814857-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        245.97,
+        -334.17,
+        266.2,
+        -300.76
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "814857-3-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        246.15,
+        -311.12,
+        248.9,
+        -303.93
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "815561-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        287.99,
+        -342.15,
+        313.81,
+        -303.7
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "815561-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        287.99,
+        -342.15,
+        313.81,
+        -303.7
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "815561-3-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        288.18,
+        -320.71,
+        313.81,
+        -304.65
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "815626-1-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        -238.56,
+        -275.47,
+        210.52,
+        -219.28
+      ],
+      "treatment": "Open deck and supports",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "816698-1-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        709.45,
+        27.13,
+        721.07,
+        167.91
+      ],
+      "treatment": "Open deck and supports",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "816739-1-0",
+      "name": null,
+      "sourceType": "Bridge",
+      "sourceRoof": "Flat",
+      "bounds": [
+        570.73,
+        247.28,
+        583.57,
+        331.2
+      ],
+      "treatment": "Open deck and supports",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819103-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        394.69,
+        -312.88,
+        696.69,
+        -32.98
+      ],
+      "treatment": "MCG peripheral oval shell and field",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819103-2-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        394.69,
+        -312.88,
+        696.69,
+        -32.98
+      ],
+      "treatment": "Replaced by shared MCG shell",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819103-3-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        629.1,
+        -96.64,
+        664.21,
+        -63.91
+      ],
+      "treatment": "Replaced by shared MCG shell",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819103-4-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        683.01,
+        -182.6,
+        691.82,
+        -140.06
+      ],
+      "treatment": "Replaced by shared MCG shell",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819103-5-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        542.04,
+        -49.4,
+        585.2,
+        -38.07
+      ],
+      "treatment": "Replaced by shared MCG shell",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819103-6-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        459.03,
+        -230.16,
+        685.59,
+        -44.45
+      ],
+      "treatment": "Replaced by shared MCG shell",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819103-7-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        411.8,
+        -293.43,
+        649,
+        -98.2
+      ],
+      "treatment": "Replaced by shared MCG shell",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819103-8-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        441.33,
+        -113.53,
+        472.73,
+        -80.9
+      ],
+      "treatment": "Replaced by shared MCG shell",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819103-9-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        630.84,
+        -251.24,
+        662.16,
+        -218.8
+      ],
+      "treatment": "Replaced by shared MCG shell",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819104-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        672.05,
+        -248.63,
+        677.81,
+        -240.67
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "819312-1-0",
+      "name": null,
+      "sourceType": "Structure",
+      "sourceRoof": "Flat",
+      "bounds": [
+        136.83,
+        -17.17,
+        179.13,
+        8.61
+      ],
+      "treatment": "Flat roof, parapet and facade scale cues",
+      "confidence": "Mapped footprint/type; fine facade details unverified"
+    },
+    {
+      "id": "way/126844336",
+      "name": "Margaret Court Arena",
+      "sourceType": "OSM landmark",
+      "sourceRoof": "Landmark",
+      "bounds": [
+        6.71,
+        -49.64,
+        138.93,
+        113.45
+      ],
+      "treatment": "Reference-led landmark",
+      "confidence": "Visual form cross-checked; dimensions approximate"
+    },
+    {
+      "id": "way/45738964",
+      "name": "Rod Laver Arena",
+      "sourceType": "OSM landmark",
+      "sourceRoof": "Landmark",
+      "bounds": [
+        98.89,
+        9.43,
+        209.56,
+        135.81
+      ],
+      "treatment": "Reference-led landmark",
+      "confidence": "Visual form cross-checked; dimensions approximate"
+    },
+    {
+      "id": "way/7243452",
+      "name": "John Cain Arena",
+      "sourceType": "OSM landmark",
+      "sourceRoof": "Landmark",
+      "bounds": [
+        405.87,
+        82.7,
+        517.39,
+        243.86
+      ],
+      "treatment": "Reference-led landmark",
+      "confidence": "Visual form cross-checked; dimensions approximate"
+    },
+    {
+      "id": "way/801007082",
+      "name": "Centrepiece Melbourne",
+      "sourceType": "OSM landmark",
+      "sourceRoof": "Landmark",
+      "bounds": [
+        224.8,
+        -51.49,
+        315.83,
+        17.68
+      ],
+      "treatment": "Reference-led landmark",
+      "confidence": "Visual form cross-checked; dimensions approximate"
+    }
+  ]
+}

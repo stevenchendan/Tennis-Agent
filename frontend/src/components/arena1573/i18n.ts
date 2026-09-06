@@ -2,6 +2,15 @@ export type Language = 'en' | 'zh';
 
 // Chinese is the original copy; proper names and architectural signage stay intact.
 const english: Record<string, string> = {
+  '影院音乐暂时无法播放，请退出后重试。':'Cinema music could not play. Exit and try again.',
+  '影院模式':'Cinema mode', '退出影院模式':'Exit cinema', '退出影院模式 · Esc':'Exit cinema · Esc',
+  '建筑为参考重建，非实测模型。': 'Reference reconstruction, not a surveyed model.',
+  '雨天': 'Rain', '示意天气 · 非实时预报': 'Illustrative weather · not a live forecast',
+  '澳网全景':'AO grounds', '探索澳网园区':'Explore the AO precinct',
+  '西侧球场':'Western courts', '东侧球场':'Eastern courts',
+  '色块为示意区域，非官方活动边界。':'Indicative areas, not official event boundaries.',
+  '官方 AO26 地图 ↗':'Official AO26 map ↗',
+  '选择场馆':'Choose a venue',
   '场馆全景': 'Overview', '垂直俯瞰': 'Top view', '看台视角': 'From a seat', '走进球场': 'Courtside', '周边区域': 'Precinct',
   '蓝色中心球场': 'The blue court', '环抱式看台': 'The seating bowl',
   '23.77 × 10.97 米标准双打场地。单打边线、发球区、中心标记，以及中部下垂的球网，均以米为单位建模。': 'A regulation 23.77 × 10.97 m doubles court. Singles sidelines, service boxes, centre marks and the sagging net are all modelled in metres.',

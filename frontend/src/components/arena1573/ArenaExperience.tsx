@@ -115,7 +115,7 @@ function Scene({data,shot,light,rotate,context,crowd,markers,rally,onSelect,onRe
     {night&&<><pointLight position={[-18,18,0]} intensity={1600} distance={85} decay={2} color="#e7f2ff"/><pointLight position={[18,18,0]} intensity={1600} distance={85} decay={2} color="#fff0d6"/><pointLight position={[0,17,-22]} intensity={1100} distance={65} decay={2}/><pointLight position={[0,17,22]} intensity={1100} distance={65} decay={2}/></>}
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-3.2,0]} receiveShadow><planeGeometry args={[3000,3000]}/><meshStandardMaterial color={bg} roughness={1}/></mesh>
     <World data={data} light={light} context={context} crowd={crowd} onReady={onReady} sun={sun} onShade={onShade}/>
-    <TennisRally active={rally}/>
+    <Suspense fallback={null}><TennisRally active={rally}/></Suspense>
     {markers&&points.filter(p=>context||p.id!=='precinct').map((p,i)=><Html key={p.id} position={p.position} center zIndexRange={[10,0]}><button className={styles.pin} title={tr(p.title)} aria-label={`${tr('探索')}${tr(p.title)}`} onClick={()=>onSelect(p.id)}><span>{String(i+1).padStart(2,'0')}</span><b>{tr(p.title)}</b></button></Html>)}
     <Rig shot={shot} rotate={rotate} onInteract={onInteract} canvasRef={canvasRef}/>
   </>;

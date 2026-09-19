@@ -8,7 +8,8 @@ def mat(name,color,rough=.65):
  m=bpy.data.materials.new(name);m.diffuse_color=(*color,1);m.use_nodes=True
  bs=m.node_tree.nodes.get('Principled BSDF');bs.inputs['Base Color'].default_value=(*color,1);bs.inputs['Roughness'].default_value=rough
  return m
-skin=mat('Warm skin',(.58,.31,.19)); shirt=mat('Jersey',(.09,.25,.27)); white=mat('Ivory fabric',(.85,.88,.82)); hair=mat('Hair',(.045,.029,.023)); sole=mat('Sole',(.68,.72,.67)); iris=mat('Eyes',(.07,.045,.022)); lip=mat('Lips',(.34,.12,.09)); pink=mat('Racket',(.57,.10,.21)); strings=mat('Strings',(.65,.69,.66))
+skin=mat('Warm skin',(.58,.31,.19)); shirt=mat('Jersey',(.09,.25,.27)); white=mat('Ivory fabric',(.85,.88,.82)); hair=mat('Hair',(.045,.029,.023)); sole=mat('Sole',(.68,.72,.67)); iris=mat('Eyes',(.07,.045,.022)); lip=mat('Lips',(.34,.12,.09))
+graphite=mat('Graphite frame',(.035,.055,.062),.32); racket_accent=mat('Racket accent',(.72,.90,.18),.4); guard=mat('Bumper guard',(.012,.016,.018),.72); grip=mat('Overgrip',(.70,.78,.75),.86); strings=mat('Strings',(.78,.82,.72),.5)
 def parent(name):
  o=bpy.data.objects.new(name,None);bpy.context.collection.objects.link(o);return o
 def uv(name,pos,scale,material,p=None):
@@ -65,16 +66,31 @@ for i in range(2):
  uv('Heel',(0,-.047,.085),(.05,.045,.057),shirt,p)
  for j in range(4):line('Laces',(-.025,.01+j*.014,.11-j*.004),(.025,.017+j*.014,.11-j*.004),.0025,white,p)
 racket=parent('Racket')
-# In Blender's X/Z plane: export maps this to Three's X/Y plane.
-for i in range(64):
- a=i*2*math.pi/64;b=(i+1)*2*math.pi/64
- line('Frame',(.155*math.cos(a),0,.21*math.sin(a)),(.155*math.cos(b),0,.21*math.sin(b)),.009,pink,racket)
-for i in range(-6,7):
- x=i*.022;z=.21*math.sqrt(max(0,1-(x/.155)**2));line('String',(x,0,-z),(x,0,z),.0008,strings,racket)
-for i in range(-8,9):
- z=i*.023;x=.155*math.sqrt(max(0,1-(z/.21)**2));line('String',(-x,0,z),(x,0,z),.0008,strings,racket)
-for s in [-1,1]:line('Throat',(s*.07,0,-.185),(0,0,-.32),.008,pink,racket)
-line('Grip',(0,0,-.31),(0,0,-.46),.018,hair,racket)
+# Regulation-inspired 27-inch racket. Blender's X/Z plane exports to Three's
+# X/Y plane, with the grip axis matching the recorded wrist quaternion.
+head_x,head_z=.148,.188
+for i in range(72):
+ a=i*2*math.pi/72;b=(i+1)*2*math.pi/72
+ material=guard if math.sin((a+b)/2)>.72 else graphite
+ radius=.0105 if material==guard else .009
+ line('Bumper' if material==guard else 'Graphite beam',(head_x*math.cos(a),0,head_z*math.sin(a)),(head_x*math.cos(b),0,head_z*math.sin(b)),radius,material,racket)
+# A visible accent at 3 and 9 o'clock keeps the racket readable edge-on.
+for side in [-1,1]:
+ for i in range(-5,6):
+  a=i*.018;b=(i+1)*.018
+  line('Frame accent',(side*head_x*math.cos(a),0,head_z*math.sin(a)),(side*head_x*math.cos(b),0,head_z*math.sin(b)),.010,racket_accent,racket)
+# 16 x 19 string pattern, inset from the beam like a modern mid-plus head.
+inner_x,inner_z=.134,.173
+for i in range(-8,8):
+ x=(i+.5)*inner_x/8;z=inner_z*math.sqrt(max(0,1-(x/inner_x)**2));line('Main string',(x,0,-z),(x,0,z),.00065,strings,racket)
+for i in range(-9,10):
+ z=i*inner_z/9;x=inner_x*math.sqrt(max(0,1-(z/inner_z)**2));line('Cross string',(-x,0,z),(x,0,z),.0006,strings,racket)
+# Open throat, stabilising bridge, handle pallet, overgrip and flared butt cap.
+for side in [-1,1]:line('Throat',(side*.069,0,-.166),(side*.022,0,-.300),.0085,graphite,racket)
+line('Throat bridge',(-.072,0,-.166),(.072,0,-.166),.0065,racket_accent,racket)
+line('Handle pallet',(0,0,-.292),(0,0,-.474),.017,grip,racket)
+for z in [-.315,-.338,-.361,-.384,-.407,-.430,-.453]:line('Grip bevel',(-.0175,-.001,z),(.0175,.001,z-.010),.0015,guard,racket)
+line('Butt cap',(-.025,0,-.478),(.025,0,-.478),.011,guard,racket)
 # Assemble neutral athletic stance; runtime articulates these same named parts.
 def bone(name,a,b):
  o=bpy.data.objects[name];a,b=Vector(a),Vector(b);o.location=(a+b)/2;o.rotation_mode='QUATERNION';o.rotation_quaternion=(b-a).to_track_quat('Z','Y');o.scale.z=(b-a).length

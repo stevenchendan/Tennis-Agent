@@ -1,0 +1,26 @@
+.shell { max-width: 1160px; margin: auto; padding: 24px; color: #edf3eb; }
+.header { margin: 40px 0 28px; max-width: 760px; }
+.eyebrow { color: #dff786; text-transform: uppercase; letter-spacing: .14em; font-size: 12px; }
+.header h1 { font-size: clamp(30px, 5vw, 52px); line-height: 1.08; margin: 12px 0; }
+.shell p { line-height: 1.65; }
+.muted { color: #b3c3bb; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.button, .choice { border: 1px solid #52635a; border-radius: 10px; padding: 11px 16px; background: #1b2b23; color: #edf3eb; cursor: pointer; text-align: left; }
+.button[aria-pressed=true], .button[aria-current=step], .choice[aria-pressed=true] { background: #dff786; color: #17251b; border-color: #dff786; }
+.button:disabled { opacity: .45; cursor: default; }
+.shell :is(button, a, input):focus-visible { outline: 3px solid #ade7f4; outline-offset: 4px; }
+.tabs { display: flex; gap: 10px; margin: 26px 0 18px; flex-wrap: wrap; }
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.court { background: #132a25; border: 1px solid #3a5145; border-radius: 18px; padding: 18px; }
+.court svg { display: block; width: 100%; max-height: 510px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: #c2d2c7; }
+.panel { border: 1px solid #3a5145; border-radius: 18px; padding: 24px; background: #13221b; }
+.panel h2 { margin: 0 0 12px; font-size: 25px; }
+.panel h3 { margin: 20px 0 6px; font-size: 16px; }
+.choice { display: block; width: 100%; margin-top: 12px; }
+.feedback { border-left: 3px solid #dff786; background: #22392a; padding: 12px 16px; margin: 18px 0; }
+.stats { font-size: 28px; margin: 16px 0; font-variant-numeric: tabular-nums; }
+.history { margin-top: 24px; border-top: 1px solid #3a5145; padding-top: 16px; }
+.history ul { padding-left: 20px; color: #b3c3bb; }
+.footer { color: #9cac9f; font-size: 12px; margin: 28px 0; }
+@media (max-width: 740px) { .workspace { grid-template-columns: 1fr; } .shell { padding: 16px; } .header { margin-top: 26px; } .panel { padding: 18px; } }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { findStrategies, STRATEGY_CATEGORIES } from "@/lib/strategies";
 
 export default function TemplatePicker({
@@ -27,6 +28,8 @@ export default function TemplatePicker({
           </div>
           <button onClick={onClose} className="rounded-lg border border-neutral-800 px-3 py-1 text-xs text-neutral-400 transition hover:text-neutral-200">Close</button>
         </div>
+        <Link href="/learn/cross-court" className="mt-4 block rounded-lg border border-emerald-700 p-3 text-sm text-emerald-200">Learn → Decide → Practise: cross-court consistency · 3 levels ↗</Link>
+        <Link href="/playing-styles" className="mt-2 block rounded-lg border border-neutral-700 p-3 text-sm text-emerald-200">Explore six playing styles in 2D & 3D ↗</Link>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           <input
             value={query}

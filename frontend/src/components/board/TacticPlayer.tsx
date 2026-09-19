@@ -48,9 +48,11 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
 
   useEffect(() => {
     if (!playing) return;
-    let last = performance.now();
+    // RAF timestamps can precede performance.now() during the current frame.
+    // Start the clock on the first callback so playback never seeks below zero.
+    let last: number | null = null;
     const tick = (now: number) => {
-      const dt = now - last;
+      const dt = last === null ? 0 : Math.max(0, now - last);
       last = now;
       elapsedRef.current = Math.min(elapsedRef.current + dt * SPEEDS[speedIx], total);
       setElapsed(elapsedRef.current);
@@ -78,7 +80,7 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
     seek(k * FRAME_MS);
   }
 
-  const frameIndex = Math.min(Math.floor(elapsed / FRAME_MS), n - 1);
+  const frameIndex = Math.max(0, Math.min(Math.floor(elapsed / FRAME_MS), n - 1));
   const localT = clamp01((elapsed - frameIndex * FRAME_MS) / FRAME_MS);
   const cur = activeTactic.frames[frameIndex];
   const next = activeTactic.frames[frameIndex + 1];

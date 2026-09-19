@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import HomeNavigation from "@/components/HomeNavigation";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api, type AnalysisSummary } from "@/lib/api";
@@ -103,23 +104,34 @@ export default function Home() {
           : "需要配置 YOLO 权重（完整分析）或 LLM key（AI 视觉复盘）后才能分析 YouTube 视频";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-6 py-16">
-      <p className="mb-3 text-sm font-medium tracking-widest text-emerald-400">
-        TENNIS · TACTICS · PATTERNS
-      </p>
-      <h1 className="text-center text-4xl font-bold leading-tight text-neutral-50 sm:text-5xl">
-        看懂网球比赛
-        <span className="text-emerald-400">，</span>
-        <br />
-        而不只是看个热闹
-      </h1>
-      <p className="mt-5 max-w-xl text-center leading-relaxed text-neutral-400">
-        上传一场比赛视频，Tennis-Agent 会追踪每一次击球、切分每一分，
-        挖掘出真正可复用的战术模式（发球+1 球路、斜线组合、回合长度胜负关系），
-        并告诉你怎么把它们用在你自己的比赛里。
-      </p>
-
-      <div className="mt-10 flex flex-col items-center gap-4">
+    <div className="home-workspace">
+      <a href="#home-content" className="home-skip-link">跳至主要内容</a>
+      <HomeNavigation />
+      <main id="home-content" className="home-content">
+        <header className="home-topbar"><span>工作台 / OVERVIEW</span><span className="home-topbar-note">LEARN. PLAY. UNDERSTAND.</span></header>
+        <section className="home-hero" aria-labelledby="home-title">
+          <div>
+            <p className="home-eyebrow">YOUR GAME STARTS HERE</p>
+            <h1 id="home-title">每一分，<br /><span>都有进步的方向。</span></h1>
+            <p className="home-intro">从看懂一条球路，到打好一场比赛。学习战术、安排训练、复盘表现，在这里开启你的下一步。</p>
+            <Link href="/drills" className="home-primary-link">开始今天的训练 <span aria-hidden="true">↗</span></Link>
+          </div>
+          <div className="home-court-art" aria-hidden="true"><div className="home-court-lines"><i /><b /></div><span className="home-court-ball" /><span className="home-court-caption">A BETTER GAME. ONE POINT AT A TIME.</span></div>
+        </section>
+        <section className="home-section" aria-labelledby="quick-start-title">
+          <div className="home-section-heading"><h2 id="quick-start-title">今天，从哪里开始？</h2><span>QUICK START</span></div>
+          <div className="home-quick-grid">
+            {[
+              ["01", "/learn/cross-court", "学习战术", "看懂斜线球路与站位，跟着课程练起来。", "LEARN"],
+              ["02", "/board", "设计训练", "绘制球路、编排战术，把想法带上球场。", "PRACTISE"],
+              ["03", "/match", "记录比赛", "实时记分，记录每一分的关键表现。", "PLAY"],
+            ].map(([number, href, title, description, tag]) => <Link href={href} className="home-quick-card" key={href}><div className="home-card-meta"><span>{number} / {tag}</span><span aria-hidden="true">↗</span></div><h3>{title}</h3><p>{description}</p></Link>)}
+          </div>
+        </section>
+        <section id="analysis" className="home-section home-analysis" aria-labelledby="analysis-title">
+          <div className="home-section-heading"><h2 id="analysis-title">比赛复盘</h2><span>VIDEO ANALYSIS</span></div>
+          <p className="mb-6 text-sm leading-6 text-neutral-400">上传比赛视频或粘贴 YouTube 链接，发现可以带进下一场比赛的战术模式。</p>
+          <div className="flex flex-col items-start gap-4">
         <button
           onClick={startDemo}
           disabled={busy}
@@ -142,6 +154,7 @@ export default function Home() {
           <div className="flex gap-2">
             <input
               type="url"
+              aria-label="YouTube 比赛视频链接"
               value={ytUrl}
               onChange={(e) => setYtUrl(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && startYoutube()}
@@ -176,37 +189,6 @@ export default function Home() {
           />
         </label>
 
-        <Link
-          href="/board"
-          className={`rounded-xl border border-neutral-700 px-6 py-3 text-sm text-neutral-300 transition hover:border-emerald-600 hover:text-emerald-300 ${
-            busy ? "pointer-events-none opacity-50" : ""
-          }`}
-        >
-          打开网球战术板：画好战术，生成链接分享给学生（无需登录）
-        </Link>
-
-        <Link
-          href="/scouting"
-          className={`rounded-xl border border-neutral-700 px-6 py-3 text-sm text-neutral-300 transition hover:border-emerald-600 hover:text-emerald-300 ${
-            busy ? "pointer-events-none opacity-50" : ""
-          }`}
-        >
-          职业球探报告：选对手 / 选场地赛事，出高阶数据赛前报告（ATP·WTA·ITF）
-        </Link>
-
-        <Link
-          href="/melbourne-park"
-          className={`group flex w-full max-w-xl items-center justify-between rounded-xl border border-sky-500/35 bg-sky-500/5 px-5 py-4 text-left transition hover:border-sky-400 hover:bg-sky-500/10 ${
-            busy ? "pointer-events-none opacity-50" : ""
-          }`}
-        >
-          <span>
-            <span className="block text-sm font-semibold text-sky-200">Melbourne Park 3D</span>
-            <span className="mt-1 block text-xs text-neutral-500">Explore the Australian Open precinct and 28 selectable courts</span>
-          </span>
-          <span className="text-lg text-sky-300 transition group-hover:translate-x-1">→</span>
-        </Link>
-
         {backendUp === false && (
           <p className="text-sm text-amber-400">
             后端未启动：请先运行 <code className="rounded bg-neutral-800 px-1.5 py-0.5">uvicorn app.main:app</code>
@@ -219,8 +201,9 @@ export default function Home() {
         )}
         {err && <p className="text-sm text-red-400">{err}</p>}
       </div>
+        </section>
 
-      <div className="mt-16 grid gap-6 text-center text-sm text-neutral-500 sm:grid-cols-3">
+      <div className="mt-8 grid gap-6 text-center text-sm text-neutral-500 sm:grid-cols-3">
         {[
           ["追踪", "YOLO 检测球员与球，映射到标准球场坐标"],
           ["理解", "区分击球/落地，切分逐分逐拍，识别发球方向与球路"],
@@ -234,7 +217,7 @@ export default function Home() {
       </div>
 
       {history.length > 0 && (
-        <section className="mt-14 w-full max-w-2xl">
+        <section className="mt-10 w-full">
           <h2 className="mb-3 text-left text-sm font-semibold tracking-wider text-neutral-400">
             我的比赛 · 点击复盘
           </h2>
@@ -261,6 +244,8 @@ export default function Home() {
           </ul>
         </section>
       )}
+      <footer className="home-footer">TENNIS AGENT <span>看懂比赛，让训练更有方向。</span></footer>
     </main>
+    </div>
   );
 }

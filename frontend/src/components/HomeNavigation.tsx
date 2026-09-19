@@ -12,6 +12,7 @@ const groups = [
     ["/board", "战术板", "Tactics board"],
   ] },
   { title: "比赛与分析 / MATCH", links: [
+    ["/game-plan", "比赛计划", "Game plan"],
     ["/#analysis", "比赛复盘", "Video analysis"],
     ["/match", "现场记分", "Match tracker"],
     ["/scouting", "球探报告", "Scouting"],

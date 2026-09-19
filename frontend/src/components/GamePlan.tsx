@@ -36,6 +36,7 @@ export default function GamePlan({
           <p className="text-xs text-neutral-500">
             由模式挖掘结果确定性生成 · 建议打印一页带去球场
           </p>
+          <Link href="/game-plan" className="no-print mt-3 inline-block text-sm text-emerald-300">Create an editable player game plan →</Link>
         </div>
         <div className="no-print flex items-center gap-2">
           <label className="text-xs text-neutral-500">视角</label>

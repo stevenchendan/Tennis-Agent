@@ -127,19 +127,21 @@ export default function TacticCourt3D({
   paths,
   ball,
   height = 560,
+  cameraPosition = [0, 13, 15],
 }: {
   theme?: string;
   players: PlayerPos[];
   paths: BallPath[];
   ball: Ball3D | null;
   height?: number;
+  cameraPosition?: [number, number, number];
 }) {
   const t = resolveCourtTheme(theme);
   const lines = lineBoxes();
 
   return (
     <div style={{ height }} className="w-full">
-      <Canvas camera={{ position: [0, 13, 15], fov: 40 }} dpr={[1, 2]}>
+      <Canvas camera={{ position: cameraPosition, fov: 40 }} dpr={[1, 2]}>
         <ambientLight intensity={0.9} />
         <directionalLight position={[6, 14, 8]} intensity={1.3} />
 

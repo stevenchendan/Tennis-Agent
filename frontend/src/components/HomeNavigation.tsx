@@ -5,6 +5,7 @@ import { useState } from "react";
 
 const groups = [
   { title: "学习与训练 / LEARN", links: [
+    ["/lessons", "120节教练教案", "Coach lesson library"],
     ["/learn/cross-court", "斜线战术课", "Cross-court lesson"],
     ["/drills", "动态训练库", "Drill library"],
     ["/video-study", "视频学习", "Video study"],

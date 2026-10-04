@@ -49,6 +49,26 @@ the event engine (hit/landing detection, rally segmentation, serve detection,
 volley classification), pattern mining (planted patterns must be recovered end to
 end), and the API (upload/analysis/Q&A full flow).
 
+## 120-session Chinese coaching fieldbook
+
+Open `/lessons` from the home navigation for 120 complete coaching sessions across
+six ability bands. Each session includes a timed plan, two specific drills,
+point-play application, coaching cues, assessment targets, easier/harder options,
+and a schematic court layout. Search, level/topic filters, 45/60/90-minute plans,
+local coaching notes, backup/restore, and two-page printing work without a backend.
+
+The portable copy is `output/网球教练120课-离线教案库.html`. The printable PDF and
+its validation script are delivered separately in milestone M6. Ability bands and target
+success rates are original teaching guidance, not official ratings. The usage
+guide explains assumptions, rotation, adaptations, and references.
+
+Content lives in `frontend/content/lessons/` (20 authored lessons per file).
+Rebuild the standalone library with `node scripts/coaching/build-library.mjs`
+from `frontend/`. Browser verification and PDF export use
+`scripts/coaching/verify-library.cjs`; set `PLAYWRIGHT_MODULE` and `BROWSER_PATH`
+when Playwright or Chromium are not at the local defaults. Refresh the portable
+HTML copy after rebuilding. See `docs/coaching-milestones.md` for delivery status.
+
 ## Tennis Tactics Board (no backend required)
 
 From the home page click **"Open the tennis tactics board"** (or visit `/board` directly): drag

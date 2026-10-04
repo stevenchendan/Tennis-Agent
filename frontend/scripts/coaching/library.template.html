@@ -1,0 +1,1095 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>场边手册 · 120节网球教练教案</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #162f29;
+        --muted: #58665f;
+        --paper: #f4f3eb;
+        --line: #d6ddd3;
+        --green: #174e3d;
+        --lime: #d7ee88;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          16px/1.65 "Microsoft YaHei",
+          "PingFang SC",
+          system-ui,
+          sans-serif;
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+      button,
+      a {
+        touch-action: manipulation;
+      }
+      button {
+        cursor: pointer;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: white;
+        color: var(--ink);
+        padding: 9px 14px;
+      }
+      button:hover {
+        border-color: var(--green);
+        background: #edf2e6;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible {
+        outline: 3px solid #8c9c22;
+        outline-offset: 3px;
+      }
+      button.primary {
+        background: var(--green);
+        color: white;
+        border-color: var(--green);
+      }
+      button[aria-pressed="true"] {
+        background: var(--lime);
+        color: var(--ink);
+        border-color: #9caf64;
+      }
+      a {
+        color: var(--green);
+      }
+      .wrap {
+        max-width: 1360px;
+        margin: auto;
+        padding: 0 36px;
+      }
+      header {
+        background: var(--green);
+        color: #f7f9ed;
+        padding: 34px 0 30px;
+      }
+      header a {
+        color: #e2efbe;
+      }
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+      }
+      h1 {
+        font-size: clamp(30px, 4vw, 52px);
+        line-height: 1.18;
+        margin: 15px 0;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.4;
+        margin: 0 0 12px;
+      }
+      h3 {
+        font-size: 17px;
+        margin: 0 0 8px;
+      }
+      p {
+        margin: 0 0 12px;
+      }
+      .hero-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 24px;
+      }
+      .hero-copy {
+        max-width: 780px;
+      }
+      .hero-count {
+        font-size: 62px;
+        line-height: 1;
+        color: var(--lime);
+      }
+      .hero-count small {
+        display: block;
+        font-size: 14px;
+        letter-spacing: 1px;
+        margin-top: 14px;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .hero-sub {
+        color: #d6e7db;
+      }
+      .toolbar {
+        padding: 22px 0 16px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: end;
+      }
+      .toolbar label {
+        display: grid;
+        gap: 5px;
+        font-size: 13px;
+      }
+      .toolbar input,
+      .toolbar select {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: white;
+        color: var(--ink);
+        padding: 10px;
+        min-height: 45px;
+      }
+      .search {
+        flex: 1;
+        min-width: 220px;
+      }
+      .search input {
+        width: 100%;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .statusline {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 310px minmax(0, 1fr);
+        gap: 26px;
+        align-items: start;
+        padding-bottom: 60px;
+      }
+      .catalog {
+        max-height: calc(100vh - 85px);
+        overflow: auto;
+        position: sticky;
+        top: 18px;
+        padding: 2px 8px 10px 2px;
+      }
+      .lesson-item {
+        width: 100%;
+        text-align: left;
+        display: block;
+        background: transparent;
+        border: 1px solid transparent;
+        border-bottom-color: var(--line);
+        border-radius: 5px;
+        padding: 14px 12px;
+        margin-bottom: 3px;
+      }
+      .lesson-item strong {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .lesson-item small {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 3px;
+      }
+      .lesson-item.active {
+        background: #e3ebd5;
+        border-color: #a3b591;
+      }
+      .number {
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: var(--muted);
+      }
+      .sheet {
+        background: #fffef9;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 30px;
+      }
+      .sheet-top {
+        border-bottom: 2px solid var(--green);
+        padding-bottom: 18px;
+        margin-bottom: 22px;
+      }
+      .sheet-top .title-line {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 15px;
+      }
+      .sheet-top h2 {
+        font-size: 29px;
+        margin: 5px 0 10px;
+      }
+      .tags {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+      }
+      .tag {
+        font-size: 12px;
+        border: 1px solid var(--line);
+        padding: 3px 8px;
+        border-radius: 30px;
+      }
+      .objective {
+        font-size: 18px;
+        margin: 14px 0 0;
+      }
+      .plan-intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 245px;
+        gap: 24px;
+      }
+      .info-row {
+        margin-bottom: 12px;
+      }
+      .info-row b {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 3px;
+      }
+      .diagram {
+        margin: 0;
+        background: #f1f4eb;
+        border-radius: 9px;
+        padding: 14px;
+      }
+      .diagram svg {
+        width: 100%;
+        height: auto;
+        display: block;
+        max-height: 310px;
+      }
+      .diagram figcaption {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 12px;
+        margin-top: 4px;
+      }
+      .timeline {
+        margin-top: 22px;
+      }
+      .block {
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr);
+        gap: 16px;
+        border-top: 1px solid var(--line);
+        padding: 17px 0;
+        break-inside: avoid;
+      }
+      .time {
+        font-size: 12px;
+        color: var(--green);
+        font-weight: 600;
+      }
+      .time strong {
+        display: block;
+        font-size: 18px;
+      }
+      .block p {
+        margin: 0;
+      }
+      .block .detail {
+        margin-top: 8px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .callout {
+        background: #edf3df;
+        padding: 16px 18px;
+        border-left: 4px solid #668a3a;
+        margin: 12px 0 20px;
+      }
+      .adapt {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .adapt > div {
+        border-top: 1px solid var(--line);
+        padding-top: 13px;
+      }
+      .notes {
+        margin-top: 22px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+      }
+      .notes label {
+        display: block;
+        font-size: 14px;
+      }
+      .notes textarea {
+        width: 100%;
+        min-height: 116px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 12px;
+        margin-top: 7px;
+        resize: vertical;
+      }
+      .record-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .record-grid label {
+        font-size: 12px;
+      }
+      .record-grid input {
+        width: 100%;
+        min-width: 0;
+        border: 1px solid var(--line);
+        padding: 8px;
+        border-radius: 4px;
+      }
+      .nav-bottom {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 24px;
+      }
+      .guide {
+        background: #fffef9;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        margin: 0 0 24px;
+      }
+      .guide summary {
+        cursor: pointer;
+        padding: 16px 20px;
+        font-weight: 600;
+      }
+      .guide-body {
+        padding: 0 22px 22px;
+        max-width: 1100px;
+      }
+      .guide-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .guide h3 {
+        margin-top: 18px;
+      }
+      .guide li {
+        margin-bottom: 7px;
+      }
+      .guide table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      .guide th,
+      .guide td {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      .guide .table-wrap {
+        overflow: auto;
+      }
+      .empty {
+        padding: 35px 10px;
+      }
+      .print-note {
+        display: none;
+      }
+      .print-area {
+        display: none;
+      }
+      .alert {
+        padding: 10px 0;
+        color: #7a3d16;
+        min-height: 20px;
+      }
+      footer {
+        padding: 22px 0;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+      }
+      @media (max-width: 950px) {
+        .wrap {
+          padding: 0 20px;
+        }
+        .layout {
+          grid-template-columns: 240px minmax(0, 1fr);
+          gap: 16px;
+        }
+        .sheet {
+          padding: 22px;
+        }
+        .plan-intro {
+          grid-template-columns: 1fr;
+        }
+        .diagram {
+          max-width: 300px;
+        }
+        .hero-count {
+          font-size: 48px;
+        }
+        .sheet-top h2 {
+          font-size: 25px;
+        }
+      }
+      @media (max-width: 650px) {
+        .wrap {
+          padding: 0 14px;
+        }
+        header {
+          padding: 25px 0;
+        }
+        .hero-count {
+          display: none;
+        }
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .catalog {
+          position: static;
+          max-height: 285px;
+          border: 1px solid var(--line);
+          border-radius: 7px;
+        }
+        .sheet {
+          padding: 18px;
+        }
+        .toolbar label {
+          flex: 1;
+          min-width: 130px;
+        }
+        .search {
+          flex-basis: 100% !important;
+        }
+        .toolbar input,
+        .toolbar select {
+          max-width: 100%;
+          width: 100%;
+        }
+        .guide-grid,
+        .adapt {
+          grid-template-columns: 1fr;
+        }
+        .block {
+          grid-template-columns: 68px minmax(0, 1fr);
+          gap: 10px;
+        }
+        .record-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .title-line {
+          flex-wrap: wrap;
+        }
+        .actions button {
+          padding: 9px 11px;
+        }
+        .sheet-top h2 {
+          font-size: 24px;
+        }
+        .objective {
+          font-size: 16px;
+        }
+        .plan-intro {
+          gap: 14px;
+        }
+        .diagram {
+          margin: auto;
+        }
+        .guide-body {
+          padding: 0 15px 18px;
+        }
+      }
+      @page {
+        size: A4;
+        margin: 12mm;
+      }
+      @media print {
+        body {
+          background: white;
+          color: #111;
+          font-family: "Microsoft YaHei", sans-serif;
+          font-size: 9pt;
+          line-height: 1.5;
+        }
+        body > header,
+        body > main,
+        body > footer {
+          display: none !important;
+        }
+        .print-area {
+          display: block;
+        }
+        .print-area .sheet {
+          border: 0;
+          border-radius: 0;
+          padding: 0;
+          background: white;
+          break-after: page;
+        }
+        .print-area .sheet:last-child {
+          break-after: auto;
+        }
+        .print-area .page-one {
+          break-after: page;
+        }
+        .print-area .page-two {
+          break-after: page;
+        }
+        .print-area .sheet:last-child .page-two {
+          break-after: auto;
+        }
+        .print-area .sheet-top {
+          padding-bottom: 8px;
+          margin-bottom: 10px;
+        }
+        .print-area .sheet-top h2 {
+          font-size: 19pt;
+          margin: 4px 0;
+        }
+        .print-area h3 {
+          font-size: 11pt;
+        }
+        .print-area .objective {
+          font-size: 11pt;
+          margin-top: 6px;
+        }
+        .print-area .plan-intro {
+          grid-template-columns: 1fr 160px;
+          gap: 16px;
+        }
+        .print-area .diagram {
+          padding: 8px;
+          max-width: none;
+          break-inside: avoid;
+        }
+        .print-area .diagram svg {
+          max-height: 218px;
+        }
+        .print-area .diagram figcaption,
+        .print-area .legend {
+          font-size: 8pt;
+        }
+        .print-area .block {
+          grid-template-columns: 75px 1fr;
+          padding: 10px 0;
+          gap: 12px;
+        }
+        .print-area .time {
+          font-size: 8pt;
+        }
+        .print-area .time strong {
+          font-size: 12pt;
+        }
+        .print-area .block .detail {
+          font-size: 8pt;
+          margin-top: 5px;
+        }
+        .print-area .info-row {
+          margin-bottom: 8px;
+        }
+        .print-area .info-row b {
+          font-size: 8pt;
+        }
+        .print-area .callout {
+          margin: 8px 0 14px;
+          padding: 10px 12px;
+        }
+        .print-area .adapt {
+          gap: 14px;
+        }
+        .print-area .notes {
+          margin-top: 15px;
+          padding-top: 10px;
+        }
+        .print-area .tag {
+          font-size: 8pt;
+        }
+        .print-area .sub {
+          font-size: 8pt;
+        }
+        .print-area .print-note {
+          display: block;
+        }
+        .print-area .no-print {
+          display: none !important;
+        }
+        .print-record {
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+          border-bottom: 1px solid #bbb;
+          padding: 8px 0;
+          min-height: 34px;
+        }
+        .writing-lines {
+          height: 95px;
+          background: repeating-linear-gradient(transparent, transparent 28px, #ccc 28px, #ccc 29px);
+        }
+        .print-guide {
+          break-after: page;
+          font-size: 10pt;
+        }
+        .print-guide h1 {
+          font-size: 25pt;
+        }
+        .print-guide h2 {
+          font-size: 16pt;
+          margin-top: 24px;
+        }
+        .print-guide table {
+          border-collapse: collapse;
+          width: 100%;
+          font-size: 9pt;
+        }
+        .print-guide td,
+        .print-guide th {
+          border-bottom: 1px solid #bbb;
+          padding: 9px;
+          text-align: left;
+        }
+        .print-guide a {
+          color: inherit;
+        }
+        .print-area a {
+          color: inherit;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap hero-row">
+        <div class="hero-copy">
+          <div class="eyebrow">Tennis Agent / Coach's Fieldbook</div>
+          <h1>把下一节课，准备好。</h1>
+          <p class="hero-sub">
+            120份完整中文教案 · 从第一次击球到比赛应变<br />打开一课，照着带。目标、流程、口令、场地图和课后记录都在一起。
+          </p>
+          <a href="/" id="home-link">返回网球工作台 ↗</a>
+        </div>
+        <div class="hero-count">120<small>6个水平 × 每级20节</small></div>
+      </div>
+    </header>
+    <main class="wrap">
+      <div class="toolbar">
+        <label class="search"
+          >找一节课<input id="search" type="search" placeholder="搜索：反手、二发、双打、抢七…" /></label
+        ><label
+          >学员水平<select id="level">
+            <option value="">全部水平</option>
+          </select></label
+        ><label
+          >场上主题<select id="topic">
+            <option value="">全部主题</option>
+            <option value="serve">发球与第三拍</option>
+            <option value="return">接发球</option>
+            <option value="net">网前与攻防转换</option>
+            <option value="doubles">双打配合</option>
+            <option value="baseline">底线与移动</option>
+            <option value="match">比赛与复盘</option>
+          </select></label
+        ><label
+          >带课时长<select id="duration">
+            <option value="60">60分钟</option>
+            <option value="45">45分钟</option>
+            <option value="90">90分钟</option>
+          </select></label
+        ><label
+          >我的课程<select id="saved">
+            <option value="">全部课程</option>
+            <option value="star">已收藏</option>
+            <option value="done">已完成</option>
+            <option value="todo">尚未完成</option>
+          </select></label
+        >
+      </div>
+      <div class="statusline">
+        <span id="count" aria-live="polite"></span>
+        <div class="actions">
+          <button id="print-current">打印本课</button><button id="print-filtered">打印筛选结果</button
+          ><button id="print-guide">打印带课指南</button><button id="export">备份带课记录</button
+          ><button id="import">恢复记录</button
+          ><input id="import-file" type="file" accept="application/json,.json" hidden />
+        </div>
+      </div>
+      <details class="guide" id="guide">
+        <summary>先读这页：分级、人数轮换、120课安排与使用说明</summary>
+        <div class="guide-body">
+          <p>
+            这是原创教学设计，不是复制某套官方课程，也不是官方评级认证。默认面向一般成人与具备相应理解能力的青少年；按能力、体能和实际回球质量选课。儿童需缩短讲解、增加游戏轮换并匹配球与场地，不能直接把成人负荷照搬。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>水平／课号</th>
+                  <th>开始条件</th>
+                  <th>球与场地</th>
+                </tr>
+              </thead>
+              <tbody id="levels-table"></tbody>
+            </table>
+          </div>
+          <div class="guide-grid">
+            <section>
+              <h3>怎样真正用够120节</h3>
+              <p>
+                每个编号都是一节完整课，不是把一个练习算一节。六组覆盖不同水平学员；同一学员可以按能力循序使用，但不承诺20节必然升级。每级按01—20顺序带，末课做复盘；尚未稳定的课可以按降阶版本再上。
+              </p>
+              <p>
+                <b>一个班的100节示例：</b
+                >前20节用该班适合等级的20课；随后20节按原顺序做同课进阶与真实回球；第41—60节按验收结果进入下一等级或巩固；第61—80节围绕比赛暴露的弱项选课；第81—100节交替专项巩固和比赛应用。这是重复利用路径，不是额外100份教案。
+              </p>
+              <h3>每课只抓一个主目标</h3>
+              <p>
+                先读目标、验收和降阶，再备场地。连续两组明显失败就先减速、缩短距离或扩大目标；稳定两组后只增加一个难点。所有命中率都是本库建议的课堂观察目标，教练可下调，并记录调整理由。
+              </p>
+            </section>
+            <section>
+              <h3>1片场地、4名学员怎样轮换</h3>
+              <p>
+                全场单打练习每次只开一组活球：A/B练习，C/D在后围网外观察落点与准备；约60—90秒或5球交换，谁失误都照计划轮换。需要教练喂球时，教练替代喂球角色，学员依次练习；捡球前全场停球。
+              </p>
+              <p>
+                仅在低速短场、两个通道清楚隔离且球不会交叉时，允许两组同时练。双打则四人同时上场，教练观察；每5分或一个计时段交换发接与网前角色。
+              </p>
+              <h3>人数变化</h3>
+              <p>
+                <b>1对1：</b
+                >教练承担喂球与对手，休息时间用于反馈，不能删掉轮休连续加量。<b>2人：</b>双方交替喂打，轮休仍保留。<b>5—6人：</b>增加场外记录与无球观察站，45—60秒轮换；保留同一组活球，额外人数不是增加交叉球路。<b>双打不足4人：</b>可练局部配合；完整团队验收另约4人完成，不能当作已完成双打比赛。
+              </p>
+            </section>
+          </div>
+          <h3>时长与实际带课</h3>
+          <p>
+            60分钟：热身8、示范7、练习A15、练习B15、应用10、复盘5。45分钟：6／5／10／10／10／4。90分钟：10／10／23／23／17／7，增加实战重复与轮休，不把全部延长时间变成连续击球。每段包含讲解、捡球、饮水与轮换；时间到保留比分或测试记录，下课接续，不为完成指定局数挤掉休息。
+          </p>
+          <h3>场地准备与带课边界</h3>
+          <p>
+            基本器材：每人球拍、约24个适合速度的球、8个扁平标志碟、球筐、计时器、记录表。标志放在目标边缘或线外，不放在落脚路线；球筐、等候者远离活球区。开课先看地面、鞋带、可用活动范围和当天状态；地滑、身体不适或视线无法看清来球时调整或停止相关练习。图示是教学布置，不是精确动作或弹道模拟。
+          </p>
+          <h3>记录怎样保存</h3>
+          <p>
+            收藏、完成标记、日期、人数、实际结果和带课笔记保存在当前浏览器。不会自动同步到其他设备，清理浏览器可能丢失；用“备份带课记录”保存文件。“恢复记录”会将备份中的同编号记录合并覆盖。打印可选择“另存为PDF”，每课分为带课页与调整记录页。
+          </p>
+          <h3>设计参考与原创范围</h3>
+          <p>
+            球速、缩小场地与早期发球—回合—计分的基本方向参考
+            <a
+              href="https://www.itftennis.com/en/growing-the-game/itf-tennis-play-and-stay/"
+              target="_blank"
+              rel="noreferrer"
+              >ITF Play and Stay</a
+            >；球与场地适配参考
+            <a
+              href="https://www.usta.com/en/home/play/get-kids-involved-in-tennis/perfect-match.html"
+              target="_blank"
+              rel="noreferrer"
+              >USTA Perfect Match</a
+            >；分间重置的方向参考
+            <a
+              href="https://www.usta.com/en/home/improve/tips-and-instruction/national/green-light--yellow-light--routines-to-succeed-on-the-tennis-cou.html"
+              target="_blank"
+              rel="noreferrer"
+              >USTA 分间流程</a
+            >。本库120课的具体组合、练习规则、分级和验收阈值为原创建议，未声称获官方认可。参考核对：2026-10-05。
+          </p>
+        </div>
+      </details>
+      <div id="message" class="alert" role="status"></div>
+      <div class="layout">
+        <nav class="catalog" id="catalog" aria-label="教案目录"></nav>
+        <div id="detail"></div>
+      </div>
+    </main>
+    <footer><div class="wrap">场边手册 / 120节 · 内容版本 2026.10 · 教学目标可调整，实际结果要记录。</div></footer>
+    <div class="print-area" id="print-area"></div>
+    <script>
+      "use strict";
+      const DATA = __LESSON_DATA__;
+      const $ = (id) => document.getElementById(id);
+      const escapeHtml = (s) =>
+        String(s ?? "").replace(
+          /[&<>"']/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
+        );
+      const STORE = "tennis-coaching-120-v1";
+      let state = { records: {} },
+        storageOkay = true;
+      try {
+        const raw = JSON.parse(localStorage.getItem(STORE) || "null");
+        if (raw && raw.records && typeof raw.records === "object") state = { records: raw.records };
+      } catch {
+        storageOkay = false;
+      }
+      let selected = DATA.lessons.find((x) => x.id === location.hash.slice(1))?.id || "001";
+      let filtered = [];
+      const times = { 45: [6, 5, 10, 10, 10, 4], 60: [8, 7, 15, 15, 10, 5], 90: [10, 10, 23, 23, 17, 7] };
+      function record(id) {
+        return state.records[id] || {};
+      }
+      function save() {
+        try {
+          localStorage.setItem(STORE, JSON.stringify(state));
+          storageOkay = true;
+        } catch {
+          storageOkay = false;
+          $("message").textContent = "当前浏览器不能保存记录；请用“备份带课记录”下载本次记录。";
+        }
+      }
+      function group(lesson) {
+        if (lesson.diagram.startsWith("doubles")) return "doubles";
+        if (["serve", "serveplus"].includes(lesson.diagram)) return "serve";
+        if (lesson.diagram === "return") return "return";
+        if (["net", "lob", "approach"].includes(lesson.diagram)) return "net";
+        if (lesson.diagram === "match") return "match";
+        return "baseline";
+      }
+      function diagramSVG(key, id) {
+        const d = DATA.diagrams[key];
+        return `<svg viewBox="0 0 190 264" role="img" aria-label="${escapeHtml(d.name)}，人物、目标区与球路示意"><defs><marker id="arrow-${id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#c06d22"/></marker><marker id="move-${id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#345b92"/></marker></defs><rect x="18" y="14" width="154" height="232" rx="3" fill="#215948"/><g stroke="#e4efe4" stroke-width="1.2" fill="none"><rect x="27" y="20" width="136" height="220"/><path d="M39 20V240M151 20V240M39 72H151M39 188H151M95 72V188M27 130H163"/></g><path d="M20 130H170" stroke="#f8fff0" stroke-width="3"/>${d.zones.map((z) => `<rect x="${z[0]}" y="${z[1]}" width="${z[2]}" height="${z[3]}" fill="#d7ee88" fill-opacity=".26" stroke="#e0f49a" stroke-dasharray="3 3"/>`).join("")}${d.shots.map((s, i) => `<path d="M${s[0]} ${s[1]} L${s[2]} ${s[3]}" stroke="#eea553" stroke-width="2" fill="none" marker-end="url(#arrow-${id})"/><text x="${(s[0] + s[2]) / 2 + 5}" y="${(s[1] + s[3]) / 2}" fill="#fff2cc" font-size="11" font-weight="bold">${i + 1}</text>`).join("")}${d.moves.map((s) => `<path d="M${s[0]} ${s[1]} L${s[2]} ${s[3]}" stroke="#a7c9ff" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#move-${id})"/>`).join("")}${d.players.map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="10" fill="#fff9df" stroke="#12352a"/><text x="${p[0]}" y="${p[1] + 4}" fill="#163a2c" font-size="12" font-weight="bold" text-anchor="middle">${p[2]}</text>`).join("")}</svg>`;
+      }
+      function block(start, minutes, title, body, detail = "") {
+        return `<section class="block"><div class="time">${String(start).padStart(2, "0")}—${String(start + minutes).padStart(2, "0")} 分<strong>${minutes}′</strong></div><div><h3>${title}</h3><p>${escapeHtml(body)}</p>${detail ? `<p class="detail">${escapeHtml(detail)}</p>` : ""}</div></section>`;
+      }
+      function lessonHTML(l, printing = false) {
+        const lev = DATA.levels[l.level - 1],
+          r = record(l.id),
+          duration = Number($("duration").value),
+          t = times[duration];
+        let minute = 0;
+        const pieces = [
+          ["热身与状态检查", lev.warm, "前1分钟查看场地和当日状态；活动从慢到快。最后用本课动作做低强度预演。"],
+          [
+            "示范与本课任务",
+            `今天只抓：${l.objective}。${l.cue}`,
+            "教练先完整示范，再示范一个常见错误；每人试2—3球，只给一句最需要的反馈。",
+          ],
+          [
+            "练习 A · 建立能力",
+            l.drillA,
+            l.diagram.startsWith("doubles")
+              ? "先用约1分钟说明规则。4人两队同时上场，教练观察；每5分或一个计时段轮换发接和网前角色。组间全场停球捡球、简短反馈。"
+              : "先用约1分钟说明规则。4人全场练习时，一对上场一对在后围网外观察；约60—90秒或5球换人。组间停球捡球、简短反馈。",
+          ],
+          [
+            "练习 B · 加入变化",
+            l.drillB,
+            "先确保A的要求可完成再加变化。连续两组失败先使用本课降阶；稳定两组只增加一个变量。每位学员都要换到主动与被动角色。",
+          ],
+          [
+            "比赛／游戏应用",
+            l.game,
+            "本段包含规则解释与轮换；完整比赛一时打不完就保留比分。课堂奖励分不等同于正式比赛计分。",
+          ],
+          [
+            "复盘与下课记录",
+            `验收：${l.assessment}`,
+            "主要数据在前面的练习中边练边采集，此处汇总，不在最后几分钟重做全部测试。让学员说一个可重复要点；记录下节课需要保留或改变什么。",
+          ],
+        ];
+        const blocks = pieces.map((p, i) => {
+          let html = block(minute, t[i], ...p);
+          minute += t[i];
+          return html;
+        });
+        const rotation = l.diagram.startsWith("doubles")
+          ? "4人两队同时练；每5分或一个计时段交换发接、前后位置。教练站在不影响发球与回球的位置观察。"
+          : "全场一组活球：A/B先练，C/D在后围网外观察；约60—90秒或5球交换。需要教练喂球时由教练替代喂球者，学员轮换；仅隔离清楚的低速短场可两组并行。";
+        return `<article class="sheet" data-lesson="${l.id}"><div class="page-one"><div class="sheet-top"><div class="number">教案 ${l.id} / ${escapeHtml(lev.name)} / 本级第 ${l.sequence} 节</div><div class="title-line"><h2>${escapeHtml(l.title)}</h2>${printing ? "" : `<div class="actions no-print"><button id="star" aria-pressed="${!!r.star}">${r.star ? "★ 已收藏" : "☆ 收藏"}</button><button id="done" aria-pressed="${!!r.done}">${r.done ? "✓ 已完成" : "标记完成"}</button></div>`}</div><div class="tags"><span class="tag">${duration} 分钟</span><span class="tag">1片场地</span><span class="tag">默认4人 · 可调整</span><span class="tag">${escapeHtml(DATA.diagrams[l.diagram].name)}</span></div><p class="objective">${escapeHtml(l.objective)}</p></div>
+<div class="plan-intro"><div><div class="info-row"><b>适合谁／开始条件</b>${escapeHtml(lev.entry)}</div><div class="info-row"><b>球与场地</b>${escapeHtml(lev.ball)}</div><div class="info-row"><b>备课与轮换</b>球拍、约24球、8个扁平标志碟、球筐与计时器。目标边缘放标志，保持跑动路线清楚。${escapeHtml(rotation)}</div></div><figure class="diagram">${diagramSVG(l.diagram, (printing ? "p" : "s") + l.id)}<div class="legend"><span>实线：球路</span><span>虚线箭头：移动</span><span>框：目标</span></div><figcaption>${escapeHtml(DATA.diagrams[l.diagram].note)}</figcaption></figure></div>
+<div class="timeline">${blocks.slice(0, 4).join("")}</div><p class="print-note sub">场边手册 · ${l.id} · 第1页／共2页　｜　应用、调整与记录见下一页</p></div>
+<div class="page-two"><h3 class="print-note">${l.id} · ${escapeHtml(l.title)} / 应用与带课记录</h3>${blocks.slice(4).join("")}<div class="callout"><h3>教练只说这一句</h3><p>${escapeHtml(l.cue)}</p></div><div class="adapt"><div><h3>太难时，先这样改</h3><p>${escapeHtml(l.easier)}</p></div><div><h3>稳定后，再这样加</h3><p>${escapeHtml(l.harder)}</p></div><div><h3>人数与场地调整</h3><p>1对1由教练承担对手并保留休息；2人交替喂打；5—6人增加场外观察站，45—60秒换人，仍只开一组全场活球。双打不足4人只练局部配合，完整验收另补。</p></div><div><h3>下节课怎么接</h3><p>${escapeHtml(lev.gate)}${l.sequence === 20 ? "用本课评估决定复习或进入下一阶段。" : `本课稳定后可继续教案${String(Number(l.id) + 1).padStart(3, "0")}；未稳定先用降阶版本复练，不急着换题。`}</p></div></div>
+<div class="notes"><h3>带课记录</h3>${printing ? `<div class="print-record">日期：${escapeHtml(r.date || "____________")}　班级：${escapeHtml(r.className || "____________")}　实到人数：${escapeHtml(r.players || "____")}　结果：${escapeHtml(r.result || "________________")}</div><p class="print-record">${escapeHtml(r.note || "目标命中 __ / __　启动成功 __ / __　选择合理 __ / __\n本课发现：\n下次调整：")}</p><div class="writing-lines"></div>` : `<p class="sub">保存在当前浏览器。备份后可带到另一台设备；记录真实结果，不只勾“完成”。</p><div class="record-grid"><label>上课日期<input id="date" type="date" value="${escapeHtml(r.date || "")}"></label><label>班级／学员<input id="className" maxlength="80" value="${escapeHtml(r.className || "")}" placeholder="如：周六成人班"></label><label>实到人数<input id="players" type="number" min="1" max="30" value="${escapeHtml(r.players || "")}" placeholder="4"></label><label>验收结果<input id="result" maxlength="120" value="${escapeHtml(r.result || "")}" placeholder="如：二发7/10"></label></div><label style="margin-top:12px">本课发现与下次调整<textarea id="note" maxlength="12000" placeholder="例：A的二发7/10；B在接发后没有回位。下课复练第三拍，先减慢来球速度。">${escapeHtml(r.note || "")}</textarea></label>`}</div><p class="print-note sub">场边手册 · ${l.id} · 第2页／共2页　｜　验收阈值为课堂建议，依据学员实际情况调整。</p>${printing ? "" : `<div class="nav-bottom no-print"><button id="prev" ${l.id === "001" ? "disabled" : ""}>← 上一课</button><button id="next" ${l.id === "120" ? "disabled" : ""}>下一课 →</button></div>`}</div></article>`;
+      }
+      function drawDetail() {
+        const l = DATA.lessons.find((x) => x.id === selected);
+        $("detail").innerHTML = lessonHTML(l);
+        for (const key of ["date", "className", "players", "result", "note"])
+          $(key).addEventListener("input", () => {
+            state.records[selected] = { ...record(selected), [key]: $(key).value };
+            save();
+          });
+        for (const key of ["star", "done"])
+          $(key).addEventListener("click", () => {
+            state.records[selected] = { ...record(selected), [key]: !record(selected)[key] };
+            save();
+            render();
+          });
+        $("prev").onclick = () => pick(String(Number(selected) - 1).padStart(3, "0"));
+        $("next").onclick = () => pick(String(Number(selected) + 1).padStart(3, "0"));
+      }
+      function pick(id) {
+        if (!DATA.lessons.some((x) => x.id === id)) return;
+        selected = id;
+        try {
+          history.replaceState(null, "", "#" + id);
+        } catch {
+          location.hash = id;
+        }
+        drawDetail();
+        drawCatalog();
+      }
+      function drawCatalog() {
+        const selectedVisible = filtered.some((x) => x.id === selected);
+        $("catalog").innerHTML = filtered.length
+          ? filtered
+              .map(
+                (l) =>
+                  `<button class="lesson-item ${l.id === selected ? "active" : ""}" data-id="${l.id}" ${l.id === selected ? 'aria-current="true"' : ""}><span class="number">${l.id} · ${escapeHtml(DATA.levels[l.level - 1].short)} ${record(l.id).done ? "✓" : ""} ${record(l.id).star ? "★" : ""}</span><strong>${escapeHtml(l.title)}</strong><small>${escapeHtml(l.objective)}</small></button>`,
+              )
+              .join("")
+          : '<p class="empty">没有找到匹配教案。试试减少筛选条件。</p>';
+        for (const b of $("catalog").querySelectorAll("[data-id]")) b.onclick = () => pick(b.dataset.id);
+        $("count").textContent =
+          `${filtered.length} / 120 节 · 已完成 ${DATA.lessons.filter((l) => record(l.id).done).length} 节${selectedVisible ? "" : " · 当前打开课程不在筛选结果中"}`;
+        $("print-filtered").disabled = !filtered.length;
+      }
+      function render() {
+        const q = $("search").value.trim().toLowerCase(),
+          level = $("level").value,
+          topic = $("topic").value,
+          saved = $("saved").value;
+        filtered = DATA.lessons.filter(
+          (l) =>
+            (!level || String(l.level) === level) &&
+            (!topic || group(l) === topic) &&
+            (!q ||
+              [l.id, l.title, l.objective, l.drillA, l.drillB, l.game, l.cue, l.assessment]
+                .join(" ")
+                .toLowerCase()
+                .includes(q)) &&
+            (!saved || (saved === "todo" ? !record(l.id).done : !!record(l.id)[saved])),
+        );
+        if (filtered.length && !filtered.some((l) => l.id === selected)) {
+          selected = filtered[0].id;
+          try {
+            history.replaceState(null, "", "#" + selected);
+          } catch {}
+        }
+        drawCatalog();
+        drawDetail();
+      }
+      function printLessons(list) {
+        $("print-area").innerHTML = list.map((l) => lessonHTML(l, true)).join("");
+        window.print();
+      }
+      function guidePrintHTML() {
+        return `<section class="print-guide"><h1>120节网球教案 · 带课指南</h1>${$("guide").querySelector(".guide-body").innerHTML}</section>`;
+      }
+      for (const lev of DATA.levels) {
+        $("level").insertAdjacentHTML("beforeend", `<option value="${lev.id}">${escapeHtml(lev.name)}</option>`);
+        $("levels-table").insertAdjacentHTML(
+          "beforeend",
+          `<tr><td>${escapeHtml(lev.name)}<br>${String((lev.id - 1) * 20 + 1).padStart(3, "0")}—${lev.id * 20}</td><td>${escapeHtml(lev.entry)}</td><td>${escapeHtml(lev.ball)}</td></tr>`,
+        );
+      }
+      for (const id of ["search", "level", "topic", "saved"])
+        $(id).addEventListener(id === "search" ? "input" : "change", render);
+      $("duration").onchange = drawDetail;
+      $("print-current").onclick = () => printLessons([DATA.lessons.find((x) => x.id === selected)]);
+      $("print-filtered").onclick = () => printLessons(filtered);
+      $("print-guide").onclick = () => {
+        $("print-area").innerHTML = guidePrintHTML();
+        window.print();
+      };
+      window.addEventListener("beforeprint", () => {
+        if (!$("print-area").innerHTML)
+          $("print-area").innerHTML = lessonHTML(
+            DATA.lessons.find((x) => x.id === selected),
+            true,
+          );
+      });
+      window.addEventListener("afterprint", () => {
+        $("print-area").innerHTML = "";
+      });
+      $("export").onclick = () => {
+        const blob = new Blob(
+            [JSON.stringify({ version: 1, exported: new Date().toISOString(), records: state.records }, null, 2)],
+            { type: "application/json" },
+          ),
+          url = URL.createObjectURL(blob),
+          a = document.createElement("a");
+        a.href = url;
+        a.download = "网球教案-带课记录-" + new Date().toISOString().slice(0, 10) + ".json";
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        $("message").textContent = "带课记录备份已开始下载。";
+      };
+      $("import").onclick = () => $("import-file").click();
+      $("import-file").onchange = async () => {
+        try {
+          const file = $("import-file").files[0];
+          if (!file) return;
+          if (file.size > 3000000) throw Error("文件过大");
+          const incoming = JSON.parse(await file.text());
+          if (
+            incoming.version !== 1 ||
+            !incoming.records ||
+            typeof incoming.records !== "object" ||
+            Array.isArray(incoming.records)
+          )
+            throw Error("格式不符");
+          const allowed = new Set(DATA.lessons.map((l) => l.id));
+          let count = 0;
+          for (const [id, value] of Object.entries(incoming.records)) {
+            if (!allowed.has(id) || !value || typeof value !== "object") continue;
+            const clean = {};
+            for (const key of ["star", "done"]) if (typeof value[key] === "boolean") clean[key] = value[key];
+            for (const key of ["date", "className", "players", "result", "note"])
+              if (typeof value[key] === "string") clean[key] = value[key].slice(0, key === "note" ? 12000 : 150);
+            state.records[id] = { ...record(id), ...clean };
+            count++;
+          }
+          save();
+          render();
+          $("message").textContent =
+            `已恢复 ${count} 节课程的记录。${storageOkay ? "" : "浏览器无法持久保存，请再次备份。"}`;
+        } catch {
+          $("message").textContent = "无法恢复：请选择本教案库导出的有效记录备份。";
+        } finally {
+          $("import-file").value = "";
+        }
+      };
+      window.addEventListener("hashchange", () => {
+        const id = location.hash.slice(1);
+        if (DATA.lessons.some((x) => x.id === id)) pick(id);
+      });
+      if (location.protocol === "file:") $("home-link").hidden = true;
+      render();
+      if (!storageOkay) $("message").textContent = "当前浏览器不能持久保存记录；可以照常查看与打印，请及时备份。";
+    </script>
+  </body>
+</html>

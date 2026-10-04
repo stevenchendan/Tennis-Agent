@@ -19,6 +19,9 @@ out/
 next-env.d.ts
 *.tsbuildinfo
 
+# Coaching fieldbook render checks
+/tmp/pdfs/
+
 # env & IDE
 .env
 .env.local

@@ -22,8 +22,8 @@
 | M2 | `codex/coaching-m2-club` | 041—080发展与俱乐部教案 | 同上；检查攻防决策、轮换与评价可执行 | 已合并 [#3](https://github.com/stevenchendan/Tennis-Agent/pull/3) |
 | M3 | `codex/coaching-m3-competition` | 081—120进阶与比赛教案 | 总数120、编号连续、压力情境与调整方案明确 | 已合并 [#4](https://github.com/stevenchendan/Tennis-Agent/pull/4) |
 | M4 | `codex/coaching-m4-library` | 构建器、离线教案库模板、浏览器验证 | 构建120课；筛选、课时、记录、备份、手机布局通过 | 已合并 [#5](https://github.com/stevenchendan/Tennis-Agent/pull/5) |
-| M5 | `codex/coaching-m5-publish` | 生成的网页与数据、离线副本、项目入口、使用说明 | 输出可重建；入口类型/代码检查；离线打开通过 | 待交付 |
-| M6 | `codex/coaching-m6-handbook` | PDF完整手册、PDF验证器 | 248页、120个双页教案、中文内容及书签完整，抽样视觉检查通过 | 待交付 |
+| M5 | `codex/coaching-m5-publish` | 生成的网页与数据、离线副本、项目入口、使用说明 | 输出可重建；入口类型/代码检查；离线打开通过 | 已合并 [#6](https://github.com/stevenchendan/Tennis-Agent/pull/6) |
+| M6 | `codex/coaching-m6-handbook` | PDF完整手册、PDF验证器 | 248页、120个双页教案、中文内容及书签完整，抽样视觉检查通过 | 验证完成；随 [#7](https://github.com/stevenchendan/Tennis-Agent/pull/7) 合并交付（实时状态见PR） |
 
 依赖：M0 → M1 → M2 → M3 → M4 → M5 → M6。M1—M3只引入原创课程源文件，不提前上线不完整课程。M4提供构建与验证能力，M5再发布完整教案库。M6独立交付打印手册。
 
@@ -37,3 +37,11 @@
 ## 合并记录
 
 每项合并后在下一项PR中登记已确认的PR编号与验证证据。最后一项合并后，以GitHub合并状态作为事实来源，并在后续文档同步中登记最终链接；不为单个状态字段无限创建收尾PR。
+
+## 本轮验证证据
+
+- M1—M3：6个源文件，每份20课；120个唯一标题，每课10个非空字段。教案是原创设计，尚无真实课堂效果背书。
+- M4：只有源文件的目录也可构建；浏览器验证覆盖120课、六级筛选、45/60/90分钟合计、笔记持久保存、收藏/完成标记、备份恢复和全部手机宽度布局；无页面运行错误。
+- M5：TypeScript与入口文件ESLint通过；网页和离线副本一致；本地文件模式可打开120课并按水平筛选。
+- M6：PDF共248页，每节课的双页标题、练习A/B、记录与页码全部验证；附逐课书签，检查中文与代表页面布局。
+- 本仓库当前未配置自动CI检查，因此上述均为本地执行结果；PR的合并能力与检查状态另在GitHub核对，未绕过保护或失败检查。

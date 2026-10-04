@@ -17,7 +17,7 @@
 
 | 编号 | 分支 | 单一交付范围 | 验收条件 | 状态 / PR |
 | --- | --- | --- | --- | --- |
-| M0 | `codex/coaching-m0-workflow` | 本文、项目工作约定、PR模板 | 范围与后续依赖清楚，不混入课程或应用代码 | 待交付 |
+| M0 | `codex/coaching-m0-workflow` | 本文、项目工作约定、PR模板 | 范围与后续依赖清楚，不混入课程或应用代码 | 已合并 [#1](https://github.com/stevenchendan/Tennis-Agent/pull/1) |
 | M1 | `codex/coaching-m1-foundations` | 001—040零基础与基础教案 | 每级20课、10字段齐全、标题唯一、目标与练习完整 | 待交付 |
 | M2 | `codex/coaching-m2-club` | 041—080发展与俱乐部教案 | 同上；检查攻防决策、轮换与评价可执行 | 待交付 |
 | M3 | `codex/coaching-m3-competition` | 081—120进阶与比赛教案 | 总数120、编号连续、压力情境与调整方案明确 | 待交付 |

@@ -23,7 +23,7 @@
 | M3 | `codex/coaching-m3-competition` | 081—120进阶与比赛教案 | 总数120、编号连续、压力情境与调整方案明确 | 已合并 [#4](https://github.com/stevenchendan/Tennis-Agent/pull/4) |
 | M4 | `codex/coaching-m4-library` | 构建器、离线教案库模板、浏览器验证 | 构建120课；筛选、课时、记录、备份、手机布局通过 | 已合并 [#5](https://github.com/stevenchendan/Tennis-Agent/pull/5) |
 | M5 | `codex/coaching-m5-publish` | 生成的网页与数据、离线副本、项目入口、使用说明 | 输出可重建；入口类型/代码检查；离线打开通过 | 已合并 [#6](https://github.com/stevenchendan/Tennis-Agent/pull/6) |
-| M6 | `codex/coaching-m6-handbook` | PDF完整手册、PDF验证器 | 248页、120个双页教案、中文内容及书签完整，抽样视觉检查通过 | 验证完成；随本手册PR合并交付 |
+| M6 | `codex/coaching-m6-handbook` | PDF完整手册、PDF验证器 | 248页、120个双页教案、中文内容及书签完整，抽样视觉检查通过 | 验证完成；随 [#7](https://github.com/stevenchendan/Tennis-Agent/pull/7) 合并交付（实时状态见PR） |
 
 依赖：M0 → M1 → M2 → M3 → M4 → M5 → M6。M1—M3只引入原创课程源文件，不提前上线不完整课程。M4提供构建与验证能力，M5再发布完整教案库。M6独立交付打印手册。
 

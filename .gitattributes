@@ -1,0 +1,5 @@
+# Generated publication artifacts; review sources under content/ and scripts/coaching/.
+frontend/public/coaching/index.html linguist-generated=true
+frontend/public/coaching/lessons.json linguist-generated=true
+output/* linguist-generated=true
+output/pdf/* linguist-generated=true

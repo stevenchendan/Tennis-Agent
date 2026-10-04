@@ -21,7 +21,7 @@
 | M1 | `codex/coaching-m1-foundations` | 001—040零基础与基础教案 | 每级20课、10字段齐全、标题唯一、目标与练习完整 | 已合并 [#2](https://github.com/stevenchendan/Tennis-Agent/pull/2) |
 | M2 | `codex/coaching-m2-club` | 041—080发展与俱乐部教案 | 同上；检查攻防决策、轮换与评价可执行 | 已合并 [#3](https://github.com/stevenchendan/Tennis-Agent/pull/3) |
 | M3 | `codex/coaching-m3-competition` | 081—120进阶与比赛教案 | 总数120、编号连续、压力情境与调整方案明确 | 已合并 [#4](https://github.com/stevenchendan/Tennis-Agent/pull/4) |
-| M4 | `codex/coaching-m4-library` | 构建器、离线教案库模板、浏览器验证 | 构建120课；筛选、课时、记录、备份、手机布局通过 | 待交付 |
+| M4 | `codex/coaching-m4-library` | 构建器、离线教案库模板、浏览器验证 | 构建120课；筛选、课时、记录、备份、手机布局通过 | 已合并 [#5](https://github.com/stevenchendan/Tennis-Agent/pull/5) |
 | M5 | `codex/coaching-m5-publish` | 生成的网页与数据、离线副本、项目入口、使用说明 | 输出可重建；入口类型/代码检查；离线打开通过 | 待交付 |
 | M6 | `codex/coaching-m6-handbook` | PDF完整手册、PDF验证器 | 248页、120个双页教案、中文内容及书签完整，抽样视觉检查通过 | 待交付 |
 

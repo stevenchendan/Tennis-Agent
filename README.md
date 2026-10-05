@@ -49,20 +49,40 @@ the event engine (hit/landing detection, rally segmentation, serve detection,
 volley classification), pattern mining (planted patterns must be recovered end to
 end), and the API (upload/analysis/Q&A full flow).
 
-## 120-session Chinese coaching fieldbook
+## Interactive Chinese coaching library — 120 sessions
 
-Open `/lessons` from the home navigation for 120 complete coaching sessions across
-six ability bands. Each session includes a timed plan, two specific drills,
-point-play application, coaching cues, assessment targets, easier/harder options,
-and a schematic court layout. Search, level/topic filters, 45/60/90-minute plans,
-local coaching notes, backup/restore, and two-page printing work without a backend.
+Open `/lessons` from the home navigation for the native, mobile-friendly library
+and `/lessons/001` for a complete session. There are 120 authored lessons across
+six ability bands, with search, level/topic filters, favorites and classroom history.
+Each lesson includes two drills, point play, coaching cues, assessment targets and
+easier/harder adaptations, with 45/60/90-minute plans.
 
-The portable copy is `output/网球教练120课-离线教案库.html`; the 248-page PDF with
-lesson bookmarks is `output/pdf/网球教练120课-完整手册.pdf`. Ability bands and target
-success rates are original teaching guidance, not official ratings. The usage
-guide explains assumptions, rotation, adaptations, and references.
+- **Interactive court:** drag players and targets by mouse or touch, move markers
+  with arrow keys, demonstrate individual shot paths, mirror, undo and save the
+  layout per lesson. Open the setup in the existing tactics editor to extend it.
+- **Teaching mode:** configure the group, follow six phases, pause/resume a timer
+  that survives reloads, record success/miss observations, undo a count, write notes
+  and save the finished classroom session separately from the next draft.
+- **Records:** filter favorite/taught/in-progress lessons and review the latest 300
+  classes. JSON backups include drafts, favorites, history and court layouts;
+  imports show a preview before merging, deduplicate history and pause timers.
+  Old offline-library favorites and completion marks migrate automatically.
 
-Content lives in `frontend/content/lessons/` (20 authored lessons per file).
+These features need no backend or account. Records stay in the current browser;
+use backup/restore to transfer them between devices. Court diagrams are schematic
+teaching aids; alternate shot choices are not presented as a continuous rally.
+
+The previous portable HTML and PDF remain historical exports in `output/`;
+the interactive project pages are the primary experience. Ability bands and target
+success rates are original teaching guidance, not official ratings.
+
+Content lives in `frontend/content/lessons/` (20 authored lessons per file), with the
+shared generated catalog in `frontend/public/coaching/lessons.json`.
+From `frontend/`, run `npm run dev` and visit `/lessons`. Native browser checks are
+`scripts/coaching/check-native.cjs`, `check-court.cjs`, `check-session.cjs` and
+`check-records.cjs`; set `BASE_URL` (default `http://127.0.0.1:3010`),
+`PLAYWRIGHT_MODULE` and `BROWSER_PATH` as needed. Use `npm run build` for production
+validation. The older standalone export workflow remains available:
 Rebuild the standalone library with `node scripts/coaching/build-library.mjs`
 from `frontend/`. Browser verification and PDF export use
 `scripts/coaching/verify-library.cjs`; set `PLAYWRIGHT_MODULE` and `BROWSER_PATH`

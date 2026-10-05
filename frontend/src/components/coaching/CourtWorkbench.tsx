@@ -4,44 +4,11 @@ import { useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEve
 import { layouts, type Layout, type Lesson } from "@/lib/coaching/catalog";
 import { encodeTactic, type Tactic } from "@/lib/tactic";
 import { W, LEN } from "@/lib/court";
+import { validateLayout } from "@/lib/coaching/court-layout";
 import s from "./coaching.module.css";
 
 const copy = (value: Layout): Layout => JSON.parse(JSON.stringify(value));
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
-function restore(raw: unknown, original: Layout): Layout | null {
-  if (!raw || typeof raw !== "object") return null;
-  const value = raw as Layout;
-  if (
-    !Array.isArray(value.players) ||
-    value.players.length !== original.players.length ||
-    !value.players.every(
-      (p, i) =>
-        Array.isArray(p) &&
-        p.length === 3 &&
-        p[2] === original.players[i][2] &&
-        Number.isFinite(p[0]) &&
-        Number.isFinite(p[1]) &&
-        p[0] >= 10 &&
-        p[0] <= 180 &&
-        p[1] >= 10 &&
-        p[1] <= 254,
-    )
-  )
-    return null;
-  for (const key of ["zones", "shots", "moves"] as const) {
-    if (
-      !Array.isArray(value[key]) ||
-      value[key].length !== original[key].length ||
-      !value[key].every(
-        (a) => Array.isArray(a) && a.length === 4 && a.every((n) => Number.isFinite(n) && n >= 0 && n <= 264),
-      )
-    )
-      return null;
-  }
-  if (!value.zones.every(([x, y, w, h]) => w > 0 && h > 0 && x + w <= 180 && y + h <= 250)) return null;
-  return { ...original, players: value.players, zones: value.zones, shots: value.shots, moves: value.moves };
-}
-
 export default function CourtWorkbench({ lesson }: { lesson: Lesson }) {
   const original = layouts[lesson.diagram],
     storageKey = `tennis-lesson-court-v1:${lesson.id}`;
@@ -62,7 +29,7 @@ export default function CourtWorkbench({ lesson }: { lesson: Lesson }) {
     try {
       const raw = localStorage.getItem(storageKey);
       if (raw) {
-        const saved = restore(JSON.parse(raw), original);
+        const saved = validateLayout(JSON.parse(raw), original);
         if (saved) setLayout(saved);
         else setMessage("旧布置无法读取，已使用课程默认布置。");
       }

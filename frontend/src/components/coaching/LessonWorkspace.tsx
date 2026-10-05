@@ -214,6 +214,7 @@ export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
         </div>
         <aside className={`${s.stack} ${s.sidebar}`}>
           <CourtWorkbench key={l.id} lesson={l} />
+          <Link className={s.button} href="/development/movement">学习击球后的步法与回位 ↗</Link>
           <section className={s.panel}>
             <h2>上场前</h2>
             <h3>学员条件</h3>

@@ -6,5 +6,6 @@ export default function DevelopmentNav() {
     <Link className={s.button} href="/development">能力档案</Link>
     <Link className={s.button} href="/development/pathways">成长路线</Link>
     <Link className={s.button} href="/development/movement">步法与回位</Link>
+    <Link className={s.button} href="/development/decisions">战术选择</Link>
   </nav>;
 }

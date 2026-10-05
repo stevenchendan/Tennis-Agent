@@ -439,6 +439,65 @@
 .dragItem {
   cursor: grab;
 }
+.phaseNav {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+.phaseNav button {
+  font-size: 12px;
+  padding: 8px 10px;
+}
+.timerPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: #102318;
+  border: 1px solid #d4ee8033;
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+.timer {
+  font-size: clamp(46px, 6vw, 72px);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: #d4ee80;
+  letter-spacing: -2px;
+}
+.currentTask {
+  font-size: 20px;
+  line-height: 1.8;
+}
+.counter {
+  font-size: 28px;
+  color: #d4ee80;
+  margin: 16px 0 !important;
+  font-variant-numeric: tabular-nums;
+}
+.counter span {
+  font-size: 14px;
+  color: #b3c1a7;
+  margin-left: 16px;
+}
+@media (max-width: 600px) {
+  .timerPanel {
+    padding: 18px;
+    flex-wrap: wrap;
+  }
+  .timerPanel > .stack {
+    display: flex;
+    gap: 8px;
+  }
+  .phaseNav {
+    gap: 6px;
+  }
+  .currentTask {
+    font-size: 17px;
+  }
+}
 .dragItem:active {
   cursor: grabbing;
 }

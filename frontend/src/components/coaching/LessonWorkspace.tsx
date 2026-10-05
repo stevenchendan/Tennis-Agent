@@ -3,10 +3,64 @@ import Link from "next/link";
 import { useState } from "react";
 import { type Lesson, type Duration, levels, stages, topic } from "@/lib/coaching/catalog";
 import CourtWorkbench from "./CourtWorkbench";
+import SessionRunner from "./SessionRunner";
+import { useCoachStore } from "./useCoachStore";
+import { getRecord, newDraft, elapsedSeconds, type Draft } from "@/lib/coaching/store";
 import s from "./coaching.module.css";
 
 export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
-  const [duration, setDuration] = useState<Duration>(60);
+  const [live, setLive] = useState(false);
+  const { store, ready, notice, update } = useCoachStore();
+  const record = getRecord(store, l.id),
+    draft = record.draft,
+    duration = draft.duration;
+  function patch(change: Partial<Draft>) {
+    update((previous) => {
+      const r = getRecord(previous, l.id);
+      return { ...previous, records: { ...previous.records, [l.id]: { ...r, draft: { ...r.draft, ...change } } } };
+    });
+  }
+  function saveClass() {
+    update((previous) => {
+      const r = getRecord(previous, l.id),
+        d = r.draft;
+      return {
+        ...previous,
+        records: {
+          ...previous.records,
+          [l.id]: {
+            ...r,
+            draft: {
+              ...newDraft(d.duration),
+              players: d.players,
+              difficulty: d.difficulty,
+              className: d.className,
+              subject: d.subject,
+              metric: d.metric,
+            },
+          },
+        },
+        history: [
+          ...previous.history,
+          {
+            id: crypto.randomUUID(),
+            lessonId: l.id,
+            date: new Date().toISOString(),
+            className: d.className,
+            subject: d.subject,
+            metric: d.metric,
+            players: d.players,
+            difficulty: d.difficulty,
+            duration: d.duration,
+            elapsed: elapsedSeconds(d),
+            success: d.outcomes.filter(Boolean).length,
+            attempts: d.outcomes.length,
+            notes: d.notes,
+          },
+        ].slice(-300),
+      };
+    });
+  }
   const level = levels[l.level - 1],
     plan = stages(l, duration);
   return (
@@ -26,32 +80,106 @@ export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
         <p>{l.objective}</p>
         <div className={s.row}>
           {([45, 60, 90] as Duration[]).map((d) => (
-            <button className={s.button} key={d} aria-pressed={duration === d} onClick={() => setDuration(d)}>
+            <button
+              className={s.button}
+              key={d}
+              disabled={!ready || !!draft.startedAt}
+              aria-pressed={duration === d}
+              onClick={() =>
+                patch({ duration: d, stage: 0, remaining: newDraft(d).remaining, deadline: null, elapsed: 0 })
+              }
+            >
               {d}分钟
             </button>
           ))}
-          <span className={s.tag}>1片场地 · 默认4人</span>
+          <span className={s.tag}>1片场地 · {draft.players}人</span>
         </div>
+        <div className={s.headerActions}>
+          <button className={s.button} aria-pressed={!live} onClick={() => setLive(false)}>
+            备课阅读
+          </button>
+          <button
+            className={`${s.button} ${s.primary}`}
+            disabled={!ready}
+            aria-pressed={live}
+            onClick={() => setLive(true)}
+          >
+            {draft.startedAt ? "继续本次带课" : "进入带课模式"}
+          </button>
+        </div>
+        {draft.startedAt && (
+          <p className={s.small}>本课有未结束的课堂。计时在后台继续；进入带课模式可暂停。结束本次课后可更换课时。</p>
+        )}
       </header>
+      <div className={s.filters} style={{ marginBottom: 24 }}>
+        <label className={s.field}>
+          班级 / 学员
+          <input
+            disabled={!ready}
+            value={draft.className}
+            maxLength={100}
+            placeholder="例如：周六成人班"
+            onChange={(e) => patch({ className: e.target.value })}
+          />
+        </label>
+        <label className={s.field}>
+          本次人数
+          <select
+            aria-label="本次人数"
+            disabled={!ready}
+            value={draft.players}
+            onChange={(e) => patch({ players: Number(e.target.value) })}
+          >
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <option key={n} value={n}>
+                {n}人
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={s.field}>
+          练习难度
+          <select
+            aria-label="练习难度"
+            disabled={!ready}
+            value={draft.difficulty}
+            onChange={(e) => patch({ difficulty: e.target.value as Draft["difficulty"] })}
+          >
+            <option value="standard">标准练法</option>
+            <option value="easier">先降阶</option>
+            <option value="harder">增加挑战</option>
+          </select>
+        </label>
+        <span className={s.small}>已保存 {store.history.filter((h) => h.lessonId === l.id).length} 次课堂</span>
+      </div>
+      {notice && (
+        <p className={s.notice} role="status">
+          {notice}
+        </p>
+      )}
       <div className={s.detailGrid}>
         <div className={s.stack}>
-          <section className={s.panel}>
-            <div className={s.spread}>
-              <h2>带课流程</h2>
-              <span className={s.small}>含轮换、饮水与捡球时间</span>
-            </div>
-            {plan.map((stage) => (
-              <section className={s.stage} key={stage.title}>
-                <div className={s.time}>
-                  {stage.start}—{stage.start + stage.minutes}′<strong>{stage.minutes}′</strong>
-                </div>
-                <div>
-                  <h3>{stage.title}</h3>
-                  <p>{stage.body}</p>
-                </div>
-              </section>
-            ))}
-          </section>
+          {live ? (
+            <SessionRunner lesson={l} draft={draft} patch={patch} onSave={saveClass} />
+          ) : (
+            <section className={s.panel}>
+              <div className={s.spread}>
+                <h2>带课流程</h2>
+                <span className={s.small}>含轮换、饮水与捡球时间</span>
+              </div>
+              {plan.map((stage) => (
+                <section className={s.stage} key={stage.title}>
+                  <div className={s.time}>
+                    {stage.start}—{stage.start + stage.minutes}′<strong>{stage.minutes}′</strong>
+                  </div>
+                  <div>
+                    <h3>{stage.title}</h3>
+                    <p>{stage.body}</p>
+                  </div>
+                </section>
+              ))}
+            </section>
+          )}
           <section className={s.panel}>
             <h2>如何观察与调整</h2>
             <div className={s.cue}>{l.cue}</div>

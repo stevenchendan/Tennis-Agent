@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { type Lesson, type Duration, levels, layouts, stages, topic } from "@/lib/coaching/catalog";
-import CourtPreview from "./CourtPreview";
+import { type Lesson, type Duration, levels, stages, topic } from "@/lib/coaching/catalog";
+import CourtWorkbench from "./CourtWorkbench";
 import s from "./coaching.module.css";
 
 export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
@@ -65,14 +65,7 @@ export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
           </section>
         </div>
         <aside className={`${s.stack} ${s.sidebar}`}>
-          <section className={s.panel}>
-            <h2>场地布置</h2>
-            <div className={s.court}>
-              <CourtPreview diagram={l.diagram} label={layouts[l.diagram].name} />
-            </div>
-            <p className={s.muted}>{layouts[l.diagram].note}</p>
-            <span className={s.tag}>球路与站位示意</span>
-          </section>
+          <CourtWorkbench key={l.id} lesson={l} />
           <section className={s.panel}>
             <h2>上场前</h2>
             <h3>学员条件</h3>

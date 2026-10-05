@@ -46,7 +46,7 @@
 
 | 编号 | 分支 | 可独立交付的范围 | 验收 | 状态 |
 | --- | --- | --- | --- | --- |
-| M7 | `codex/coaching-m7-native-pages` | 用原生 `/lessons` 目录和 `/lessons/[id]` 详情替代HTML跳转；搜索、筛选、课时与完整教案 | 120课可访问、链接可分享、空结果/无效ID、响应式与类型检查 | 实现中 |
+| M7 | `codex/coaching-m7-native-pages` | 用原生 `/lessons` 目录和 `/lessons/[id]` 详情替代HTML跳转；搜索、筛选、课时与完整教案 | 120课可访问、链接可分享、空结果/无效ID、响应式与类型检查 | 已合并 [#8](https://github.com/stevenchendan/Tennis-Agent/pull/8) |
 | M8 | `codex/coaching-m8-court` | 2D场地图：分步球路、演示、球员与目标编辑、镜像、复原、连接现有战术板 | 鼠标/触摸/键盘可用，布局按课保存，球路解释不混淆备选线路和连续回合 | 待实现 |
 | M9 | `codex/coaching-m9-session` | 带课模式：阶段导航、可靠计时、人数/难度、收藏、逐次课堂记录、备份恢复 | 暂停/切课/后台计时，刷新恢复，记录与历史，移动端端到端验证 | 待实现 |
 

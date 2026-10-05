@@ -10,8 +10,8 @@
 | M11 | `codex/coaching-m11-passport` | 12项能力、多学员观察、推荐课、历史与独立备份 | 学员隔离、刷新、复测、损坏数据保护、手机布局 | 已合并 [#12](https://github.com/stevenchendan/Tennis-Agent/pull/12) |
 | M12 | `codex/coaching-m12-pathways` | 年龄背景与能力分开的成长路线 | 能力决定课程、可访问教案、来源说明 | 已合并 [#13](https://github.com/stevenchendan/Tennis-Agent/pull/13) |
 | M13 | `codex/coaching-m13-movement` | 步法与回位互动演示 | 分步控制、球路比较、键盘与手机 | 已合并 [#14](https://github.com/stevenchendan/Tennis-Agent/pull/14) |
-| M14 | `codex/coaching-m14-decisions` | 战术情境选择、反馈与关联练习 | 每题独立反馈、重试、课程链接 | 本地验收通过；待PR |
-| M15 | `codex/coaching-m15-mental` | 带课目标、分间重置、课后复盘 | 草稿恢复、课堂保存、备份兼容 | 待开始 |
+| M14 | `codex/coaching-m14-decisions` | 战术情境选择、反馈与关联练习 | 每题独立反馈、重试、课程链接 | 已合并 [#15](https://github.com/stevenchendan/Tennis-Agent/pull/15) |
+| M15 | `codex/coaching-m15-mental` | 带课目标、分间重置、课后复盘 | 草稿恢复、课堂保存、备份兼容 | 验收通过；远程合并状态以本功能PR为准 |
 
 本轮目标：将已完成的120课按可独立审阅、验证、回退的边界交付。课程内容完成不等于已合并；只有 GitHub 确认合并后才更新交付状态。
 
@@ -101,3 +101,10 @@
 
 - 类型检查与新增源码 ESLint 通过。浏览器验证错误与合理选择反馈、情境间独立状态、重试、进度、教案链接、刷新重开及390px布局；已检查手机截图。
 - 六道原创情境覆盖发球、接发、相持、防守、网前及对手上网；图示只表达方向，不声称球的真实飞行高度或轨迹。
+
+### M15 与第三轮整体验证
+
+- 心理训练包含过程目标、提示词、三步重置、可撤销计数与复盘；与草稿、课堂历史及原有备份结合。新字段可选，旧版记录和备份仍可读取。
+- 类型检查、相关源码 ESLint 及完整生产构建通过，共生成145页。正式版本运行全部九套浏览器检查通过：native、court、session、records、development、pathways、movement、decisions、mental。
+- 新增套件验证能力档案隔离与恢复、路线选择、交互演示、情境反馈、心理训练保存和旧备份兼容；原有四套验证教案搜索、场地编辑、计时和记录未回归。已审查桌面和390px截图。
+- 临时生产预览使用独立构建目录，构建器自动改动的 tsconfig 已恢复，不纳入提交。仓库无远程CI，以上均为本地执行证据。

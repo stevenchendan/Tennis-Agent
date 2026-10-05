@@ -4,6 +4,7 @@ import { useState } from "react";
 import { type Lesson, type Duration, levels, stages, topic } from "@/lib/coaching/catalog";
 import CourtWorkbench from "./CourtWorkbench";
 import SessionRunner from "./SessionRunner";
+import MentalPracticeCard from "./MentalPracticeCard";
 import { useCoachStore } from "./useCoachStore";
 import { getRecord, newDraft, elapsedSeconds, type Draft } from "@/lib/coaching/store";
 import s from "./coaching.module.css";
@@ -21,7 +22,7 @@ export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
     });
   }
   function saveClass() {
-    update((previous) => {
+    return update((previous) => {
       const r = getRecord(previous, l.id),
         d = r.draft;
       return {
@@ -56,6 +57,7 @@ export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
             success: d.outcomes.filter(Boolean).length,
             attempts: d.outcomes.length,
             notes: d.notes,
+            mental: d.mental,
           },
         ].slice(-300),
       };
@@ -179,6 +181,7 @@ export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
       )}
       <div className={s.detailGrid}>
         <div className={s.stack}>
+          <MentalPracticeCard draft={draft} patch={patch} ready={ready} live={live} />
           {live ? (
             <SessionRunner lesson={l} draft={draft} patch={patch} onSave={saveClass} />
           ) : (

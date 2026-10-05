@@ -91,6 +91,31 @@ when Playwright or Chromium are not at the local defaults. Run
 and add PDF bookmarks. Refresh the portable HTML copy after rebuilding.
 See `docs/coaching-milestones.md` for delivery status.
 
+### Player development tools
+
+The lesson library links to four Chinese coaching tools inspired by the reviewed
+pages of 《青少年网球教学训练大纲（试行本）》:
+
+- `/development`: twelve-skill player passports, observations over time and linked
+  practice lessons. Passports have their own validated JSON backup and recovery.
+- `/development/pathways`: six ability-based lesson sequences. Age context changes
+  teaching emphasis independently of the selected skill level; URLs retain choices.
+- `/development/movement`: four-step movement/recovery demonstrations, crosscourt
+  versus down-the-line comparison, mirroring and reduced-motion support.
+- `/development/decisions`: six tactical situations with choice feedback, court
+  diagrams, retries and related lessons.
+
+Each lesson also includes an optional process goal, between-point reset routine and
+reflection. These remain in the lesson draft until the class is saved, then appear
+in classroom history and the existing class backup. Older backups remain supported.
+All records stay in the browser. Export passports and classroom records separately.
+Source pages are identified in each tool; ratings, lesson mappings and scenarios
+are project adaptations, not official assessments. Coaches should review them in practice.
+
+From `frontend/`, the additional browser checks are `scripts/coaching/check-development.cjs`,
+`check-pathways.cjs`, `check-movement.cjs`, `check-decisions.cjs` and `check-mental.cjs`
+in the same directory, using the same environment variables as the existing checks.
+
 ## Tennis Tactics Board (no backend required)
 
 From the home page click **"Open the tennis tactics board"** (or visit `/board` directly): drag

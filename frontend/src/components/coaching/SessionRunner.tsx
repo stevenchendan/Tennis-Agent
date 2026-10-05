@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { stages, type Lesson } from "@/lib/coaching/catalog";
-import { type Draft, remainingSeconds } from "@/lib/coaching/store";
+import { type Draft, remainingSeconds, hasMentalPractice } from "@/lib/coaching/store";
 import s from "./coaching.module.css";
 
 export default function SessionRunner({
@@ -13,7 +13,7 @@ export default function SessionRunner({
   lesson: Lesson;
   draft: Draft;
   patch: (patch: Partial<Draft>) => void;
-  onSave: () => void;
+  onSave: () => boolean;
 }) {
   const [now, setNow] = useState(Date.now),
     [saved, setSaved] = useState(false);
@@ -179,10 +179,9 @@ export default function SessionRunner({
       <div className={s.row} style={{ marginTop: 18 }}>
         <button
           className={`${s.button} ${s.primary}`}
-          disabled={!draft.startedAt && !draft.outcomes.length && !draft.notes.trim()}
+          disabled={!draft.startedAt && !draft.outcomes.length && !draft.notes.trim() && !hasMentalPractice(draft.mental)}
           onClick={() => {
-            onSave();
-            setSaved(true);
+            setSaved(onSave());
           }}
         >
           保存并结束本次课

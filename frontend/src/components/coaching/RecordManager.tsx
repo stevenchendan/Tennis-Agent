@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { lessons, layouts, type Layout } from "@/lib/coaching/catalog";
-import { type CoachStore, validateStore, migrateLegacy, pausedSnapshot } from "@/lib/coaching/store";
+import { type CoachStore, validateStore, migrateLegacy, pausedSnapshot, hasMentalPractice } from "@/lib/coaching/store";
 import { validateLayout } from "@/lib/coaching/court-layout";
 import s from "./coaching.module.css";
 
@@ -208,6 +208,13 @@ export default function RecordManager({
                 : `计时累计 ${Math.floor(h.elapsed / 60)}分${Math.round(h.elapsed % 60)}秒`}
             </p>
             {h.notes && <p className={s.savedNotes}>{h.notes}</p>}
+            {hasMentalPractice(h.mental) && <div className={s.cue}>
+              <h4>心理训练记录</h4>
+              {h.mental?.goal && <p>过程目标：{h.mental.goal}</p>}
+              {h.mental?.cue && <p>重置提示：{h.mental.cue}</p>}
+              <p>完成重置：{h.mental?.resets} 次</p>
+              {h.mental?.reflection && <p className={s.savedNotes}>复盘：{h.mental.reflection}</p>}
+            </div>}
           </article>
         ))}
         {history.length > limit && (

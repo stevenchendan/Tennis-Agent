@@ -2,6 +2,9 @@ import { durations, lessons, type Duration } from "./catalog";
 
 export const STORAGE_KEY = "tennis-coach-workspace-v2";
 export type Difficulty = "standard" | "easier" | "harder";
+export type MentalPractice = { goal: string; cue: string; resets: number; reflection: string };
+export const newMentalPractice = (): MentalPractice => ({ goal: "", cue: "", resets: 0, reflection: "" });
+export const hasMentalPractice = (m?: MentalPractice) => !!m && !!(m.goal.trim() || m.cue.trim() || m.resets || m.reflection.trim());
 export type Draft = {
   duration: Duration;
   players: number;
@@ -16,6 +19,7 @@ export type Draft = {
   elapsed: number;
   notes: string;
   outcomes: boolean[];
+  mental?: MentalPractice;
 };
 export type SavedClass = {
   id: string;
@@ -31,6 +35,7 @@ export type SavedClass = {
   success: number;
   attempts: number;
   notes: string;
+  mental?: MentalPractice;
 };
 export type CourseRecord = { favorite: boolean; draft: Draft };
 export type CoachStore = { version: 2; records: Record<string, CourseRecord>; history: SavedClass[] };
@@ -49,6 +54,7 @@ export const newDraft = (duration: Duration = 60): Draft => ({
   elapsed: 0,
   notes: "",
   outcomes: [],
+  mental: newMentalPractice(),
 });
 export const getRecord = (store: CoachStore, id: string): CourseRecord =>
   store.records[id] || { favorite: false, draft: newDraft() };
@@ -63,6 +69,9 @@ function obj(v: unknown): v is Record<string, unknown> {
 const finite = (v: unknown, min: number, max: number) =>
   typeof v === "number" && Number.isFinite(v) && v >= min && v <= max;
 const short = (v: unknown, max: number) => typeof v === "string" && v.length <= max;
+function validMental(v: unknown): boolean {
+  return v === undefined || (obj(v) && short(v.goal, 160) && short(v.cue, 80) && short(v.reflection, 600) && Number.isInteger(v.resets) && finite(v.resets, 0, 2000));
+}
 function validDraft(v: unknown): v is Draft {
   if (!obj(v) || ![45, 60, 90].includes(v.duration as number) || !Number.isInteger(v.stage) || !finite(v.stage, 0, 5))
     return false;
@@ -75,6 +84,7 @@ function validDraft(v: unknown): v is Draft {
     short(v.subject, 100) &&
     short(v.metric, 100) &&
     short(v.notes, 4000) &&
+    validMental(v.mental) &&
     finite(v.remaining, 0, max) &&
     finite(v.elapsed, 0, 1e8) &&
     (v.deadline === null || finite(v.deadline, 0, 9e12)) &&
@@ -110,6 +120,7 @@ export function validateStore(value: unknown): CoachStore | null {
       !short(h.subject, 100) ||
       !short(h.metric, 100) ||
       !short(h.notes, 4000) ||
+      !validMental(h.mental) ||
       !finite(h.players, 1, 6) ||
       !["standard", "easier", "harder"].includes(h.difficulty as string) ||
       ![45, 60, 90].includes(h.duration as number) ||

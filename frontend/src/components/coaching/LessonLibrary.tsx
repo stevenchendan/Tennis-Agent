@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { lessons, levels, topics, topic } from "@/lib/coaching/catalog";
 import CourtPreview from "./CourtPreview";
 import RecordManager from "./RecordManager";
+import DevelopmentNav from "./DevelopmentNav";
 import { useCoachStore } from "./useCoachStore";
 import { getRecord } from "@/lib/coaching/store";
 import s from "./coaching.module.css";
@@ -53,6 +54,7 @@ export default function LessonLibrary() {
         </h1>
         <p>按学员能力选一课。看清场地、理解练法，把时间留给真正的带课。</p>
       </header>
+      <DevelopmentNav />
       <div className={s.levelRow} aria-label="筛选学员水平">
         <button aria-pressed={!level} onClick={() => update("level", "")}>
           全部水平

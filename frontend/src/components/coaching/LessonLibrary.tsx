@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { lessons, levels, topics, topic } from "@/lib/coaching/catalog";
 import CourtPreview from "./CourtPreview";
+import RecordManager from "./RecordManager";
+import { useCoachStore } from "./useCoachStore";
+import { getRecord } from "@/lib/coaching/store";
 import s from "./coaching.module.css";
 
 export default function LessonLibrary() {
@@ -13,18 +16,27 @@ export default function LessonLibrary() {
     level = params.get("level") || "",
     subject = params.get("topic") || "全部主题";
   const [limit, setLimit] = useState(24);
+  const { store, ready, notice, update: save } = useCoachStore();
+  const saved = params.get("saved") || "";
   function update(key: string, value: string) {
-    const next = new URLSearchParams(params.toString());
+    const next = new URLSearchParams(window.location.search);
     if (value) next.set(key, value);
     else next.delete(key);
     setLimit(24);
-    router.replace(`/lessons?${next}`, { scroll: false });
+    // Filters are client-side; update the shareable URL without a server navigation per keystroke.
+    window.history.replaceState(null, "", `/lessons?${next}`);
   }
   const filtered = lessons.filter(
     (l) =>
       (!level || String(l.level) === level) &&
       (subject === "全部主题" || topic(l) === subject) &&
-      (!q || `${l.id} ${l.title} ${l.objective} ${l.drillA} ${l.drillB}`.includes(q.trim())),
+      (!q || `${l.id} ${l.title} ${l.objective} ${l.drillA} ${l.drillB}`.includes(q.trim())) &&
+      (!saved ||
+        (saved === "favorites"
+          ? getRecord(store, l.id).favorite
+          : saved === "taught"
+            ? store.history.some((h) => h.lessonId === l.id)
+            : !!getRecord(store, l.id).draft.startedAt)),
   );
   return (
     <main className={s.shell}>
@@ -63,10 +75,19 @@ export default function LessonLibrary() {
         </label>
         <label className={s.field}>
           训练主题
-          <select value={subject} onChange={(e) => update("topic", e.target.value)}>
+          <select aria-label="训练主题" value={subject} onChange={(e) => update("topic", e.target.value)}>
             {topics.map((t) => (
               <option key={t}>{t}</option>
             ))}
+          </select>
+        </label>
+        <label className={s.field}>
+          我的教案
+          <select aria-label="我的教案" value={saved} onChange={(e) => update("saved", e.target.value)}>
+            <option value="">全部教案</option>
+            <option value="favorites">已收藏</option>
+            <option value="taught">带过的课</option>
+            <option value="active">未结束课堂</option>
           </select>
         </label>
         <button
@@ -79,6 +100,8 @@ export default function LessonLibrary() {
           清除筛选
         </button>
       </div>
+      <RecordManager store={store} ready={ready} update={save} />
+      {notice && <p className={s.notice}>{notice}</p>}
       {level && levels[Number(level) - 1] && <p className={s.count}>{levels[Number(level) - 1].entry}</p>}
       <p className={s.count} role="status">
         找到 {filtered.length} 节课 · 每课可选45 / 60 / 90分钟
@@ -95,11 +118,29 @@ export default function LessonLibrary() {
                   {l.id} / {levels[l.level - 1].short}
                 </span>
                 <span>{topic(l)}</span>
+                <button
+                  className={s.button}
+                  disabled={!ready}
+                  aria-label={`${getRecord(store, l.id).favorite ? "取消收藏" : "收藏"}教案${l.id}`}
+                  aria-pressed={getRecord(store, l.id).favorite}
+                  onClick={() =>
+                    save((previous) => {
+                      const r = getRecord(previous, l.id);
+                      return { ...previous, records: { ...previous.records, [l.id]: { ...r, favorite: !r.favorite } } };
+                    })
+                  }
+                >
+                  {getRecord(store, l.id).favorite ? "★" : "☆"}
+                </button>
               </div>
               <h2>
                 <Link href={`/lessons/${l.id}`}>{l.title}</Link>
               </h2>
               <p>{l.objective}</p>
+              {store.history.some((h) => h.lessonId === l.id) && (
+                <p className={s.small}>已带 {store.history.filter((h) => h.lessonId === l.id).length} 次</p>
+              )}
+              {getRecord(store, l.id).draft.startedAt && <span className={s.tag}>有未结束课堂</span>}
             </div>
             <Link className={s.cardFooter} href={`/lessons/${l.id}`} aria-label={`打开教案${l.id}：${l.title}`}>
               <span>查看教案</span>

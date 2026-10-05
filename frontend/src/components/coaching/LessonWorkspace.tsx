@@ -72,7 +72,7 @@ export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
         </span>
         <Link href="/">工作台</Link>
       </nav>
-      <header className={s.hero}>
+      <header className={`${s.hero} ${live ? s.compactHero : ""}`}>
         <p className={s.eyebrow}>
           Lesson {l.id} / 第{l.sequence}课
         </p>
@@ -95,6 +95,19 @@ export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
           <span className={s.tag}>1片场地 · {draft.players}人</span>
         </div>
         <div className={s.headerActions}>
+          <button
+            className={s.button}
+            disabled={!ready}
+            aria-pressed={record.favorite}
+            onClick={() =>
+              update((previous) => {
+                const r = getRecord(previous, l.id);
+                return { ...previous, records: { ...previous.records, [l.id]: { ...r, favorite: !r.favorite } } };
+              })
+            }
+          >
+            {record.favorite ? "★ 已收藏" : "☆ 收藏本课"}
+          </button>
           <button className={s.button} aria-pressed={!live} onClick={() => setLive(false)}>
             备课阅读
           </button>
@@ -111,47 +124,54 @@ export default function LessonWorkspace({ lesson: l }: { lesson: Lesson }) {
           <p className={s.small}>本课有未结束的课堂。计时在后台继续；进入带课模式可暂停。结束本次课后可更换课时。</p>
         )}
       </header>
-      <div className={s.filters} style={{ marginBottom: 24 }}>
-        <label className={s.field}>
-          班级 / 学员
-          <input
-            disabled={!ready}
-            value={draft.className}
-            maxLength={100}
-            placeholder="例如：周六成人班"
-            onChange={(e) => patch({ className: e.target.value })}
-          />
-        </label>
-        <label className={s.field}>
-          本次人数
-          <select
-            aria-label="本次人数"
-            disabled={!ready}
-            value={draft.players}
-            onChange={(e) => patch({ players: Number(e.target.value) })}
-          >
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <option key={n} value={n}>
-                {n}人
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={s.field}>
-          练习难度
-          <select
-            aria-label="练习难度"
-            disabled={!ready}
-            value={draft.difficulty}
-            onChange={(e) => patch({ difficulty: e.target.value as Draft["difficulty"] })}
-          >
-            <option value="standard">标准练法</option>
-            <option value="easier">先降阶</option>
-            <option value="harder">增加挑战</option>
-          </select>
-        </label>
-        <span className={s.small}>已保存 {store.history.filter((h) => h.lessonId === l.id).length} 次课堂</span>
-      </div>
+      <details className={s.info} open={!live} style={{ marginBottom: 24 }}>
+        <summary>
+          本次设置 · {draft.players}人 · {duration}分钟 · {draft.className || "未命名班级"}
+        </summary>
+        <div className={s.filters} style={{ marginTop: 12 }}>
+          <label className={s.field}>
+            班级 / 学员
+            <input
+              disabled={!ready}
+              value={draft.className}
+              maxLength={100}
+              placeholder="例如：周六成人班"
+              onChange={(e) => patch({ className: e.target.value })}
+            />
+          </label>
+          <label className={s.field}>
+            本次人数
+            <select
+              aria-label="本次人数"
+              disabled={!ready}
+              value={draft.players}
+              onChange={(e) => patch({ players: Number(e.target.value) })}
+            >
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <option key={n} value={n}>
+                  {n}人
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={s.field}>
+            练习难度
+            <select
+              aria-label="练习难度"
+              disabled={!ready}
+              value={draft.difficulty}
+              onChange={(e) => patch({ difficulty: e.target.value as Draft["difficulty"] })}
+            >
+              <option value="standard">标准练法</option>
+              <option value="easier">先降阶</option>
+              <option value="harder">增加挑战</option>
+            </select>
+          </label>
+          <Link className={s.link} href="/lessons#records">
+            查看课堂记录（{store.history.filter((h) => h.lessonId === l.id).length}次）
+          </Link>
+        </div>
+      </details>
       {notice && (
         <p className={s.notice} role="status">
           {notice}

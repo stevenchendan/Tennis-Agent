@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { emptyStore, validateStore, STORAGE_KEY, type CoachStore } from "@/lib/coaching/store";
+import { emptyStore, validateStore, migrateLegacy, STORAGE_KEY, type CoachStore } from "@/lib/coaching/store";
 
 export function useCoachStore() {
   const [store, setStore] = useState<CoachStore>(emptyStore),
@@ -11,9 +11,22 @@ export function useCoachStore() {
       try {
         const text = localStorage.getItem(STORAGE_KEY);
         if (text) {
-          const next = validateStore(JSON.parse(text));
-          if (next) setStore(next);
-          else setNotice("保存的数据格式异常，未覆盖原数据。可在记录管理中恢复有效备份。");
+          try {
+            const next = validateStore(JSON.parse(text));
+            if (next) setStore(next);
+            else throw new Error("Invalid records");
+          } catch {
+            localStorage.setItem(`${STORAGE_KEY}-recovery`, text);
+            setNotice("记录格式异常，已保留原文副本。可在记录管理中恢复有效备份。");
+          }
+        } else {
+          const legacy = localStorage.getItem("tennis-coaching-120-v1");
+          const migrated = legacy ? migrateLegacy(JSON.parse(legacy)) : null;
+          if (migrated) {
+            setStore(migrated);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+            setNotice("已迁移旧教案库的收藏、笔记和完成标记；原记录仍保留。");
+          } else setStore(emptyStore());
         }
       } catch {
         setNotice("无法读取本地记录。仍可带课，请及时备份本次记录。");
@@ -22,7 +35,7 @@ export function useCoachStore() {
     };
     load();
     const sync = (event: StorageEvent) => {
-      if (event.key === STORAGE_KEY) load();
+      if (event.key === STORAGE_KEY || event.key === null) load();
     };
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);

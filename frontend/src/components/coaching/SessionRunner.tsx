@@ -129,6 +129,7 @@ export default function SessionRunner({
         <label className={s.field}>
           记录指标
           <select
+            aria-label="记录指标"
             value={draft.metric}
             disabled={draft.outcomes.length > 0}
             onChange={(e) => patch({ metric: e.target.value })}

@@ -482,6 +482,56 @@
   color: #b3c1a7;
   margin-left: 16px;
 }
+.records {
+  background: #191e18;
+  border: 1px solid #ffffff20;
+  border-radius: 9px;
+  margin: 20px 0;
+}
+.records > summary {
+  cursor: pointer;
+  padding: 17px 20px;
+  font-size: 15px;
+}
+.records > summary span {
+  color: #d4ee80;
+  margin-left: 16px;
+  font-size: 13px;
+}
+.recordBody {
+  padding: 0 22px 24px;
+}
+.historyItem {
+  padding: 20px 0;
+  border-top: 1px solid #ffffff20;
+}
+.historyItem h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.historyItem p {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.savedNotes {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #d7decf;
+}
+.compactHero {
+  padding: 24px 0 12px;
+}
+.compactHero h1 {
+  font-size: 32px;
+  letter-spacing: -1px;
+}
+.compactHero .eyebrow {
+  display: none;
+}
+.compactHero p {
+  margin-bottom: 12px;
+}
 @media (max-width: 600px) {
   .timerPanel {
     padding: 18px;

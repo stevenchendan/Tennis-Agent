@@ -124,3 +124,53 @@ export function validateStore(value: unknown): CoachStore | null {
   }
   return value as unknown as CoachStore;
 }
+
+/** Legacy fieldbook records contain completion flags, not full timed classes. */
+export function migrateLegacy(value: unknown): CoachStore | null {
+  if (!obj(value) || !obj(value.records) || (value.version !== undefined && value.version !== 1)) return null;
+  const store = emptyStore();
+  for (const [id, r] of Object.entries(value.records)) {
+    if (!lessons.some((l) => l.id === id) || !obj(r)) return null;
+    const text = (key: string, max: number) => (typeof r[key] === "string" ? (r[key] as string).slice(0, max) : "");
+    const draft = newDraft();
+    draft.className = text("className", 100);
+    draft.players = Math.max(1, Math.min(6, Number(r.players) || 4));
+    if (!Number.isInteger(draft.players)) draft.players = 4;
+    draft.notes = [text("note", 3500), text("result", 200) ? `旧版验收：${text("result", 200)}` : ""]
+      .filter(Boolean)
+      .join("\n");
+    store.records[id] = { favorite: r.star === true, draft };
+    if (r.done === true) {
+      const date = text("date", 40);
+      store.history.push({
+        id: `legacy-${id}`,
+        lessonId: id,
+        date: date && !Number.isNaN(Date.parse(date)) ? new Date(date).toISOString() : new Date().toISOString(),
+        className: draft.className,
+        subject: "旧版完成标记",
+        metric: "未记录次数",
+        players: draft.players,
+        difficulty: "standard",
+        duration: 60,
+        elapsed: 0,
+        success: 0,
+        attempts: 0,
+        notes: draft.notes,
+      });
+      store.records[id].draft = { ...draft, notes: "" };
+    }
+  }
+  return validateStore(store);
+}
+
+export function pausedSnapshot(store: CoachStore): CoachStore {
+  return {
+    ...store,
+    records: Object.fromEntries(
+      Object.entries(store.records).map(([id, r]) => [
+        id,
+        { ...r, draft: { ...r.draft, remaining: remainingSeconds(r.draft), deadline: null } },
+      ]),
+    ),
+  };
+}

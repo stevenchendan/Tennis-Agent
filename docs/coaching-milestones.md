@@ -115,3 +115,7 @@
 - [战术板回放](https://github.com/stevenchendan/Tennis-Agent/pull/18)按落点和击球时刻播放单打与双打。教练预览、学生分享链接和战术风格演示共用回放时钟。
 - [Blender 球员工程](https://github.com/stevenchendan/Tennis-Agent/pull/19)保留六段动作及击球标记，可调整模型、球衣和握拍。
 - 1573 主场使用同一球员和球拍，八拍回合覆盖正反手、落地反弹和回位。周边球场使用简化模型。验证步骤和动作来源见[动作系统说明](TENNIS_MOTION_SYSTEM.md)。
+
+- 挥拍复核已加入由实测拍框标记重建的球拍朝向、双手反拍握柄约束和击球特写中的拍头轨迹，可分别检查触球前和随挥。测量来源、镜像和高压球的适配见[动捕署名](../frontend/public/models/tennis/mocap/ATTRIBUTION.md)。
+
+- 在 15 套战术中核对了 7,191 个拍框顶端位置和 51 次触球。双手反拍从引拍到随挥的采样区间内，辅助手与预定握点的最大插值误差为 4.6 毫米。

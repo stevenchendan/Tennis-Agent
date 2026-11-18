@@ -112,3 +112,9 @@ Run the skinned-motion test on the shipped match mesh and all six pieces of clot
 The 1573 Arena main court uses the match athlete and the same captured forehand and backhand as the tactics board. Eight alternating contacts define a repeating baseline rally. Each outgoing ball clears the net, lands inside the opposite baseline, slows at the bounce and meets the receiving racket. Players recover towards the middle and settle before the next stroke. The root travel and split steps are authored.
 
 Neighbouring courts sample the same recorded joints at different times. Six instanced mesh batches keep their distant players, rackets and balls visible without loading a full skinned body per player. Run the arena and precinct rally checks from the frontend directory to verify all eight exchanges and the 31-court layout.
+
+### Racket swing review
+
+The racket is mounted in the animated palm. The six clips combine the original player's wrist travel with rigid racket rotations aligned to separate optical trials. The two-handed backhand reaches a second grip higher on the handle with the support arm and clavicle. A fixed grip per stroke preserves the handle position in the fingers during playback, seeking and ready-pose transitions. An overhead borrows the measured service racket phase and carries it on the recorded smash arm. Outside the optical window the last relative orientation follows the forearm. Impact time is editorial.
+
+The contact camera shows the racket tip path. Gold covers preparation to impact, aqua covers the follow-through. The path samples the animated palm and outer bumper every five milliseconds, including the player's movement on court. Toggle the path in any 3D camera. The director holds the server through impact and early extension. The Blender review scene checks every baked racket position against the web data when rebuilt.

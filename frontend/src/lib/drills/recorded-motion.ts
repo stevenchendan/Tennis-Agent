@@ -19,6 +19,7 @@ export function recordedSample(kind: string, relativeTime: number) {
   const a = Math.floor(index), b = Math.min(a + 1, clip.poses.length - 1);
   const duration = (clip.poses.length - 1) * clip.dt;
   const fade = Math.max(0, Math.min(1, t / .14, (duration - t) / .18));
-  return { a: clip.poses[a], b: clip.poses[b], alpha: index - a, weight: fade * fade * (3 - 2 * fade) };
+  return { socket: clip.socket, a: clip.poses[a], b: clip.poses[b], alpha: index - a, weight: fade * fade * (3 - 2 * fade) };
 }
+export const readySocket = recordings.volley.socket;
 export const recordedReady = recordings.volley.poses[0];

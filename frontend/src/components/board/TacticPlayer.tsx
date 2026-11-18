@@ -91,6 +91,7 @@ export default function TacticPlayer({ tactic }: { tactic: Tactic }) {
         {view3d ? (
           <TacticCourt3D
             theme={courtTactic.theme}
+            replay={replay}
             frame={frame}
             frameCount={n}
             onReady={onReady}

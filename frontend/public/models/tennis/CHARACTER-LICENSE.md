@@ -24,4 +24,4 @@ To reproduce, place the following inputs in one directory, preserving their base
 - From the system asset pack, use the OBJ and MHClO files for male_casualsuit06, shoes05, short04 and high-poly eyes, their diffuse textures, and `young_lightskinned_male_diffuse.png` from the young_caucasian_male skin.
 - From the frontend directory, run `python scripts/build-match-athlete.py <input-directory>` with NumPy and Pillow installed. Run `blender --background --factory-startup --python-exit-code 1 --python scripts/build-match-studio.py` to extract the project racket and assemble the packed, editable `art/match-athlete.blend` file.
 
-The Blender review scene contains adapted motion from Tennis-MoCap. Those animation tracks retain [CC BY-SA 3.0 and the authors' attribution](./mocap/ATTRIBUTION.md).
+The Blender review scene uses body motion adapted from Tennis-MoCap under CC BY-SA 3.0 and racket rotations derived from the Lublin and Bath optical trials. [Source credits and terms for the combined scene](./mocap/ATTRIBUTION.md).

@@ -5,7 +5,7 @@ import tempfile
 from pathlib import Path
 
 import bpy
-from mathutils import Matrix
+from mathutils import Matrix, Quaternion, Vector
 
 
 frontend = Path(__file__).resolve().parents[1]
@@ -37,9 +37,28 @@ binary = bytearray(raw[28+length:])
 names = json.loads((library / "tennis-motion/rig-bones.json").read_text())
 clips = json.loads((library / "drills/recorded-motion.json").read_text())
 nodes = {n.get("name"): i for i,n in enumerate(doc["nodes"])}
+grip = json.loads((library / "tennis-motion/racket-grip.json").read_text())
+parents = {child: i for i, node in enumerate(doc["nodes"]) for child in node.get("children", [])}
+def bind_matrix(index):
+    node = doc["nodes"][index]
+    if "matrix" in node:
+        raw = node["matrix"]
+        local = Matrix([raw[i:i+4] for i in range(0,16,4)]).transposed()
+    else:
+        x,y,z,w = node.get("rotation", [0,0,0,1])
+        local = Matrix.LocRotScale(Vector(node.get("translation",[0,0,0])),
+                                   Quaternion((w,x,y,z)), Vector(node.get("scale",[1,1,1])))
+    return bind_matrix(parents[index]) @ local if index in parents else local
+
+wrist = nodes["RightHand"]
+units = bind_matrix(wrist).to_scale()
 socket = len(doc["nodes"])
-doc["nodes"].append({"name":"Racket contact"})
-doc["scenes"][0]["nodes"].append(socket)
+doc["nodes"][wrist].setdefault("children", []).append(socket)
+doc["nodes"].extend([
+    {"name":"Racket grip", "translation":[v/s for v,s in zip(grip["palm"],units)],
+     "scale":[1/s for s in units], "children":[socket+1]},
+    {"name":"Racket contact", "translation":[0,grip["centerFromPalm"],0]},
+])
 for name in names:
     node = doc["nodes"][nodes[name]]
     if "matrix" in node:
@@ -62,11 +81,12 @@ def accessor(rows, kind):
     doc["accessors"].append(entry)
     return len(doc["accessors"])-1
 
-poses, markers = [], []
+poses, markers, sockets = [], [], []
 for name, clip in clips.items():
     markers.append((name,len(poses),len(poses)+round(clip["contact"]/clip["dt"])))
     poses.extend(clip["poses"])
     poses.extend([clip["poses"][-1]]*12)
+    sockets.extend([clip["socket"]]*(len(clip["poses"])+12))
 times = accessor([[i/50] for i in range(len(poses))],"SCALAR")
 animation = {"name":"Stroke review","channels":[],"samplers":[]}
 def channel(node, path, values):
@@ -76,8 +96,7 @@ def channel(node, path, values):
 for i, name in enumerate(names):
     channel(nodes[name],"rotation",[p["b"][i] for p in poses])
 channel(nodes["Hips"],"translation",[p["h"] for p in poses])
-channel(socket,"translation",[p["r"] for p in poses])
-channel(socket,"rotation",[p["q"] for p in poses])
+channel(socket,"rotation",sockets)
 doc["animations"]=[animation]
 doc["buffers"][0]["byteLength"]=len(binary)
 header=json.dumps(doc,separators=(",",":")).encode()
@@ -111,6 +130,22 @@ scene.frame_end=len(poses)-1
 for name, first, hit in markers:
     scene.timeline_markers.new(name,frame=first)
     scene.timeline_markers.new(name+" · contact",frame=hit)
+# Blender parents ordinary objects at the bone tail. Resolve its imported
+# parent inverse against the wrist pivot once in the first calibrated pose.
+scene.frame_set(0)
+pivot = bpy.data.objects["Racket grip"]
+def blender_point(xyz):
+    x,y,z = xyz
+    return Vector((x,-z,y))
+parent_space = pivot.matrix_world @ pivot.matrix_basis.inverted()
+delta = blender_point(poses[0]["r"]) - racket.matrix_world.translation
+pivot.location += parent_space.to_3x3().inverted() @ delta
+for name, first, hit in markers:
+    for i, sample in enumerate(clips[name]["poses"]):
+        scene.frame_set(first+i)
+        miss = (racket.matrix_world.translation-blender_point(sample["r"])).length
+        if miss > .001:
+            raise ValueError(f"{name} frame {i} misses the racket centre by {miss:.4f} m")
 scene.frame_set(markers[-1][2])
 for obj in scene.objects:
     if obj.type=="ARMATURE":

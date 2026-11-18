@@ -1,15 +1,10 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import vm from 'node:vm';
-import ts from 'typescript';
-const modules={};
-function load(name){
-  const loadedModule={exports:{}};
-  const source=fs.readFileSync(`src/components/arena1573/${name}.ts`,'utf8');
-  vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{module:loadedModule,exports:loadedModule.exports,require:id=>modules[id.replace('./','')]});
-  return modules[name]=loadedModule.exports;
-}
-load('precinctGeometry');const {rallyCourts,courtElevation}=load('courtPlacements'),{rallyFrame}=load('rallyMotion');
+import path from "node:path";
+import {root,load} from "./load-tennis-source.mjs";
+const arena=name=>load(path.join(root,"src/components/arena1573",name));
+const {rallyCourts,courtElevation}=arena("courtPlacements");
+const {rallyFrame}=arena("rallyMotion");
 const data=JSON.parse(fs.readFileSync('public/data/1573-context.json'));
 const courts=rallyCourts(data),mapped=data.features.filter(f=>f.kind==='court');
 assert.equal(courts.length,mapped.length,'All mapped courts except detailed 1573, plus JCA');

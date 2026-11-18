@@ -9,6 +9,7 @@ const bytes=fs.readFileSync(new URL('public/models/tennis/match-athlete.glb',bas
 const {scene}=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
 const names=JSON.parse(fs.readFileSync(new URL('src/lib/tennis-motion/rig-bones.json',base)));
 const clips=JSON.parse(fs.readFileSync(new URL('src/lib/drills/recorded-motion.json',base)));
+const grip=JSON.parse(fs.readFileSync(new URL('src/lib/tennis-motion/racket-grip.json',base)));
 const bones=names.map(n=>scene.getObjectByName(n));
 assert.ok(bones.every(b=>b?.isBone));
 const pairs=[['RightArm','RightForeArm'],['RightForeArm','RightHand'],['LeftUpLeg','LeftLeg'],['LeftLeg','LeftFoot']];
@@ -28,7 +29,11 @@ for(const [kind,clip] of Object.entries(clips)) for(let i=0;i<clip.poses.length-
     pairs.forEach(([a,b],j)=>assert.ok(Math.abs(at(a).distanceTo(at(b))-originalLengths[j])<1e-5,`${kind}: skin bones must not stretch between frames`));
     if(fraction===0){
       assert.ok(at('RightHand').distanceTo(new T.Vector3(...a.j[9]))<1e-4,`${kind}: baked and deployed wrist transforms match`);
-      const center=at('RightHand').add(new T.Vector3(.065,.39,.02).applyQuaternion(new T.Quaternion(...a.q)));
+      const hand=scene.getObjectByName('RightHand').getWorldQuaternion(new T.Quaternion());
+      const racket=hand.clone().multiply(new T.Quaternion(...clip.socket));
+      assert.ok(racket.normalize().angleTo(new T.Quaternion(...a.q).normalize())<.001,kind+': grip follows the hand');
+      const center=at('RightHand').add(new T.Vector3(...grip.palm).applyQuaternion(hand))
+        .add(new T.Vector3(0,grip.centerFromPalm,0).applyQuaternion(racket));
       assert.ok(center.distanceTo(new T.Vector3(...a.r))<1e-4,`${kind}: actual rig reaches the ball marker`);
     }
     for(const mesh of meshes) for(let v=0;v<mesh.geometry.attributes.position.count;v++) {

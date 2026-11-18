@@ -1,5 +1,7 @@
 import type {BallPath, PlayerPos, Point, Tactic} from "../tactic";
 import {LEN, NET} from "../court";
+import recordings from "../drills/recorded-motion.json";
+import grip from "./racket-grip.json";
 import {recordedContact, recordedSample} from "../drills/recorded-motion";
 import type {MotionClipKey} from "./index";
 import type {AthletePose} from "./athlete";
@@ -195,3 +197,29 @@ export function sampleReplay(replay: Replay, seconds: number) {
   return {time:t,frameIndex,players,ball,shot};
 }
 export type ReplayFrame = ReturnType<typeof sampleReplay>;
+
+// Sample the outer tip of the hoop at the actual baked pose times. Keep both
+// the turn before impact and the extension after it visible on a paused frame.
+export function shotSwingPath(replay: Replay, shot: Shot) {
+  const clip = recordings[shot.kind];
+  const before: [number, number, number][] = [], after: [number, number, number][] = [];
+  if (shot.id === undefined) return {before, after};
+  for (const [index, pose] of clip.poses.entries()) {
+    const relative = index * clip.dt - clip.contact;
+    if (relative < -.38 || relative > .32) continue;
+    const t = shot.hit + relative;
+    if (t < 0 || t > replay.duration) continue;
+    const actor = sampleReplay(replay, t).players.find(p => p.id === shot.id);
+    if (!actor || actor.pose.stroke !== shot.kind || Math.abs(actor.pose.relativeTime-relative) > .0001) continue;
+    const [x,y,z,w] = pose.q;
+    const length = grip.tipFromCenter;
+    // Rotate local (0,length,0) by the recorded racket quaternion.
+    const tip = offset([pose.r[0]+2*length*(x*y-z*w),
+      pose.r[1]+length*(1-2*(x*x+z*z)),pose.r[2]+2*length*(y*z+x*w)], actor.pose.yaw);
+    const point: [number,number,number] = [actor.x+tip.x, tip.z, actor.y+tip.y];
+    if (relative < .0001) before.push(point);
+    if (relative > -.0001) after.push(point);
+  }
+  return {before, after};
+}
+export type TacticalReplay = Replay;

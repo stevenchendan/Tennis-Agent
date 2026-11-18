@@ -124,11 +124,15 @@ for (const id of ['1','2']) {
 }
 console.log('Footwork state checks passed: approach, stroke, close, split-step, recovery and reset.');
 console.log('Recorded motion checks passed: ball/racket alignment and consistent handedness on both diagonals.');
+const grip=load('../tennis-motion/racket-grip.json');
 for(const [kind,clip] of Object.entries(load('recorded-motion.json'))) {
   const pairs=[[7,8],[8,9],[4,5],[5,6],[10,11],[11,12],[13,14],[14,15]];
   const lengths=pairs.map(([a,b])=>new Vector3(...clip.poses[0].j[a]).distanceTo(new Vector3(...clip.poses[0].j[b])));
   for(const pose of clip.poses) {
-    const racket=new Vector3(.065,.39,.02).applyQuaternion(new Quaternion(...pose.q)).add(new Vector3(...pose.j[9]));
+    const rotation=new Quaternion(...pose.q);
+    const hand=rotation.clone().multiply(new Quaternion(...clip.socket).invert());
+    const racket=new Vector3(...pose.j[9]).add(new Vector3(...grip.palm).applyQuaternion(hand))
+      .add(new Vector3(0,grip.centerFromPalm,0).applyQuaternion(rotation));
     assert.ok(racket.distanceTo(new Vector3(...pose.r))<.00003,kind+': rendered grip must match contact data');
     assert.ok(Math.min(pose.j[12][1],pose.j[15][1])>=.034,kind+': ankles must stay above the floor');
     assert.ok(pose.b.length>30,kind+': full skinned skeleton is retained');

@@ -5,7 +5,7 @@ import {Html, Line, OrbitControls} from "@react-three/drei";
 import * as T from "three";
 import {CX, NET, PLAYER_COLORS, resolveCourtTheme} from "@/lib/court";
 import {strokeLabels, type BallPath} from "@/lib/tactic";
-import {BALL_RADIUS, type ReplayFrame} from "@/lib/tennis-motion/tactical-replay";
+import {BALL_RADIUS, shotSwingPath, type TacticalReplay, type ReplayFrame} from "@/lib/tennis-motion/tactical-replay";
 import Athlete from "../drills/Athlete";
 import TrainingCourt from "../drills/TrainingCourt";
 import BroadcastGrounds from "./BroadcastGrounds";
@@ -13,7 +13,8 @@ import styles from "./broadcast.module.css";
 
 const angles = {director:"导演剪辑",baseline:"转播机位",sideline:"边线机位",contact:"击球特写",orbit:"自由视角"};
 type Angle = keyof typeof angles;
-function Director({angle,frame}:{angle:Angle;frame:ReplayFrame}) {
+type ReplayShot = TacticalReplay["shots"][number];
+function Director({angle,frame,review}:{angle:Angle;frame:ReplayFrame;review?:ReplayShot}) {
   const {camera,size}=useThree();
   const sceneCamera=camera as T.PerspectiveCamera;
   const focus=useMemo(()=>new T.Vector3(),[]);
@@ -21,8 +22,8 @@ function Director({angle,frame}:{angle:Angle;frame:ReplayFrame}) {
   const target=useMemo(()=>new T.Vector3(),[]);
   const mobile=size.width/size.height<1.18;
   const place=()=>{
-    const shot=frame.shot;
-    const serviceCloseup=angle==="director" && shot?.kind==="serve" && frame.time<shot.hit-.09;
+    const shot=angle==="contact"?review:frame.shot;
+    const serviceCloseup=angle==="director" && shot?.kind==="serve" && frame.time<shot.hit+.19;
     if(angle==="contact" || serviceCloseup) {
       const id=shot?.id ?? frame.players[0]?.id;
       const player=frame.players.find(p=>p.id===id) ?? frame.players[0];
@@ -84,14 +85,20 @@ class SceneBoundary extends Component<{children:ReactNode;fallback:ReactNode},{f
   render(){return this.state.failed?this.props.fallback:this.props.children;}
 }
 
-export default function TacticCourt3D({theme,frame,paths,frameCount,onReady,onFlat}:{
-  theme?:string;frame:ReplayFrame;paths:BallPath[];frameCount:number;onReady:()=>void;onFlat:()=>void;
+export default function TacticCourt3D({theme,frame,paths,replay,frameCount,onReady,onFlat}:{
+  theme?:string;frame:ReplayFrame;replay:TacticalReplay;paths:BallPath[];frameCount:number;onReady:()=>void;onFlat:()=>void;
 }) {
   const [angle,setAngle]=useState<Angle>("director");
   const [guides,setGuides]=useState(false);
+  const [tracePreference,setTracePreference]=useState<boolean|null>(null);
+  const showTrace=tracePreference ?? angle==="contact";
+  const review=replay.shots.reduce<ReplayShot|undefined>((closest,shot)=>
+    shot.id!==undefined && (!closest || Math.abs(shot.hit-frame.time)<Math.abs(closest.hit-frame.time)) ? shot : closest,undefined);
+  const trail=useMemo(()=>showTrace && review ? shotSwingPath(replay,review):null,[replay,review,showTrace]);
   const [ready,setReady]=useState(false);
   const notified=useRef(false);
   const markReady=useMemo(()=>()=>{setReady(true);if(!notified.current){onReady();notified.current=true;}},[onReady]);
+  const captionShot=angle==="contact"?review:frame.shot;
   const fallback=<button className={styles.loading} onClick={onFlat}>无法显示 3D 球场 · 打开 2D 回放</button>;
   return <>
     <div className={styles.stage} aria-label="3D 战术回放">
@@ -106,21 +113,25 @@ export default function TacticCourt3D({theme,frame,paths,frameCount,onReady,onFl
               {guides && <Html center position={[p.x,2.05,p.y]} zIndexRange={[5,0]} style={{pointerEvents:"none",whiteSpace:"nowrap",font:"bold 11px sans-serif",color:"#fff",background:"#152b26cc",borderRadius:4,padding:"2px 6px"}}>P{p.id}</Html>}
             </group>)}
             <TennisBall frame={frame}/>
+            {trail && review && Math.abs(frame.time-review.hit)<.75 && <>
+              {trail.before.length>1 && <Line points={trail.before} color="#f3c768" lineWidth={2} transparent opacity={.78} depthWrite={false}/>}
+              {trail.after.length>1 && <Line points={trail.after} color="#92e2db" lineWidth={2} transparent opacity={.78} depthWrite={false}/>}
+            </>}
             {guides && paths.map((path,i)=><group key={i}>
               <Line points={[[path.from.x,.025,path.from.y],[path.to.x,.025,path.to.y]]} color="#f3ec99" dashed dashSize={.25} gapSize={.18} transparent opacity={.72}/>
               <mesh position={[path.to.x,.023,path.to.y]} rotation={[-Math.PI/2,0,0]}><ringGeometry args={[.19,.25,48]}/><meshBasicMaterial color="#e5e88f" transparent opacity={.82}/></mesh>
             </group>)}
           </group>
-          <Director angle={angle} frame={frame}/>
+          <Director angle={angle} frame={frame} review={review}/>
           <SceneReady onReady={markReady}/>
         </Suspense>
       </Canvas></SceneBoundary>
       {!ready && <div className={styles.loading} style={{pointerEvents:"none",background:"transparent",alignItems:"start",paddingTop:32}}>准备球场与球员…</div>}
-      {ready && <div className={styles.score}><strong>{String(frame.frameIndex+1).padStart(2,"0")} / {String(frameCount).padStart(2,"0")}</strong><span>{frame.shot ? ((frame.shot.id!==undefined?`P${frame.shot.id} · `:"")+strokeLabels[frame.shot.kind]) : "站位与回位"}</span></div>}
+      {ready && <div className={styles.score}><strong>{String(frame.frameIndex+1).padStart(2,"0")} / {String(frameCount).padStart(2,"0")}</strong><span>{captionShot ? ((captionShot.id!==undefined?`P${captionShot.id} · `:"")+strokeLabels[captionShot.kind]) : "站位与回位"}</span></div>}
     </div>
     <div className={styles.options}>
       <div className={styles.angles} aria-label="回放机位">{(Object.keys(angles) as Angle[]).map(a=><button key={a} aria-pressed={a===angle} onClick={()=>setAngle(a)}>{angles[a]}</button>)}</div>
-      <div className={styles.angles}><button aria-pressed={guides} onClick={()=>setGuides(v=>!v)}>战术标注</button><a className={styles.credits} href="/models/tennis/BROADCAST-CREDITS.md" target="_blank" rel="noreferrer">素材署名</a></div>
+      <div className={styles.angles}><button aria-pressed={showTrace} onClick={()=>setTracePreference(!showTrace)}>拍头轨迹</button><button aria-pressed={guides} onClick={()=>setGuides(v=>!v)}>战术标注</button><a className={styles.credits} href="/models/tennis/BROADCAST-CREDITS.md" target="_blank" rel="noreferrer">素材署名</a></div>
     </div>
   </>;
 }

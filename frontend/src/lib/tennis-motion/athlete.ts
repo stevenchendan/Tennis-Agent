@@ -2,7 +2,8 @@ import * as T from "three";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import names from "./rig-bones.json";
-import { recordedReady, recordedSample } from "../drills/recorded-motion";
+import grip from "./racket-grip.json";
+import { recordedReady, recordedSample, readySocket } from "../drills/recorded-motion";
 import type { DrillStrokeKind } from "./index";
 
 export type AthletePose = {
@@ -44,7 +45,7 @@ const neutralYaw = Math.atan2(recordedReady.j[7][2]-recordedReady.j[4][2], recor
 export function createAthlete(source: T.Group, equipment: T.Group, color: string) {
   const body = clone(source), racket = makeRacket(equipment);
   const group = new T.Group(), stance = new T.Group();
-  stance.add(body, racket);
+  stance.add(body);
   group.add(stance);
   body.updateWorldMatrix(true, true);
   const teamMaterials: T.Material[]=[];
@@ -65,6 +66,15 @@ export function createAthlete(source: T.Group, equipment: T.Group, color: string
   if (bones.some(bone => !bone?.isBone)) throw new Error("Athlete skeleton does not match the motion library");
   const legs = ["Left","Right"].map(side => ["UpLeg","Leg","Foot"].map(name => bones[names.indexOf(side+name)]));
   const wrist = bones[names.indexOf("RightHand")];
+  // The socket is rigid in the palm even when the ready pose blends into a
+  // stroke. Remove the imported skeleton's uniform unit conversion once.
+  const mount = new T.Group();
+  const inverseScale = new T.Vector3(1, 1, 1).divide(wrist.getWorldScale(new T.Vector3()));
+  mount.scale.copy(inverseScale);
+  mount.position.fromArray(grip.palm).multiply(inverseScale);
+  racket.position.y = grip.centerFromPalm;
+  wrist.add(mount);
+  mount.add(racket);
   const a = new T.Quaternion(), b = new T.Quaternion(), parentQ = new T.Quaternion();
   const p = new T.Vector3(), q = new T.Vector3(), hip = new T.Vector3(), knee = new T.Vector3(), ankle = new T.Vector3();
   const target = new T.Vector3(), bend = new T.Vector3(), direction = new T.Vector3(), footQ = new T.Quaternion();
@@ -110,7 +120,7 @@ export function createAthlete(source: T.Group, equipment: T.Group, color: string
   }
 
   function pose(input: AthletePose) {
-    const {weight, alpha, a: first, b: last} = recordedSample(input.stroke, input.relativeTime);
+    const {weight, alpha, socket, a: first, b: last} = recordedSample(input.stroke, input.relativeTime);
     const idle = 1-weight;
     group.position.set(input.x, 0, input.z);
     group.rotation.y = input.yaw;
@@ -126,11 +136,7 @@ export function createAthlete(source: T.Group, equipment: T.Group, color: string
     const speed = Math.hypot(input.vx, input.vz);
     const walking = Math.min(1, speed/.85)*idle;
     if (walking > .001 && group.parent) legs.forEach((leg, side) => step(leg, side, input, walking));
-    wrist.getWorldPosition(p);
-    stance.worldToLocal(p);
-    a.fromArray(first.q).slerp(b.fromArray(last.q),alpha);
-    racket.quaternion.fromArray(recordedReady.q).slerp(a,weight);
-    racket.position.copy(p).add(q.set(.065,.39,.02).applyQuaternion(racket.quaternion));
+    mount.quaternion.fromArray(readySocket).slerp(a.fromArray(socket), weight);
   }
   return {group, racket, pose, dispose() {
     racket.traverse(o => { if (o instanceof T.Mesh) o.geometry.dispose(); });

@@ -1,6 +1,7 @@
 // Rebuild the browser rig and motion from the original, attributed assets.
 // Rotations are retargeted in world space, then stored in the target hierarchy.
 import fs from 'node:fs';
+import {calibrateRacket, placeSupportHand} from './calibrate-racket.mjs';
 import * as T from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
@@ -50,43 +51,58 @@ bind.LeftHand=new T.Quaternion().setFromUnitVectors(leftPalm,new T.Vector3(0,-1,
 const facing=new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),Math.PI);
 const round=v=>v.map(n=>+n.toFixed(6));
 const library={};
+const markers=JSON.parse(fs.readFileSync(new URL('mocap/racket-markers.json',base)));
+const equipment=JSON.parse(fs.readFileSync(new URL('../src/lib/tennis-motion/racket-grip.json',import.meta.url)));
+const palm=new T.Vector3(...equipment.palm);
 const strokes = {
-  volley: { contact: 1.94, lead: .6, axis: [-.65,.70,.3] },
-  'backhand-volley': { contact: 1.7, lead: .6, axis: [.65,.70,.3] },
-  forehand: { contact: 2.12, lead: .6, axis: [-.65,.70,.3] },
-  overhead: { contact: 2.2, lead: .8, axis: [-.15,.98,.12] },
-  backhand: { contact: 2.08, lead: .72, axis: [.94,.22,-.27] },
-  serve: { contact: 2.56, lead: 1.26, axis: [-.1,.98,.14] },
+  volley: { contact: 1.94, lead: .6 },
+  'backhand-volley': { contact: 1.7, lead: .6 },
+  forehand: { contact: 2.12, lead: .6 },
+  overhead: { contact: 2.2, lead: .8 },
+  backhand: { contact: 2.08, lead: .72 },
+  serve: { contact: 2.56, lead: 1.26 },
 };
-for(const [kind, {contact, lead, axis: gripAxis}] of Object.entries(strokes)) {
+for(const [kind, {contact, lead}] of Object.entries(strokes)) {
   const {skeleton,clip}=new BVHLoader().parse(fs.readFileSync(new URL(`mocap/${kind}.bvh`,base),'utf8'));
   const root=skeleton.bones[0], source=Object.fromEntries(skeleton.bones.map(b=>[b.name,b]));
   const mixer=new T.AnimationMixer(root); mixer.clipAction(clip).play();
   const sample=t=>{mixer.setTime(t);root.updateMatrixWorld(true);};
   const first=Math.round((contact-lead)/.02),last=Math.round((contact+.65)/.02);
+  const forearmAt=time=>{sample(time);return facing.clone().multiply(worldQuaternion(source.RightElbow));};
+  // No independent smash trial is available. Transfer the measured overarm
+  // racket phase to the captured overhead arm and its own impact time.
+  const calibration=calibrateRacket(markers[kind==='overhead'?'serve':kind],contact,forearmAt);
+  const support=markers[kind]?.supportInRacket;
   sample(contact);
   const origin=worldPosition(root).multiplyScalar(.011);
-  const axis=new T.Vector3(...gripAxis).normalize();
-  const gripOffset=worldQuaternion(source.RightWrist).invert().multiply(new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),axis));
   const poses=[];
   let lowestSole = Infinity;
   const vertex = new T.Vector3();
   for(let i=first;i<=last;i++) {
     sample(i*.02); bones.forEach((bone, j) => bone.quaternion.copy(restRotations[j])); scene.updateMatrixWorld(true);
-    const q=facing.clone().multiply(worldQuaternion(source.RightWrist)).multiply(gripOffset);
+    const q=calibration.rotation(i*.02-contact,facing.clone().multiply(worldQuaternion(source.RightElbow)));
+    const hand=q.clone().multiply(calibration.handInRacket);
     const hip=worldPosition(root).multiplyScalar(.011); hip.x-=origin.x;hip.z-=origin.z;hip.applyQuaternion(facing);
     byName.Hips.position.copy(byName.Hips.parent.worldToLocal(hip));
     // Hierarchy order is essential: each local rotation uses its updated parent.
     for(const bone of bones) {
       if(map[bone.name]) {
         const desired=facing.clone().multiply(worldQuaternion(source[map[bone.name]])).multiply(bind[bone.name]);
-        if(bone.name==='RightHand') desired.copy(q).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),-Math.PI/2));
+        if(bone.name==='RightHand') desired.copy(hand);
         bone.quaternion.copy(worldQuaternion(bone.parent).invert().multiply(desired));
       }
       // Close the racket hand instead of leaving a flat, open paddle hand.
-      if(/^RightHandIndex[123]$/.test(bone.name)) bone.quaternion.multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),.9));
+      if(/^RightHandIndex[123]$/.test(bone.name) || (support && /^LeftHandIndex[123]$/.test(bone.name))) bone.quaternion.multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),.9));
       bone.quaternion.normalize();
       bone.updateWorldMatrix(false,true);
+    }
+    const center=worldPosition(byName.RightHand).add(palm.clone().applyQuaternion(hand))
+      .add(new T.Vector3(0,equipment.centerFromPalm,0).applyQuaternion(q));
+    if (support) {
+      const supportQ=q.clone().multiply(new T.Quaternion(...support));
+      const target=center.clone().add(new T.Vector3(0,-equipment.supportFromCenter,0).applyQuaternion(q))
+        .sub(palm.clone().applyQuaternion(supportQ));
+      placeSupportHand(byName.LeftArm,byName.LeftForeArm,byName.LeftHand,target,supportQ);
     }
     mesh.skeleton.update();
     for (let v = 0; v < positions.count; v++) {
@@ -94,13 +110,13 @@ for(const [kind, {contact, lead, axis: gripAxis}] of Object.entries(strokes)) {
       lowestSole = Math.min(lowestSole, vertex.y);
     }
     const j=jointNames.map(n=>worldPosition(byName[n]));
-    poses.push({j:j.map(p=>p.toArray()),q:q.toArray(),r:j[9].clone().add(new T.Vector3(.065,.39,.02).applyQuaternion(q)).toArray(),h:byName.Hips.position.toArray(),b:bones.map(b=>b.quaternion.toArray()),foot:Math.min(...['LeftFoot','RightFoot','LeftToeBase','RightToeBase'].map(n=>worldPosition(byName[n]).y))});
+    poses.push({j:j.map(p=>p.toArray()),q:q.toArray(),r:center.toArray(),h:byName.Hips.position.toArray(),b:bones.map(b=>b.quaternion.toArray()),foot:Math.min(...['LeftFoot','RightFoot','LeftToeBase','RightToeBase'].map(n=>worldPosition(byName[n]).y))});
   }
   // One floor alignment for the entire clip preserves the recorded rise/fall.
   const floor=Math.min(lowestSole, Math.min(...poses.map(p=>p.foot))-.035);
   const localShift=new T.Vector3(0,floor,0).divide(byName.Hips.parent.getWorldScale(new T.Vector3()));
   for(const p of poses){p.j=p.j.map(v=>round([v[0],v[1]-floor,v[2]]));p.r=round([p.r[0],p.r[1]-floor,p.r[2]]);p.h=round(new T.Vector3(...p.h).sub(localShift).toArray());p.b=p.b.map(round);p.q=round(p.q);delete p.foot;}
-  library[kind]={dt:.02,contact:+(contact-first*.02).toFixed(2),poses};
+  library[kind]={socket:round(calibration.handInRacket.clone().invert().toArray()),dt:.02,contact:+(contact-first*.02).toFixed(2),poses};
   console.log(kind,poses.length,'frames, contact',poses[Math.round(library[kind].contact/.02)].r);
 }
 fs.writeFileSync(new URL('../src/lib/drills/recorded-motion.json',import.meta.url),JSON.stringify(library));

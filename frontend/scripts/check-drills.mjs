@@ -18,7 +18,9 @@ const { getFrame, DURATION, court, activeHalves } = load('motion');
 const {recordedContact,recordedSample}=load('recorded-motion');
 const {studioUnits,studioFrame}=load('../tennis-motion/studio');
 const {recordingFor}=load('recorded-motion');
-assert.throws(()=>recordingFor('serve'),/No recording available/);
+assert.equal(recordingFor('serve'),'serve');
+assert.equal(recordingFor('backhand-groundstroke'),'backhand');
+assert.ok(recordedContact('serve')[1] > 2.3, 'Serve marker must be overhead');
 assert.throws(()=>recordingFor('unrecognised-stroke'),/Unknown tennis technique/);
 assert.equal(recordingFor('forehand-groundstroke'),'forehand');
 for(const unit of studioUnits) {

@@ -95,6 +95,14 @@ Tennis-MoCap is the primary captured source because it contains the six core ten
 
 The board compiles each diagram into a seekable sequence in court metres. Drawn endpoints are landing targets. An optional per-arrow stroke selection travels in the existing v1 share link. Unannotated shots use proximity, side and service context. Serve preparation starts behind the baseline. Connected shots use the measured skeleton's racket offset, a gravity arc and a slower rebound. Volleys can intercept the incoming flight before its target. Disconnected arrows begin a new demonstration. The positions, restitution and grip alignment are authored approximations.
 
-The preview, shared student link and playing-style split view use the same clock for the 2D and 3D courts. The four cameras, optional tactical markings, quarter speed and keyboard timeline support inspecting the ball and players. A local CC0 panorama supplies the stadium background and lighting.
+The preview, shared student link and playing-style split view use the same clock for the 2D and 3D courts. The director cut, four manual cameras, optional tactical markings, quarter speed and keyboard timeline support inspecting the ball and players. A local CC0 panorama supplies the stadium background and lighting.
 
 Run `node scripts/check-tactical-replay.mjs` from `frontend` to exercise shared links, frame transitions, generated contacts and drawn landings against actual racket transforms under a rotated parent. Check the Server +1 preview and share link at desktop and phone widths.
+
+### Match athlete and Blender review
+
+The tactics board, playing styles, drills and movement lab use a fitted MakeHuman mesh with separate textured clothing, shoes, eyes and hair on the captured-stroke skeleton. Immutable skin geometry and textures are shared among players. Each player owns a skeleton and jersey material. The browser loads the extracted racket separately.
+
+Open `frontend/art/match-athlete.blend` in Blender. The packed 50 fps timeline contains six strokes and six contact markers. Each garment can be edited independently. The browser files and source instructions are under `frontend/public/models/tennis`. The director camera opens a service sequence at court level and cuts to the wide court as the ball leaves the racket. Contact review remains available throughout the point.
+
+Run the skinned-motion test on the shipped match mesh and all six pieces of clothing and anatomy. The technical tests establish repeatability and contact alignment. Anatomical review by a tennis coach and performance testing on physical phones remain open.

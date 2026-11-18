@@ -11,7 +11,7 @@ import TrainingCourt from "../drills/TrainingCourt";
 import BroadcastGrounds from "./BroadcastGrounds";
 import styles from "./broadcast.module.css";
 
-const angles = {baseline:"转播机位",sideline:"边线机位",contact:"击球特写",orbit:"自由视角"};
+const angles = {director:"导演剪辑",baseline:"转播机位",sideline:"边线机位",contact:"击球特写",orbit:"自由视角"};
 type Angle = keyof typeof angles;
 function Director({angle,frame}:{angle:Angle;frame:ReplayFrame}) {
   const {camera,size}=useThree();
@@ -22,13 +22,14 @@ function Director({angle,frame}:{angle:Angle;frame:ReplayFrame}) {
   const mobile=size.width/size.height<1.18;
   const place=()=>{
     const shot=frame.shot;
-    if(angle==="contact") {
+    const serviceCloseup=angle==="director" && shot?.kind==="serve" && frame.time<shot.hit-.09;
+    if(angle==="contact" || serviceCloseup) {
       const id=shot?.id ?? frame.players[0]?.id;
       const player=frame.players.find(p=>p.id===id) ?? frame.players[0];
       const high=shot?.kind==="serve" || shot?.kind==="overhead";
       focus.set(player.x-CX,high?1.43:1.05,player.y-NET);
       const side=player.y<NET?-1:1;
-      position.set(focus.x+side*5.45,1.74,focus.z+side*3.65);
+      position.set(focus.x+side*5.45,1.64,focus.z-side*3.65);
       target.copy(focus);
       sceneCamera.fov=mobile?39:32;
     } else if(angle==="sideline") {
@@ -86,7 +87,7 @@ class SceneBoundary extends Component<{children:ReactNode;fallback:ReactNode},{f
 export default function TacticCourt3D({theme,frame,paths,frameCount,onReady,onFlat}:{
   theme?:string;frame:ReplayFrame;paths:BallPath[];frameCount:number;onReady:()=>void;onFlat:()=>void;
 }) {
-  const [angle,setAngle]=useState<Angle>("baseline");
+  const [angle,setAngle]=useState<Angle>("director");
   const [guides,setGuides]=useState(false);
   const [ready,setReady]=useState(false);
   const notified=useRef(false);

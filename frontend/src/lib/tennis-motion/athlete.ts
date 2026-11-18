@@ -38,46 +38,6 @@ function makeRacket(equipment: T.Group) {
   return racket;
 }
 
-// Work in bind-pose metres so the collar, cuffs and shoe uppers follow the skin.
-function dress(mesh: T.SkinnedMesh, color: string) {
-  const geometry = mesh.geometry.clone();
-  const bind = geometry.getAttribute("position");
-  const points = new Float32Array(bind.count * 3);
-  const point = new T.Vector3();
-  for (let i = 0; i < bind.count; i++) point.fromBufferAttribute(bind, i).applyMatrix4(mesh.matrixWorld).toArray(points, i * 3);
-  geometry.setAttribute("kitPosition", new T.BufferAttribute(points, 3));
-  mesh.geometry = geometry;
-  const material = new T.MeshStandardMaterial({ roughness: .77 });
-  material.onBeforeCompile = shader => {
-    shader.uniforms.team = { value: new T.Color(color) };
-    shader.vertexShader = "attribute vec3 kitPosition; varying vec3 kit;\n" + shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\n kit = kitPosition;");
-    shader.fragmentShader = "uniform vec3 team; varying vec3 kit;\n" + shader.fragmentShader.replace("#include <color_fragment>", `
-      #include <color_fragment>
-      float h = kit.y;
-      float lat = abs(kit.x);
-      vec3 skin = vec3(.50,.263,.155);
-      vec3 navy = vec3(.025,.045,.058);
-      vec3 ivory = vec3(.83,.85,.80);
-      vec3 fabric = mix(team,team*.50,smoothstep(.13,.22,lat)*.55);
-      float collar = 1.48 - .07 * exp(-90.*lat*lat);
-      vec3 pigment = skin;
-      if(h > .84 && h < collar && lat < .33) {
-        pigment = fabric;
-        if(h > collar-.018 || lat > .313) pigment = mix(fabric,ivory,.70);
-      }
-      if(h > .624 && h < .902 && lat < .29) pigment = mix(navy,navy*1.55,smoothstep(.13,.21,lat));
-      if(h > .887 && h < .905 && lat < .27) pigment = navy*.72;
-      if(h < .22) pigment = ivory * (.91 + .055*cos(h*480.));
-      if(h < .112) pigment = mix(ivory,team,.17 + .55*smoothstep(.048,.065,h)*(1.-smoothstep(.077,.09,h)));
-      if(h < .029) pigment = navy;
-      if(lat > .63 && lat < .684 && h > 1.) pigment = ivory;
-      if(h > 1.69 + .027*cos(kit.x*18.) - kit.z*.20) pigment = vec3(.054,.033,.024);
-      diffuseColor.rgb *= pigment;
-    `);
-  };
-  mesh.material = material;
-}
-
 const readyHip = recordedReady.j[0];
 const neutralYaw = Math.atan2(recordedReady.j[7][2]-recordedReady.j[4][2], recordedReady.j[7][0]-recordedReady.j[4][0]);
 
@@ -87,9 +47,15 @@ export function createAthlete(source: T.Group, equipment: T.Group, color: string
   stance.add(body, racket);
   group.add(stance);
   body.updateWorldMatrix(true, true);
+  const teamMaterials: T.Material[]=[];
   body.traverse(part => {
     if (part instanceof T.SkinnedMesh) {
-      dress(part, color);
+      if (part.material.name==="Jersey") {
+        const jersey=part.material.clone() as T.MeshStandardMaterial;
+        jersey.color.set(color);
+        part.material=jersey;
+        teamMaterials.push(jersey);
+      }
       part.frustumCulled = false;
       part.castShadow = true;
       part.receiveShadow = true;
@@ -168,6 +134,7 @@ export function createAthlete(source: T.Group, equipment: T.Group, color: string
   }
   return {group, racket, pose, dispose() {
     racket.traverse(o => { if (o instanceof T.Mesh) o.geometry.dispose(); });
-    body.traverse(o => { if (o instanceof T.SkinnedMesh) { o.geometry.dispose(); o.material.dispose(); o.skeleton.dispose(); } });
+    body.traverse(o => { if(o instanceof T.SkinnedMesh) o.skeleton.dispose(); });
+    teamMaterials.forEach(material=>material.dispose());
   }};
 }

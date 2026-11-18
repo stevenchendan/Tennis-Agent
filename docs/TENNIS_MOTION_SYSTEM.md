@@ -90,3 +90,11 @@ Tennis-MoCap is the primary captured source because it contains the six core ten
 1. Extend the skinned motion library with the recorded serve and backhand. The serve retains 1.26 seconds of preparation to include the tossing arm. Editorial contacts are at 2.56 and 2.08 seconds of the respective source recordings. Verify the deployed skin, grip and floor across all six clips with `node scripts/check-skinned-motion.mjs` and `node scripts/check-drills.mjs` in `frontend`.
 2. Build the tactics-board replay around timed racket contacts, authored landing targets, and selectable broadcast cameras. Exercise both the editor preview and student share route.
 3. Use the same captured strokes for the featured arena rally and keep distant precinct courts inexpensive.
+
+### Tactics board replay
+
+The board compiles each diagram into a seekable sequence in court metres. Drawn endpoints are landing targets. An optional per-arrow stroke selection travels in the existing v1 share link. Unannotated shots use proximity, side and service context. Serve preparation starts behind the baseline. Connected shots use the measured skeleton's racket offset, a gravity arc and a slower rebound. Volleys can intercept the incoming flight before its target. Disconnected arrows begin a new demonstration. The positions, restitution and grip alignment are authored approximations.
+
+The preview, shared student link and playing-style split view use the same clock for the 2D and 3D courts. The four cameras, optional tactical markings, quarter speed and keyboard timeline support inspecting the ball and players. A local CC0 panorama supplies the stadium background and lighting.
+
+Run `node scripts/check-tactical-replay.mjs` from `frontend` to exercise shared links, frame transitions, generated contacts and drawn landings against actual racket transforms under a rotated parent. Check the Server +1 preview and share link at desktop and phone widths.

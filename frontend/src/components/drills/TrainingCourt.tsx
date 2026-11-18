@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
+import type { CourtTheme } from "@/lib/court";
 
 function surfaceTexture() {
   const canvas = document.createElement("canvas"); canvas.width = canvas.height = 256;
@@ -67,20 +68,21 @@ function Bench({ x, y }: { x: number; y: number }) {
   </group>;
 }
 
-export default function TrainingCourt() {
+export default function TrainingCourt({theme}: {theme?: CourtTheme}) {
   const texture = useMemo(surfaceTexture, []);
   useEffect(() => () => texture.dispose(), [texture]);
   const stripes = [[5.485, 0, 10.97, .1], [5.485, 23.77, 10.97, .1], [0, 11.885, .05, 23.77], [10.97, 11.885, .05, 23.77], [1.37, 11.885, .05, 23.77], [9.6, 11.885, .05, 23.77], [5.485, 5.485, 8.23, .05], [5.485, 18.285, 8.23, .05], [5.485, 11.885, .05, 12.8], [5.485, .12, .05, .24], [5.485, 23.65, .05, .24]];
   return <group>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[5.485, -.08, 11.885]} receiveShadow><planeGeometry args={[160, 160]} /><meshStandardMaterial color="#5d7560" roughness={1} /></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[5.485, -.02, 11.5]} receiveShadow><planeGeometry args={[20.2, 35.5]} /><meshStandardMaterial color="#3d7670" map={texture} roughness={.95} /></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[5.485, -.005, 11.885]} receiveShadow><planeGeometry args={[10.97, 23.77]} /><meshStandardMaterial color="#3679a4" map={texture} roughness={.9} /></mesh>
-    {stripes.map(([x, y, width, length], i) => <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[x, .007, y]} receiveShadow><planeGeometry args={[width, length]} /><meshStandardMaterial color="#f4f2dd" roughness={1} /></mesh>)}
+    {!theme && <mesh rotation={[-Math.PI / 2, 0, 0]} position={[5.485, -.08, 11.885]} receiveShadow><planeGeometry args={[160, 160]} /><meshStandardMaterial color="#5d7560" roughness={1} /></mesh>}
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[5.485, -.02, 11.5]} receiveShadow><planeGeometry args={theme?[27,38]:[20.2,35.5]} /><meshStandardMaterial color={theme?.outer ?? "#3d7670"} map={texture} roughness={.95} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[5.485, -.005, 11.885]} receiveShadow><planeGeometry args={[10.97, 23.77]} /><meshStandardMaterial color={theme?.inner ?? "#3679a4"} map={texture} roughness={.9} /></mesh>
+    {stripes.map(([x, y, width, length], i) => <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[x, .007, y]} receiveShadow><planeGeometry args={[width, length]} /><meshStandardMaterial color={theme?.line ?? "#f4f2dd"} roughness={1} /></mesh>)}
     <Net />
-    <Fence position={[5.485, 0, -5.55]} length={20} /><Fence position={[5.485, 0, 28.55]} length={20} />
-    <Fence position={[-4.5, 0, 11.5]} length={34.1} rotate /><Fence position={[15.47, 0, 11.5]} length={34.1} rotate />
+    {!theme && <><Fence position={[5.485, 0, -5.55]} length={20} /><Fence position={[5.485, 0, 28.55]} length={20} />
+    <Fence position={[-4.5, 0, 11.5]} length={34.1} rotate /><Fence position={[15.47, 0, 11.5]} length={34.1} rotate /></>}
     <Bench x={-3.5} y={8.7} /><Bench x={14.2} y={14.5} />
-    <group position={[4.1, 0, 26.8]}>{[-.22, .22].map(x => <mesh key={x} position={[x, .46, 0]} castShadow><boxGeometry args={[.025, .92, .025]} /><meshStandardMaterial color="#dce0d4" metalness={.7} /></mesh>)}<mesh position={[0, .95, 0]} castShadow><boxGeometry args={[.6, .24, .4]} /><meshStandardMaterial color="#26392e" /></mesh>{Array.from({ length: 12 }, (_, i) => <mesh key={i} position={[-.2 + (i % 4) * .13, 1.08, -.12 + Math.floor(i / 4) * .12]}><sphereGeometry args={[.034, 8, 6]} /><meshStandardMaterial color="#d9ef3f" /></mesh>)}</group>
+    {!theme && <><group position={[4.1, 0, 26.8]}>{[-.22, .22].map(x => <mesh key={x} position={[x, .46, 0]} castShadow><boxGeometry args={[.025, .92, .025]} /><meshStandardMaterial color="#dce0d4" metalness={.7} /></mesh>)}<mesh position={[0, .95, 0]} castShadow><boxGeometry args={[.6, .24, .4]} /><meshStandardMaterial color="#26392e" /></mesh>{Array.from({ length: 12 }, (_, i) => <mesh key={i} position={[-.2 + (i % 4) * .13, 1.08, -.12 + Math.floor(i / 4) * .12]}><sphereGeometry args={[.034, 8, 6]} /><meshStandardMaterial color="#d9ef3f" /></mesh>)}</group>
     {[[-3.3, 6], [-3.3, 19], [14.4, 6], [14.4, 19]].map(([x, y], i) => <group key={i} position={[x, 0, y]}><mesh castShadow position={[0, 3.9, 0]}><cylinderGeometry args={[.07, .1, 7.8, 8]} /><meshStandardMaterial color="#bac7bc" metalness={.65} roughness={.55} /></mesh><mesh position={[0, 7.8, 0]} rotation={[.3, 0, 0]}><boxGeometry args={[.65, .15, .35]} /><meshStandardMaterial color="#e3e5d4" /></mesh></group>)}
+    </>}
   </group>;
 }

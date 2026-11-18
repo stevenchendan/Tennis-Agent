@@ -22,35 +22,43 @@ function Perimeter() {
 }
 
 function GallerySeats() {
-  const seats=useRef<T.InstancedMesh>(null), backs=useRef<T.InstancedMesh>(null);
-  const count=2*5*52;
-  useLayoutEffect(()=>{
-    if(!seats.current || !backs.current) return;
-    const model=new T.Object3D(), color=new T.Color();
-    let i=0;
-    for(const side of [-1,1]) for(let row=0;row<5;row++) for(let seat=0;seat<52;seat++) {
-      const aisle=Math.floor(seat/13)*.7, z=-15.9+seat*.58+aisle;
-      const x=side*(11.55+row*.8), y=.64+row*.42;
-      model.position.set(x,y,z);model.rotation.set(0,0,0);model.updateMatrix();
-      seats.current.setMatrixAt(i,model.matrix);
-      model.position.set(x+side*.195,y+.19,z);model.rotation.z=-side*.09;model.updateMatrix();
-      backs.current.setMatrixAt(i,model.matrix);
-      color.setHSL(.49+(seat%7)*.002,.14,.30+((seat*7+row*13)%11)*.007,T.SRGBColorSpace);
-      seats.current.setColorAt(i,color);backs.current.setColorAt(i,color);i++;
+  const seats=useRef<T.InstancedMesh>(null);
+  const count=2*3*48;
+  // A continuous moulded seat shell with a raised rim, curved back and rolled lip.
+  const shell=useMemo(()=>{
+    const profile=[[-.22,.045],[-.20,.025],[-.12,.003],[.06,0],[.145,.025],[.18,.09],[.195,.23],[.23,.325],[.241,.33]];
+    const positions:number[]=[],indices:number[]=[];
+    for(let j=0;j<profile.length;j++) for(let i=0;i<=10;i++) {
+      const u=i/5-1, [x,y]=profile[j];
+      positions.push(x-Math.pow(Math.abs(u),2)*Math.max(0,y)*.28,y+.031*u*u,u*(.221-.022*y));
+      if(j<profile.length-1 && i<10) {const a=j*11+i;indices.push(a,a+11,a+1,a+1,a+11,a+12);}
     }
-    for(const mesh of [seats.current,backs.current]) {mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();}
+    const g=new T.BufferGeometry();g.setAttribute("position",new T.Float32BufferAttribute(positions,3));g.setIndex(indices);g.computeVertexNormals();return g;
+  },[]);
+  useEffect(()=>()=>shell.dispose(),[shell]);
+  useLayoutEffect(()=>{
+    if(!seats.current)return;
+    const model=new T.Object3D(),color=new T.Color();
+    let i=0;
+    for(const side of [-1,1]) for(let row=0;row<3;row++) for(let seat=0;seat<48;seat++) {
+      model.position.set(side*(11.55+row*.8),.51+row*.4,-15+seat*.595+Math.floor(seat/12)*.72);
+      model.rotation.y=side===1?0:Math.PI;model.updateMatrix();
+      seats.current.setMatrixAt(i,model.matrix);
+      color.setHSL(.48,.21,.25+((seat*7+row*13)%11)*.006,T.SRGBColorSpace);
+      seats.current.setColorAt(i++,color);
+    }
+    seats.current.instanceMatrix.needsUpdate=true;seats.current.computeBoundingSphere();
   },[]);
   return <>
-    {[-1,1].map(side=><group key={side}>{Array.from({length:5},(_,r)=><mesh key={r} position={[side*(11.55+r*.8),.1+r*.21,0]} receiveShadow><boxGeometry args={[.8,.24+r*.42,34]}/><meshStandardMaterial color="#747c74" roughness={.98}/></mesh>)}
-      <mesh position={[side*10.45,.56,0]} receiveShadow castShadow><boxGeometry args={[.14,1.12,36.9]}/><meshStandardMaterial color="#23443e"/></mesh>
+    {[-1,1].map(side=><group key={side}>{Array.from({length:3},(_,r)=><mesh key={r} position={[side*(11.55+r*.8),.14+r*.2,0]} receiveShadow castShadow><boxGeometry args={[.8,.28+r*.4,33]}/><meshStandardMaterial color="#686e65" roughness={.98}/></mesh>)}
+      <mesh position={[side*10.45,.52,0]} receiveShadow castShadow><boxGeometry args={[.14,1.04,36.9]}/><meshStandardMaterial color="#21413a"/></mesh>
     </group>)}
-    <instancedMesh ref={seats} args={[undefined,undefined,count]} receiveShadow><boxGeometry args={[.44,.065,.46]}/><meshStandardMaterial roughness={.65}/></instancedMesh>
-    <instancedMesh ref={backs} args={[undefined,undefined,count]} receiveShadow><boxGeometry args={[.07,.34,.46]}/><meshStandardMaterial roughness={.65}/></instancedMesh>
+    <instancedMesh ref={seats} args={[shell,undefined,count]} castShadow receiveShadow><meshStandardMaterial side={T.DoubleSide} roughness={.56}/></instancedMesh>
   </>;
 }
 
 export default function BroadcastGrounds() {
-  const back=useLoader(T.TextureLoader,"/models/tennis/stadium-sunrise.webp");
+  const back=useLoader(T.TextureLoader,"/models/tennis/club-sunrise.webp");
   const {scene}=useThree();
   useLayoutEffect(()=>{
     back.colorSpace=T.SRGBColorSpace;back.mapping=T.EquirectangularReflectionMapping;
@@ -62,7 +70,7 @@ export default function BroadcastGrounds() {
   // see the stands beyond the back wall without looking into a floating field.
   const panorama=useMemo(()=>{
     const positions:number[]=[],uv:number[]=[],indices:number[]=[];
-    const radius=58,columns=128,rows=36;
+    const radius=42,columns=128,rows=36;
     for(let row=0;row<=rows;row++) for(let col=0;col<=columns;col++) {
       const az=(col/columns-.5)*2*Math.PI, el=-.18+row/rows*1.55;
       positions.push(radius*Math.cos(az),1.55+radius*Math.tan(el),radius*Math.sin(az));
@@ -79,9 +87,9 @@ export default function BroadcastGrounds() {
   useEffect(()=>()=>panorama.dispose(),[panorama]);
   return <>
     <mesh geometry={panorama}><meshBasicMaterial map={back} side={T.DoubleSide} toneMapped={false}/></mesh>
-    <Environment files="/models/tennis/stadium-light.hdr" environmentIntensity={.62}/>
-    <hemisphereLight args={["#dce7fa","#9b9070",.85]}/>
-    <directionalLight position={[-14,15,-11]} color="#ffe3b9" intensity={2.35} castShadow
+    <Environment files="/models/tennis/club-light.hdr" environmentIntensity={.87}/>
+    <hemisphereLight args={["#dce7fa","#7b826b",.52]}/>
+    <directionalLight position={[12,8,18]} color="#ffe7ca" intensity={2.15} castShadow
       shadow-mapSize={[2048,2048]} shadow-camera-left={-24} shadow-camera-right={24} shadow-camera-top={24} shadow-camera-bottom={-24} shadow-camera-far={75} shadow-normalBias={.012} shadow-bias={-.00012}/>
     <Perimeter/><GallerySeats/>
   </>;

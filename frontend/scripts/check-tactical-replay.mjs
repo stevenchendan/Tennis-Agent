@@ -31,11 +31,14 @@ const {recordedContact}=lib("drills/recorded-motion");
 const {TEMPLATES}=lib("templates");
 const {playingStyles,styleTactic}=lib("playing-styles");
 const {createAthlete}=lib("tennis-motion/athlete");
+// Node samples the geometry and does not upload embedded textures to a GPU.
+globalThis.self=globalThis;
+globalThis.createImageBitmap=async()=>({width:1,height:1,close(){}});
 async function readModel(name) {
   const b=fs.readFileSync(path.join(root,"public/models/tennis",name));
   return (await new GLTFLoader().parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),"")).scene;
 }
-const rig=createAthlete(await readModel("tennis-athlete.glb"),await readModel("club-player.glb"),"#22d3ee");
+const rig=createAthlete(await readModel("match-athlete.glb"),await readModel("match-racket.glb"),"#22d3ee");
 assert.ok(rig.racket.children.length > 0,"Test the exported string bed and frame");
 const arena=new THREE.Group();arena.position.set(20,3,-15);arena.rotation.y=.67;arena.add(rig.group);
 const custom=defaultTactic();

@@ -1,6 +1,6 @@
 export type Handedness = "right" | "left" | "either";
 export type MotionStatus = "captured" | "illustrative" | "planned";
-export type MotionClipKey = "volley" | "backhand-volley" | "forehand" | "overhead";
+export type MotionClipKey = "volley" | "backhand-volley" | "forehand" | "backhand" | "serve" | "overhead";
 
 export type TechniqueId =
   | "partner-feed"
@@ -50,16 +50,16 @@ export const techniqueLibrary: Record<TechniqueId, TechniqueUnit> = {
     window: { beforeContact: .65, afterContact: .78 }, checkpoints: ["Unit turn", "Load outside leg", "Racket drop", "Contact in front", "Across-body recovery"], source: "Tennis-MoCap",
   },
   "backhand-groundstroke": {
-    id: "backhand-groundstroke", label: "Backhand groundstroke", family: "groundstroke", handedness: "right", clip: null, status: "planned",
-    window: { beforeContact: .72, afterContact: .82 }, checkpoints: ["Early shoulder turn", "Set spacing", "Contact in front", "Complete recovery"], source: "unassigned",
+    id: "backhand-groundstroke", label: "Backhand groundstroke", family: "groundstroke", handedness: "right", clip: "backhand", status: "captured",
+    window: { beforeContact: .72, afterContact: .66 }, checkpoints: ["Early shoulder turn", "Set spacing", "Contact in front", "Complete recovery"], source: "Tennis-MoCap",
   },
   overhead: {
     id: "overhead", label: "Overhead", family: "overhead", handedness: "right", clip: "overhead", status: "captured",
     window: { beforeContact: .82, afterContact: .72 }, checkpoints: ["Turn sideways", "Track with non-hitting hand", "Reach to contact", "Pronate", "Land balanced"], source: "Tennis-MoCap",
   },
   serve: {
-    id: "serve", label: "Serve", family: "serve", handedness: "right", clip: null, status: "planned",
-    window: { beforeContact: 1.25, afterContact: 1 }, checkpoints: ["Balanced start", "Consistent toss", "Leg drive", "Racket drop", "Reach and pronate", "Land inside court"], source: "unassigned",
+    id: "serve", label: "Serve", family: "serve", handedness: "right", clip: "serve", status: "captured",
+    window: { beforeContact: 1.26, afterContact: .66 }, checkpoints: ["Balanced start", "Consistent toss", "Leg drive", "Racket drop", "Reach and pronate", "Land inside court"], source: "Tennis-MoCap",
   },
 };
 
@@ -73,13 +73,15 @@ export const movementLibrary: Record<MovementId, MovementUnit> = {
   reset: { id: "reset", label: "Reset", intent: "Return to the next drill starting position.", racketState: "neutral" },
 };
 
-export type DrillStrokeKind = "feed" | "volley" | "backhand-volley" | "forehand" | "overhead";
+export type DrillStrokeKind = MotionClipKey | "feed";
 
 const strokeTechnique: Record<DrillStrokeKind, TechniqueId> = {
   feed: "partner-feed",
   volley: "forehand-volley",
   "backhand-volley": "backhand-volley",
   forehand: "forehand-groundstroke",
+  backhand: "backhand-groundstroke",
+  serve: "serve",
   overhead: "overhead",
 };
 

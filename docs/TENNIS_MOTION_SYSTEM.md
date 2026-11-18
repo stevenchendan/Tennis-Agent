@@ -2,11 +2,11 @@
 
 ## Interactive review workspace
 
-`/movement-lab` previews the shared player independently of drill choreography. It includes four adapted captured strokes, an illustrative feed, six illustrative movement states and the composed Mercy Shot sequence. Serve and backhand groundstroke are visible as unavailable entries; they cannot silently play a different clip. No unit is currently coach-approved.
+`/movement-lab` previews the shared player independently of drill choreography. It includes six adapted captured strokes, an illustrative feed, six illustrative movement states and the composed Mercy Shot sequence. The serve and backhand groundstroke use their own recordings. No unit is currently coach-approved.
 
 Use the front, side and rear cameras, 0.25× / 0.5× / 1× playback, 50 Hz frame stepping, timeline and contact-frame jump to inspect the current implementation. The yellow marker appears at the annotated racket contact only; it does not represent a simulated incoming ball in isolated technique previews. Strategy mode uses the actual Mercy Shot court and ball sequence.
 
-This workspace still uses the articulated character. A skinned player, motion retargeting, planted-foot transitions and coaching review remain outstanding. Passing the numerical tests does not establish anatomical or coaching accuracy.
+This workspace uses the shared skinned character and retargeted rotations. Locomotion and hand calibration still need coaching review. Passing the numerical tests does not establish anatomical or coaching accuracy.
 
 The product should demonstrate hundreds of drills without rebuilding a player for every page. A drill therefore composes reusable **movement units** and **technique units** on a court timeline.
 
@@ -84,3 +84,9 @@ Both views now use the CC0 Quaternius weighted character (`tennis-athlete.glb`),
 Run `node scripts/retarget-tennis-motion.mjs`, `node scripts/check-drills.mjs`, and `node scripts/check-skinned-motion.mjs` inside `frontend`. The last check loads the actual exported skin and verifies intermediate-frame limb lengths, wrist/contact agreement, finite deformed vertices and floor penetration. These are structural checks, not evidence of correct tennis technique. Footwork is still illustrative and needs captured locomotion plus foot planting.
 
 Tennis-MoCap is the primary captured source because it contains the six core tennis gestures and already fits the BVH ingestion pipeline. MinimumTennis can inform missing transitions and handedness after individual animation provenance is verified. Vid2Player3D is an architecture reference for hierarchical control rather than a runtime dependency.
+
+## Court playback milestones
+
+1. Extend the skinned motion library with the recorded serve and backhand. The serve retains 1.26 seconds of preparation to include the tossing arm. Editorial contacts are at 2.56 and 2.08 seconds of the respective source recordings. Verify the deployed skin, grip and floor across all six clips with `node scripts/check-skinned-motion.mjs` and `node scripts/check-drills.mjs` in `frontend`.
+2. Build the tactics-board replay around timed racket contacts, authored landing targets, and selectable broadcast cameras. Exercise both the editor preview and student share route.
+3. Use the same captured strokes for the featured arena rally and keep distant precinct courts inexpensive.

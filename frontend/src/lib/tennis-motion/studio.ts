@@ -3,7 +3,7 @@ import { recordedContact } from '../drills/recorded-motion';
 import { techniqueLibrary, movementLibrary, type TechniqueId, type MovementId } from './index';
 
 export type StudioUnit = { id: string; label: string; category: 'Technique' | 'Movement' | 'Strategy'; status: 'Captured preview' | 'Illustrative' | 'Not available'; duration: number; contact?: number; kind?: Stroke['kind']; movement?: MovementId; cues: readonly string[] };
-const kinds: Partial<Record<TechniqueId, Stroke['kind']>> = { 'partner-feed': 'feed', 'forehand-volley': 'volley', 'backhand-volley': 'backhand-volley', 'forehand-groundstroke': 'forehand', overhead: 'overhead' };
+const kinds: Record<TechniqueId, Stroke['kind']> = { 'partner-feed': 'feed', 'forehand-volley': 'volley', 'backhand-volley': 'backhand-volley', 'forehand-groundstroke': 'forehand', 'backhand-groundstroke': 'backhand', serve: 'serve', overhead: 'overhead' };
 export const studioUnits: StudioUnit[] = [
   ...Object.values(techniqueLibrary).map(unit => ({ id: unit.id, label: unit.label, category: 'Technique' as const, status: (unit.clip ? unit.status === 'captured' ? 'Captured preview' : 'Illustrative' : 'Not available') as StudioUnit['status'], duration: unit.window.beforeContact + unit.window.afterContact, contact: unit.window.beforeContact, kind: kinds[unit.id], cues: unit.checkpoints })),
   ...Object.values(movementLibrary).filter(unit => unit.id !== 'stroke').map(unit => ({ id: unit.id, label: unit.label, category: 'Movement' as const, status: 'Illustrative' as const, duration: 3, movement: unit.id, cues: [unit.intent] })),

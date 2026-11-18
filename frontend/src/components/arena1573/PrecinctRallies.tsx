@@ -1,57 +1,86 @@
-'use client';
+"use client";
 
-import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as T from 'three';
-import type { ContextData } from './model';
-import { rallyCourts } from './courtPlacements';
-import { rallyFrame } from './rallyMotion';
+import {useMemo,useRef} from "react";
+import {useFrame} from "@react-three/fiber";
+import * as T from "three";
+import {recordedReady,recordedSample} from "@/lib/drills/recorded-motion";
+import type {ContextData} from "./model";
+import {rallyCourts} from "./courtPlacements";
+import {BALL_RADIUS,COURT_SURFACE,rallyFrame} from "./rallyMotion";
 
-/** Shared low-detail articulated players: six draw calls for the whole precinct. */
-export default function PrecinctRallies({data,active,visible}:{data:ContextData;active:boolean;visible:boolean}){
+const limbs=[[10,11],[11,12],[13,14],[14,15],[4,5],[5,6],[7,8],[8,9]];
+const readyYaw=Math.atan2(recordedReady.j[7][2]-recordedReady.j[4][2],recordedReady.j[7][0]-recordedReady.j[4][0]);
+const kits=["#d7ab45","#4186a3","#ba6953","#75a891"];
+
+export default function PrecinctRallies({data,active,visible}:{data:ContextData;active:boolean;visible:boolean}) {
   const courts=useMemo(()=>rallyCourts(data),[data]);
-  const torso=useRef<T.InstancedMesh>(null),heads=useRef<T.InstancedMesh>(null),limbs=useRef<T.InstancedMesh>(null),rackets=useRef<T.InstancedMesh>(null),grips=useRef<T.InstancedMesh>(null),balls=useRef<T.InstancedMesh>(null);
-  const time=useRef(0);
-  const scratch=useMemo(()=>({object:new T.Object3D(),a:new T.Vector3(),b:new T.Vector3(),up:new T.Vector3(0,1,0),color:new T.Color()}),[]);
-  useFrame((_,delta)=>{
-    if(active&&visible)time.current+=Math.min(delta,.05);
-    if(!visible||!torso.current||!heads.current||!limbs.current||!rackets.current||!grips.current||!balls.current)return;
-    const {object:o,a,b,up,color}=scratch;
+  const torso=useRef<T.InstancedMesh>(null),heads=useRef<T.InstancedMesh>(null),arms=useRef<T.InstancedMesh>(null);
+  const rackets=useRef<T.InstancedMesh>(null),grips=useRef<T.InstancedMesh>(null),balls=useRef<T.InstancedMesh>(null);
+  const time=useRef(0),last=useRef(-1);
+  const scratch=useMemo(()=>({
+    joints:Array.from({length:16},()=>new T.Vector3()),o:new T.Object3D(),world:new T.Vector3(),up:new T.Vector3(0,1,0),
+    a:new T.Vector3(),b:new T.Vector3(),mid:new T.Vector3(),center:new T.Vector3(),handle:new T.Vector3(),
+    localQ:new T.Quaternion(),nextQ:new T.Quaternion(),yawQ:new T.Quaternion(),color:new T.Color(),
+  }),[]);
+  useFrame((_,dt)=>{
+    if(!visible || !torso.current || !heads.current || !arms.current || !rackets.current || !grips.current || !balls.current)return;
+    if(active)time.current+=Math.min(dt,.2);
+    if(last.current===time.current)return;
+    const initial=last.current<0;
+    last.current=time.current;
+    const {joints,o,world,up,a,b,mid,center,handle,localQ,nextQ,yawQ,color}=scratch;
+    function segment(batch:T.InstancedMesh,i:number,start:T.Vector3,end:T.Vector3,width:number,depth=width) {
+      a.subVectors(end,start);const length=a.length();
+      o.position.copy(start).lerp(end,.5);o.quaternion.setFromUnitVectors(up,a.normalize());
+      o.scale.set(width,length,depth);o.updateMatrix();batch.setMatrixAt(i,o.matrix);
+    }
     courts.forEach((court,index)=>{
-      const t=time.current+index*.713,frame=rallyFrame(t),cos=Math.cos(court.rotation),sin=Math.sin(court.rotation);
-      const world=(x:number,y:number,z:number,out:T.Vector3)=>out.set(court.x+x*cos+z*sin,court.y+y,court.z-x*sin+z*cos);
-      const put=(mesh:T.InstancedMesh,i:number,x:number,y:number,z:number,sx:number,sy:number,sz:number,angle=0)=>{
-        world(x,y,z,o.position);o.rotation.set(0,court.rotation+angle,0);o.scale.set(sx,sy,sz);o.updateMatrix();mesh.setMatrixAt(i,o.matrix);
-      };
+      const frame=rallyFrame(time.current+index*.713),c=Math.cos(court.rotation),s=Math.sin(court.rotation);
       frame.players.forEach((p,side)=>{
-        const i=index*2+side,step=p.moving?Math.sin(t*12)*.22:0;
-        const angle=p.side===1?0:Math.PI;
-        put(torso.current!,i,p.x,1.13,p.z,.48,.65,.31,angle+p.swing*.3);
-        torso.current!.setColorAt(i,color.set(['#e4af38','#457eaa','#d2654d','#74a496'][(index+side)%4]));
-        put(heads.current!,i,p.x,1.65,p.z,.17,.20,.17);
-        const bone=(slot:number,start:number[],end:number[],radius=.07)=>{
-          world(...start as [number,number,number],a);world(...end as [number,number,number],b);
-          o.position.copy(a).add(b).multiplyScalar(.5);const length=a.distanceTo(b);
-          o.quaternion.setFromUnitVectors(up,b.sub(a).normalize());o.scale.set(radius,length,radius);o.updateMatrix();limbs.current!.setMatrixAt(i*4+slot,o.matrix);
-        };
-        for(const s of [-1,1])bone(s<0?0:1,[p.x+s*.13,.87,p.z],[p.x+s*.24,.16,p.z+step*s],.095);
-        const swing=p.swing*1.75,rx=p.x+p.side*(.78*Math.cos(swing)-.12*Math.sin(swing)),rz=p.z+p.side*(-.3-.75*Math.sin(swing)),ry=.99+Math.abs(p.swing)*.35;
-        bone(2,[p.x+p.side*.22,1.4,p.z],[rx,ry,rz],.065);
-        bone(3,[p.x-p.side*.22,1.4,p.z],[p.x-p.side*.4,1.05,p.z-p.side*.25],.065);
-        put(rackets.current!,i,rx,ry,rz,.28,.36,.28,angle+swing);
-        put(grips.current!,i,rx,ry-.4,rz,.035,.32,.035,angle+swing);
+        const i=index*2+side,sample=recordedSample(p.stroke,p.relativeTime),idle=1-sample.weight;
+        const yaw=court.rotation+p.yaw+readyYaw*idle;
+        yawQ.setFromAxisAngle(up,yaw);
+        world.set(court.x+p.x*c+p.z*s,court.y+COURT_SURFACE+.06*p.split*idle,court.z-p.x*s+p.z*c);
+        for(let j=0;j<joints.length;j++) {
+          const joint=joints[j].fromArray(sample.a.j[j]).lerp(b.fromArray(sample.b.j[j]),sample.alpha);
+          joint.lerp(b.fromArray(recordedReady.j[j]),idle);
+          joint.x-=recordedReady.j[0][0]*idle;joint.z-=recordedReady.j[0][2]*idle;
+          joint.applyQuaternion(yawQ).add(world);
+        }
+        const speed=Math.hypot(p.vx,p.vz);
+        if(speed>.02 && idle>.01) for(const [foot,offset] of [[12,0],[15,.5]]) {
+          const phase=(p.distance/1.12+offset)%1;
+          const step=Math.sin(2*Math.PI*phase)*.20*Math.min(1,speed)*idle;
+          joints[foot].x+=step*(p.vx*c+p.vz*s)/speed;joints[foot].z+=step*(p.vz*c-p.vx*s)/speed;
+          joints[foot].y+=Math.max(0,-Math.sin(2*Math.PI*phase))*.09*idle;
+        }
+        mid.copy(joints[4]).lerp(joints[7],.5);
+        segment(torso.current!,i,joints[0],mid,.225,.175);
+        if(initial)torso.current!.setColorAt(i,color.set(kits[(index+side)%kits.length]));
+        o.position.copy(joints[3]).y+=.092;o.quaternion.copy(yawQ);o.scale.set(.098,.13,.11);o.updateMatrix();
+        heads.current!.setMatrixAt(i,o.matrix);
+        limbs.forEach(([from,to],j)=>segment(arms.current!,i*8+j,joints[from],joints[to],j<4?.072:.047));
+        localQ.fromArray(sample.a.q).slerp(nextQ.fromArray(sample.b.q),sample.alpha);
+        localQ.slerp(nextQ.fromArray(recordedReady.q),idle).premultiply(yawQ);
+        center.set(.065,.39,.02).applyQuaternion(localQ).add(joints[9]);
+        o.position.copy(center);o.quaternion.copy(localQ);o.scale.set(.135,.18,.13);o.updateMatrix();rackets.current!.setMatrixAt(i,o.matrix);
+        handle.set(0,-.18,0).applyQuaternion(localQ).add(center);
+        segment(grips.current!,i,joints[9],handle,.017);
       });
-      put(balls.current!,index,...frame.ball,.075,.075,.075);
+      const [x,y,z]=frame.ball;
+      o.position.set(court.x+x*c+z*s,court.y+COURT_SURFACE+y,court.z-x*s+z*c);
+      o.quaternion.identity();o.scale.setScalar(BALL_RADIUS);o.updateMatrix();balls.current!.setMatrixAt(index,o.matrix);
     });
-    for(const mesh of [torso,heads,limbs,rackets,grips,balls]){mesh.current!.instanceMatrix.needsUpdate=true;if(mesh.current!.instanceColor)mesh.current!.instanceColor!.needsUpdate=true;}
+    for(const batch of [torso,heads,arms,rackets,grips,balls])batch.current!.instanceMatrix.needsUpdate=true;
+    if(initial && torso.current.instanceColor)torso.current.instanceColor.needsUpdate=true;
   });
-  const players=courts.length*2;
+  const count=courts.length*2;
   return <group visible={visible}>
-    <instancedMesh ref={torso} args={[undefined,undefined,players]} frustumCulled={false}><boxGeometry/><meshStandardMaterial roughness={.8}/></instancedMesh>
-    <instancedMesh ref={heads} args={[undefined,undefined,players]} frustumCulled={false}><sphereGeometry args={[1,8,6]}/><meshStandardMaterial color="#b98562"/></instancedMesh>
-    <instancedMesh ref={limbs} args={[undefined,undefined,players*4]} frustumCulled={false}><cylinderGeometry args={[1,1,1,6]}/><meshStandardMaterial color="#c39b79"/></instancedMesh>
-    <instancedMesh ref={rackets} args={[undefined,undefined,players]} frustumCulled={false}><torusGeometry args={[1,.075,4,12]}/><meshStandardMaterial color="#d0d6d5"/></instancedMesh>
-    <instancedMesh ref={grips} args={[undefined,undefined,players]} frustumCulled={false}><boxGeometry/><meshStandardMaterial color="#273944"/></instancedMesh>
-    <instancedMesh ref={balls} args={[undefined,undefined,courts.length]} frustumCulled={false}><sphereGeometry args={[1,8,6]}/><meshStandardMaterial color="#dce849" emissive="#7a870e" emissiveIntensity={.25}/></instancedMesh>
+    <instancedMesh ref={torso} args={[undefined,undefined,count]} frustumCulled={false}><cylinderGeometry args={[1,.72,1,8]}/><meshStandardMaterial roughness={.86}/></instancedMesh>
+    <instancedMesh ref={heads} args={[undefined,undefined,count]} frustumCulled={false}><sphereGeometry args={[1,8,6]}/><meshStandardMaterial color="#b78a70"/></instancedMesh>
+    <instancedMesh ref={arms} args={[undefined,undefined,count*8]} frustumCulled={false}><cylinderGeometry args={[.8,1,1,6]}/><meshStandardMaterial color="#b98e72"/></instancedMesh>
+    <instancedMesh ref={rackets} args={[undefined,undefined,count]} frustumCulled={false}><torusGeometry args={[1,.065,4,14]}/><meshStandardMaterial color="#d1d5cb"/></instancedMesh>
+    <instancedMesh ref={grips} args={[undefined,undefined,count]} frustumCulled={false}><cylinderGeometry args={[1,1,1,6]}/><meshStandardMaterial color="#314039"/></instancedMesh>
+    <instancedMesh ref={balls} args={[undefined,undefined,courts.length]} frustumCulled={false}><sphereGeometry args={[1,8,6]}/><meshStandardMaterial color="#d6eb46"/></instancedMesh>
   </group>;
 }

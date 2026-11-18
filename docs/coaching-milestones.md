@@ -108,3 +108,10 @@
 - 类型检查、相关源码 ESLint 及完整生产构建通过，共生成145页。正式版本运行全部九套浏览器检查通过：native、court、session、records、development、pathways、movement、decisions、mental。
 - 新增套件验证能力档案隔离与恢复、路线选择、交互演示、情境反馈、心理训练保存和旧备份兼容；原有四套验证教案搜索、场地编辑、计时和记录未回归。已审查桌面和390px截图。
 - 临时生产预览使用独立构建目录，构建器自动改动的 tsconfig 已恢复，不纳入提交。仓库无远程CI，以上均为本地执行证据。
+
+### 战术板与动作库回放
+
+- [六段采集动作](https://github.com/stevenchendan/Tennis-Agent/pull/17)覆盖发球、正反手底线击球、正反手截击和高压。动作实验室可停在击球帧。
+- [战术板回放](https://github.com/stevenchendan/Tennis-Agent/pull/18)按落点和击球时刻播放单打与双打。教练预览、学生分享链接和战术风格演示共用回放时钟。
+- [Blender 球员工程](https://github.com/stevenchendan/Tennis-Agent/pull/19)保留六段动作及击球标记，可调整模型、球衣和握拍。
+- 1573 主场使用同一球员和球拍，八拍回合覆盖正反手、落地反弹和回位。周边球场使用简化模型。验证步骤和动作来源见[动作系统说明](TENNIS_MOTION_SYSTEM.md)。

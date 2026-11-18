@@ -106,3 +106,9 @@ The tactics board, playing styles, drills and movement lab use a fitted MakeHuma
 Open `frontend/art/match-athlete.blend` in Blender. The packed 50 fps timeline contains six strokes and six contact markers. Each garment can be edited independently. The browser files and source instructions are under `frontend/public/models/tennis`. The director camera opens a service sequence at court level and cuts to the wide court as the ball leaves the racket. Contact review remains available throughout the point.
 
 Run the skinned-motion test on the shipped match mesh and all six pieces of clothing and anatomy. The technical tests establish repeatability and contact alignment. Anatomical review by a tennis coach and performance testing on physical phones remain open.
+
+### Arena rally
+
+The 1573 Arena main court uses the match athlete and the same captured forehand and backhand as the tactics board. Eight alternating contacts define a repeating baseline rally. Each outgoing ball clears the net, lands inside the opposite baseline, slows at the bounce and meets the receiving racket. Players recover towards the middle and settle before the next stroke. The root travel and split steps are authored.
+
+Neighbouring courts sample the same recorded joints at different times. Six instanced mesh batches keep their distant players, rackets and balls visible without loading a full skinned body per player. Run the arena and precinct rally checks from the frontend directory to verify all eight exchanges and the 31-court layout.

@@ -65,9 +65,15 @@ export const playingStyles: PlayingStyle[] = [
 
 export const SHOT_SECONDS = 2.4;
 export function styleTactic(style: PlayingStyle): Tactic {
-  return { v: 1, title: style.name, frames: style.cues.map((note, i) => ({
-    note, players: positions(style, i), paths: [{ from: style.contacts[i], to: style.contacts[i + 1] }],
-  })) };
+  return {v:1,title:style.name,frames:style.cues.map((note,i)=>{
+    const from=style.contacts[i], receive=style.contacts[i+1];
+    const serve=i===0 && (style.id==="big-server" || style.id==="serve-volley");
+    const attack=style.id==="all-court" || style.id==="serve-volley";
+    const incomingVolley=attack && i%2===1 && receive.y>=8;
+    const to=serve ? {x:7.6,y:17} : incomingVolley ? {x:receive.x+(receive.x-from.x)*.11,y:receive.y+(receive.y-from.y)*.11} : {x:receive.x*.88+from.x*.12,y:receive.y*.88+from.y*.12};
+    const stroke=serve ? "serve" : attack && i%2===0 && from.y>=8 ? "volley" : undefined;
+    return {note,players:positions(style,i),paths:[{from,to,stroke}]};
+  })};
 }
 function positions(style: PlayingStyle, index: number): PlayerPos[] {
   return [0, 1].map(side => {

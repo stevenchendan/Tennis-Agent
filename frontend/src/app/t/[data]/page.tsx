@@ -36,7 +36,7 @@ export default function TacticViewPage({ params }: { params: Promise<{ data: str
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8">
+    <main className="mx-auto max-w-6xl px-4 py-6">
       <div className="mb-5 text-center">
         <p className="mb-2 text-xs font-medium tracking-widest text-emerald-400">TENNIS TACTIC</p>
         <h1 className="text-2xl font-bold text-neutral-50">

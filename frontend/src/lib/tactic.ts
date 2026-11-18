@@ -12,7 +12,13 @@ export interface PlayerPos {
   y: number;
 }
 
+export const strokeLabels = {
+  serve: "发球", forehand: "正手底线", backhand: "反手底线",
+  volley: "正手截击", "backhand-volley": "反手截击", overhead: "高压",
+} as const;
+
 export interface BallPath {
+  stroke?: keyof typeof strokeLabels;
   from: Point;
   to: Point;
 }
@@ -154,7 +160,9 @@ export function sanitizeTactic(raw: unknown): Tactic | null {
       const fp = toPoint(from);
       const tp = toPoint(to);
       if (!fp || !tp) return null;
-      st.push({ from: fp, to: tp });
+      const kind = (p as Record<string, unknown>).stroke;
+      const stroke = typeof kind === "string" && Object.hasOwn(strokeLabels, kind) ? kind as BallPath["stroke"] : undefined;
+      st.push(stroke ? { from: fp, to: tp, stroke } : { from: fp, to: tp });
     }
 
     const cleanNote =

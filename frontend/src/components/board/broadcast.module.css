@@ -1,0 +1,13 @@
+.stage{position:relative;isolation:isolate;overflow:hidden;border-radius:12px;background:#142722;height:clamp(320px,54vw,570px);color:#fff}
+.stage canvas{display:block}
+.loading{position:absolute;inset:0;display:grid;place-items:center;background:#132320;color:#e2e8df;font-size:.84rem;z-index:2}
+.score{position:absolute;pointer-events:none;top:16px;left:16px;display:flex;align-items:stretch;overflow:hidden;background:rgba(15,29,28,.93);box-shadow:0 2px 13px #09161032;border-radius:4px;font:600 12px/1.4 system-ui,sans-serif;letter-spacing:.035em}
+.score strong{display:grid;place-items:center;padding:7px 10px;background:#e3e6b3;color:#17231b;font-variant-numeric:tabular-nums}
+.score span{padding:7px 10px}
+.options{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 2px 0}
+.angles{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.options button{border-radius:5px;border:1px solid transparent;background:transparent;padding:6px 10px;font-size:12px;color:#a4afa6;cursor:pointer}
+.options button[aria-pressed=true]{background:#293b33;border-color:#45584a;color:#f2f5d7}
+.options button:focus-visible,.options button:hover{color:white;outline:1px solid #a5b8a2}
+.credits{font-size:10px;color:#a5aea8}
+@media(max-width:600px){.stage{height:clamp(300px,95vw,420px)}.score{top:8px;left:8px}.options{gap:5px}.options button{padding:5px 7px}}

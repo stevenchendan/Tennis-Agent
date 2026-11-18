@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import TacticCourt, { type BoardMode } from "@/components/board/TacticCourt";
-import TacticPlayer from "@/components/board/TacticPlayer";
+import dynamic from "next/dynamic";
 import TemplatePicker from "@/components/board/TemplatePicker";
 import { COURT_THEMES } from "@/lib/court";
 import {
@@ -17,6 +17,7 @@ import {
   MAX_PLAYERS,
   MAX_TITLE_LEN,
   spawnPlayerPos,
+  strokeLabels,
   tacticShareUrl,
   type BallPath,
   type Frame,
@@ -25,6 +26,8 @@ import {
 } from "@/lib/tactic";
 import { templateByKey } from "@/lib/templates";
 import { findStrategies } from "@/lib/strategies";
+
+const TacticPlayer = dynamic(() => import("./TacticPlayer"), {ssr:false});
 
 const DRAFT_KEY = "tactics-board-draft-v1";
 
@@ -314,6 +317,17 @@ export default function BoardEditor() {
           />
         </div>
 
+        {frame.paths.length > 0 && <div className="flex flex-wrap gap-3">
+          {frame.paths.map((path, pi) => <label key={pi} className="flex items-center gap-2 text-xs text-neutral-400">
+            第 {pi+1} 拍
+            <select aria-label={`第 ${pi+1} 拍动作`} value={path.stroke ?? ""} className="rounded-md bg-neutral-900 px-2 py-1.5 text-neutral-100"
+              onChange={e => updateFrame(idx, f => ({...f, paths:f.paths.map((p,j) => j===pi ? {...p, stroke:(e.target.value || undefined) as BallPath["stroke"]}:p)}))}>
+              <option value="">自动判断动作</option>
+              {Object.entries(strokeLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}
+            </select>
+          </label>)}
+        </div>}
+
         {/* frame note */}
         <div className="space-y-1.5">
           <label className="text-xs font-medium text-neutral-500">
@@ -407,7 +421,7 @@ export default function BoardEditor() {
           onClick={() => setPreviewOpen(false)}
         >
           <div
-            className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-950 p-5"
+            className="max-h-[94vh] w-full max-w-6xl overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-950 p-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">

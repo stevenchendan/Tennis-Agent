@@ -1,213 +1,125 @@
 "use client";
+import {Component, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode} from "react";
+import {Canvas, useFrame, useThree} from "@react-three/fiber";
+import {Html, Line, OrbitControls} from "@react-three/drei";
+import * as T from "three";
+import {CX, NET, PLAYER_COLORS, resolveCourtTheme} from "@/lib/court";
+import {strokeLabels, type BallPath} from "@/lib/tactic";
+import {BALL_RADIUS, type ReplayFrame} from "@/lib/tennis-motion/tactical-replay";
+import Athlete from "../drills/Athlete";
+import TrainingCourt from "../drills/TrainingCourt";
+import BroadcastGrounds from "./BroadcastGrounds";
+import styles from "./broadcast.module.css";
 
-import * as THREE from "three";
-import { Canvas } from "@react-three/fiber";
-import { Html, Line, OrbitControls } from "@react-three/drei";
-import {
-  BALL_COLOR,
-  LEN,
-  PAD,
-  PLAYER_COLORS,
-  SINGLES,
-  SVC_FAR,
-  SVC_NEAR,
-  W,
-  resolveCourtTheme,
-} from "@/lib/court";
-import type { BallPath, PlayerPos } from "@/lib/tactic";
-
-export interface Ball3D {
-  /** court coordinates, meters */
-  x: number;
-  y: number;
-  /** synthesized arc height above the ground, meters */
-  z: number;
+const angles = {baseline:"转播机位",sideline:"边线机位",contact:"击球特写",orbit:"自由视角"};
+type Angle = keyof typeof angles;
+function Director({angle,frame}:{angle:Angle;frame:ReplayFrame}) {
+  const {camera,size}=useThree();
+  const sceneCamera=camera as T.PerspectiveCamera;
+  const focus=useMemo(()=>new T.Vector3(),[]);
+  const position=useMemo(()=>new T.Vector3(),[]);
+  const target=useMemo(()=>new T.Vector3(),[]);
+  const mobile=size.width/size.height<1.18;
+  const place=()=>{
+    const shot=frame.shot;
+    if(angle==="contact") {
+      const id=shot?.id ?? frame.players[0]?.id;
+      const player=frame.players.find(p=>p.id===id) ?? frame.players[0];
+      const high=shot?.kind==="serve" || shot?.kind==="overhead";
+      focus.set(player.x-CX,high?1.43:1.05,player.y-NET);
+      const side=player.y<NET?-1:1;
+      position.set(focus.x+side*5.45,1.74,focus.z+side*3.65);
+      target.copy(focus);
+      sceneCamera.fov=mobile?39:32;
+    } else if(angle==="sideline") {
+      position.set(mobile?36:26,9.4,3.4);target.set(0,.65,0);
+      sceneCamera.fov=mobile?48:43;
+    } else {
+      const follow=frame.ball ? (frame.ball.x-CX)*.075:0;
+      position.set(1.4,mobile?9.5:7.3,mobile?-27:-24);
+      target.set(follow,.55,-1.55);
+      sceneCamera.fov=mobile?46:38;
+    }
+    sceneCamera.position.copy(position);
+    sceneCamera.lookAt(target);sceneCamera.updateProjectionMatrix();
+  };
+  useFrame(()=>{if(angle!=="orbit")place();});
+  return angle==="orbit"?<OrbitControls makeDefault target={[0,.6,0]} minDistance={3} maxDistance={52} maxPolarAngle={Math.PI*.486} enableDamping/>:null;
 }
 
-// court (x, y) → centered world coords; the near player ends up at -z,
-// matching a broadcast camera placed behind them.
-const tx = (x: number) => x - W / 2;
-const tz = (y: number) => y - LEN / 2;
-
-const LINE_Y = 0.02;
-const LINE_W = 0.06;
-
-/** White lines as thin raised boxes: [sizeX, sizeZ, posX, posZ]. */
-function lineBoxes(): [number, number, number, number][] {
-  const cx3 = 0;
-  const halfW = W / 2;
-  const singlesL = -(halfW - SINGLES);
-  const singlesR = halfW - SINGLES;
-  const svcNearZ = tz(SVC_NEAR);
-  const svcFarZ = tz(SVC_FAR);
-  return [
-    // sidelines + doubles lines (run along z)
-    [LINE_W, LEN, -halfW, 0],
-    [LINE_W, LEN, halfW, 0],
-    [LINE_W, LEN, singlesL, 0],
-    [LINE_W, LEN, singlesR, 0],
-    // baselines (run along x)
-    [W, LINE_W, cx3, -LEN / 2],
-    [W, LINE_W, cx3, LEN / 2],
-    // service lines + center service line
-    [W - 2 * SINGLES, LINE_W, cx3, svcNearZ],
-    [W - 2 * SINGLES, LINE_W, cx3, svcFarZ],
-    [LINE_W, SVC_FAR - SVC_NEAR, cx3, (svcNearZ + svcFarZ) / 2],
-  ];
-}
-
-function Net({ bandColor }: { bandColor: string }) {
-  const netW = W + 0.9;
-  return (
-    <group>
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * (W / 2 + 0.45), 0.53, 0]}>
-          <cylinderGeometry args={[0.06, 0.06, 1.06, 12]} />
-          <meshStandardMaterial color="#1a1a22" />
-        </mesh>
-      ))}
-      {/* net body */}
-      <mesh position={[0, 0.46, 0]}>
-        <boxGeometry args={[netW, 0.92, 0.02]} />
-        <meshStandardMaterial color="#101319" transparent opacity={0.55} />
-      </mesh>
-      {/* white band + center strap */}
-      <mesh position={[0, 0.945, 0]}>
-        <boxGeometry args={[netW, 0.07, 0.03]} />
-        <meshStandardMaterial color={bandColor} />
-      </mesh>
-      <mesh position={[0, 0.46, 0]}>
-        <boxGeometry args={[0.07, 0.92, 0.035]} />
-        <meshStandardMaterial color={bandColor} />
-      </mesh>
+function TennisBall({frame}:{frame:ReplayFrame}) {
+  const ball=frame.ball;
+  const seams=useMemo(()=>{
+    const points=Array.from({length:65},(_,i)=>{
+      const a=i*Math.PI/32, lat=.55*Math.cos(2*a);
+      return new T.Vector3(Math.cos(lat)*Math.cos(a),Math.sin(lat),Math.cos(lat)*Math.sin(a)).multiplyScalar(BALL_RADIUS);
+    });
+    return new T.TubeGeometry(new T.CatmullRomCurve3(points,true),64,.00125,4,true);
+  },[]);
+  useEffect(()=>()=>seams.dispose(),[seams]);
+  if(!ball) return null;
+  return <>
+    <mesh position={[ball.x,.011,ball.y]} rotation={[-Math.PI/2,0,0]} scale={1+ball.z*.32}>
+      <circleGeometry args={[.055,20]}/><meshBasicMaterial color="#102a19" transparent opacity={.36/(1+ball.z)} depthWrite={false}/>
+    </mesh>
+    <group position={[ball.x,ball.z,ball.y]}>
+      <group rotation={[frame.time*26,.35,frame.time*4]}>
+        <mesh castShadow><sphereGeometry args={[BALL_RADIUS,18,14]}/><meshStandardMaterial color="#d7f443" roughness={.96} emissive="#a3bd22" emissiveIntensity={.19}/></mesh>
+        <mesh geometry={seams}><meshStandardMaterial color="#feffb7"/></mesh>
+      </group>
+      <sprite scale={[.095,.095,1]}><spriteMaterial map={undefined} color="#edff76" opacity={.12} transparent depthWrite={false}/></sprite>
     </group>
-  );
+  </>;
 }
 
-function PlayerMarker({ player }: { player: PlayerPos }) {
-  const color = PLAYER_COLORS[player.id] ?? "#e7efe9";
-  return (
-    <group position={[tx(player.x), 0, tz(player.y)]}>
-      {/* soft contact shadow */}
-      <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.42, 24]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.28} />
-      </mesh>
-      <mesh position={[0, 0.78, 0]}>
-        <capsuleGeometry args={[0.32, 0.6, 8, 16]} />
-        <meshStandardMaterial color={color} roughness={0.55} />
-      </mesh>
-      <Html center distanceFactor={16} position={[0, 1.55, 0]} style={{ pointerEvents: "none" }}>
-        <div
-          style={{
-            padding: "2px 8px",
-            borderRadius: 999,
-            background: "rgba(10,15,13,0.85)",
-            color,
-            fontSize: 13,
-            fontWeight: 700,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {`P${player.id}`}
-        </div>
-      </Html>
-    </group>
-  );
+function SceneReady({onReady}:{onReady:()=>void}) {
+  useLayoutEffect(()=>{onReady();},[onReady]);
+  return null;
 }
 
-/**
- * Read-only 3D playback court (editor stays 2D top-down on purpose).
- * Receives the same interpolated state the SVG court gets; the ball flies
- * along a synthesized arc whose height scales with shot distance.
- */
-export default function TacticCourt3D({
-  theme,
-  players,
-  paths,
-  ball,
-  height = 560,
-  cameraPosition = [0, 13, 15],
-}: {
-  theme?: string;
-  players: PlayerPos[];
-  paths: BallPath[];
-  ball: Ball3D | null;
-  height?: number;
-  cameraPosition?: [number, number, number];
+class SceneBoundary extends Component<{children:ReactNode;fallback:ReactNode},{failed:boolean}> {
+  state={failed:false};
+  static getDerivedStateFromError(){return {failed:true};}
+  render(){return this.state.failed?this.props.fallback:this.props.children;}
+}
+
+export default function TacticCourt3D({theme,frame,paths,frameCount,onReady,onFlat}:{
+  theme?:string;frame:ReplayFrame;paths:BallPath[];frameCount:number;onReady:()=>void;onFlat:()=>void;
 }) {
-  const t = resolveCourtTheme(theme);
-  const lines = lineBoxes();
-
-  return (
-    <div style={{ height }} className="w-full">
-      <Canvas camera={{ position: cameraPosition, fov: 40 }} dpr={[1, 2]}>
-        <ambientLight intensity={0.9} />
-        <directionalLight position={[6, 14, 8]} intensity={1.3} />
-
-        {/* run-off + surface */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.008, 0]}>
-          <planeGeometry args={[W + 2 * PAD + 4, LEN + 2 * PAD + 6]} />
-          <meshStandardMaterial color={t.outer} />
-        </mesh>
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[W, LEN]} />
-          <meshStandardMaterial color={t.inner} />
-        </mesh>
-
-        {/* lines */}
-        {lines.map(([sx, sz, px, pz], i) => (
-          <mesh key={i} position={[px, LINE_Y, pz]}>
-            <boxGeometry args={[sx, 0.015, sz]} />
-            <meshStandardMaterial color={t.line} />
-          </mesh>
-        ))}
-
-        <Net bandColor={t.net} />
-
-        {/* current frame shot paths: dashed line + landing ring */}
-        {paths.map((p, i) => (
-          <group key={i}>
-            <Line
-              points={[
-                [tx(p.from.x), 0.07, tz(p.from.y)],
-                [tx(p.to.x), 0.07, tz(p.to.y)],
-              ]}
-              color={BALL_COLOR}
-              lineWidth={2}
-              dashed
-              dashSize={0.4}
-              gapSize={0.28}
-              transparent
-              opacity={0.8}
-            />
-            <mesh position={[tx(p.to.x), 0.04, tz(p.to.y)]} rotation={[-Math.PI / 2, 0, 0]}>
-              <ringGeometry args={[0.16, 0.27, 32]} />
-              <meshBasicMaterial color={BALL_COLOR} transparent opacity={0.85} side={THREE.DoubleSide} />
-            </mesh>
+  const [angle,setAngle]=useState<Angle>("baseline");
+  const [guides,setGuides]=useState(false);
+  const [ready,setReady]=useState(false);
+  const notified=useRef(false);
+  const markReady=useMemo(()=>()=>{setReady(true);if(!notified.current){onReady();notified.current=true;}},[onReady]);
+  const fallback=<button className={styles.loading} onClick={onFlat}>无法显示 3D 球场 · 打开 2D 回放</button>;
+  return <>
+    <div className={styles.stage} aria-label="3D 战术回放">
+      <SceneBoundary fallback={fallback}><Canvas shadows={{type:T.PCFShadowMap}} dpr={[1,1.6]} camera={{position:[1.4,7.3,-24],fov:38,near:.09,far:230}}
+        gl={{antialias:true,powerPreference:"high-performance",toneMapping:T.ACESFilmicToneMapping,toneMappingExposure:1.04}} fallback={fallback}>
+        <Suspense fallback={null}>
+          <BroadcastGrounds/>
+          <group position={[-CX,0,-NET]}>
+            <TrainingCourt theme={resolveCourtTheme(theme)}/>
+            {frame.players.map(p=><group key={p.id}>
+              <Athlete color={PLAYER_COLORS[p.id]??"#eee8d5"} pose={p.pose}/>
+              {guides && <Html center position={[p.x,2.05,p.y]} zIndexRange={[5,0]} style={{pointerEvents:"none",whiteSpace:"nowrap",font:"bold 11px sans-serif",color:"#fff",background:"#152b26cc",borderRadius:4,padding:"2px 6px"}}>P{p.id}</Html>}
+            </group>)}
+            <TennisBall frame={frame}/>
+            {guides && paths.map((path,i)=><group key={i}>
+              <Line points={[[path.from.x,.025,path.from.y],[path.to.x,.025,path.to.y]]} color="#f3ec99" dashed dashSize={.25} gapSize={.18} transparent opacity={.72}/>
+              <mesh position={[path.to.x,.023,path.to.y]} rotation={[-Math.PI/2,0,0]}><ringGeometry args={[.19,.25,48]}/><meshBasicMaterial color="#e5e88f" transparent opacity={.82}/></mesh>
+            </group>)}
           </group>
-        ))}
-
-        {players.map((p) => (
-          <PlayerMarker key={p.id} player={p} />
-        ))}
-
-        {ball && (
-          <mesh position={[tx(ball.x), Math.max(ball.z, 0.16), tz(ball.y)]}>
-            <sphereGeometry args={[0.14, 24, 24]} />
-            <meshStandardMaterial color={BALL_COLOR} emissive={BALL_COLOR} emissiveIntensity={0.35} />
-          </mesh>
-        )}
-
-        <OrbitControls
-          enablePan={false}
-          minDistance={9}
-          maxDistance={36}
-          minPolarAngle={0.12}
-          maxPolarAngle={1.32}
-          target={[0, 0, 0]}
-        />
-      </Canvas>
+          <Director angle={angle} frame={frame}/>
+          <SceneReady onReady={markReady}/>
+        </Suspense>
+      </Canvas></SceneBoundary>
+      {!ready && <div className={styles.loading} style={{pointerEvents:"none",background:"transparent",alignItems:"start",paddingTop:32}}>准备球场与球员…</div>}
+      {ready && <div className={styles.score}><strong>{String(frame.frameIndex+1).padStart(2,"0")} / {String(frameCount).padStart(2,"0")}</strong><span>{frame.shot ? ((frame.shot.id!==undefined?`P${frame.shot.id} · `:"")+strokeLabels[frame.shot.kind]) : "站位与回位"}</span></div>}
     </div>
-  );
+    <div className={styles.options}>
+      <div className={styles.angles} aria-label="回放机位">{(Object.keys(angles) as Angle[]).map(a=><button key={a} aria-pressed={a===angle} onClick={()=>setAngle(a)}>{angles[a]}</button>)}</div>
+      <div className={styles.angles}><button aria-pressed={guides} onClick={()=>setGuides(v=>!v)}>战术标注</button><a className={styles.credits} href="/models/tennis/BROADCAST-CREDITS.md" target="_blank" rel="noreferrer">素材署名</a></div>
+    </div>
+  </>;
 }

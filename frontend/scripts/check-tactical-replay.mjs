@@ -53,9 +53,9 @@ for (const item of items) {
       const trail=[...trace.before,...trace.after.slice(1)];
       const clip=clipData[shot.kind];
       let point=0;
-      for(let i=0;i<clip.poses.length;i++) {
-        const relative=i*clip.dt-clip.contact,seconds=shot.hit+relative;
-        if(relative<-.38 || relative>.32 || seconds<0 || seconds>replay.duration) continue;
+      for(let i=0;i<clip.trail.points.length;i++) {
+        const relative=clip.trail.start+i*clip.trail.dt,seconds=shot.hit+relative;
+        if(seconds<0 || seconds>replay.duration) continue;
         const actor=sampleReplay(replay,seconds).players.find(p=>p.id===shot.id);
         if(!actor || actor.pose.stroke!==shot.kind || Math.abs(actor.pose.relativeTime-relative)>.0001) continue;
         rig.pose(actor.pose);

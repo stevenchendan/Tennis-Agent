@@ -116,7 +116,29 @@ for(const [kind, {contact, lead}] of Object.entries(strokes)) {
   const floor=Math.min(lowestSole, Math.min(...poses.map(p=>p.foot))-.035);
   const localShift=new T.Vector3(0,floor,0).divide(byName.Hips.parent.getWorldScale(new T.Vector3()));
   for(const p of poses){p.j=p.j.map(v=>round([v[0],v[1]-floor,v[2]]));p.r=round([p.r[0],p.r[1]-floor,p.r[2]]);p.h=round(new T.Vector3(...p.h).sub(localShift).toArray());p.b=p.b.map(round);p.q=round(p.q);delete p.foot;}
-  library[kind]={socket:round(calibration.handInRacket.clone().invert().toArray()),dt:.02,contact:+(contact-first*.02).toFixed(2),poses};
+  // Draw subframe positions from the same interpolated arm chain as the
+  // runtime. A 50 Hz chord can cut across a fast service loop by centimetres.
+  const clipContact=+(contact-first*.02).toFixed(2);
+  const socket=calibration.handInRacket.clone().invert();
+  const armChain=bones.map((bone,index)=>({bone,index})).filter(({bone})=>{
+    for(let p=byName.RightHand;p;p=p.parent) if(p===bone) return true;
+    return false;
+  });
+  const trail={start:-.38,dt:.005,points:[]};
+  for(let step=0;step<=140;step++) {
+    const sampleIndex=Math.round((clipContact+trail.start+step*trail.dt)*200)/4;
+    const frame=Math.floor(sampleIndex), fraction=sampleIndex-frame;
+    const a=poses[frame], b=poses[frame+1];
+    for(const {bone,index} of armChain) {
+      bone.quaternion.fromArray(a.b[index]).slerp(new T.Quaternion(...b.b[index]),fraction);
+    }
+    byName.Hips.position.fromArray(a.h).lerp(new T.Vector3(...b.h),fraction);
+    const hand=worldQuaternion(byName.RightHand).normalize();
+    const tip=worldPosition(byName.RightHand).add(palm.clone().applyQuaternion(hand))
+      .add(new T.Vector3(0,equipment.centerFromPalm+equipment.tipFromCenter,0).applyQuaternion(hand.multiply(socket)));
+    trail.points.push(round(tip.toArray()));
+  }
+  library[kind]={socket:round(socket.toArray()),dt:.02,contact:clipContact,poses,trail};
   console.log(kind,poses.length,'frames, contact',poses[Math.round(library[kind].contact/.02)].r);
 }
 fs.writeFileSync(new URL('../src/lib/drills/recorded-motion.json',import.meta.url),JSON.stringify(library));
